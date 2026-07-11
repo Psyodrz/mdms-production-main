@@ -224,7 +224,7 @@ function Hero({ hero, onOpenModal }: { hero?: any; onOpenModal?: (project: Proje
             poster="/images/about-hero.jpg"
             preload="auto"
           >
-            <source src="/videos/hero.mp4" type="video/mp4" />
+            <source src="https://zmpeiobdilrgtuzggzuj.supabase.co/storage/v1/object/public/mp-cms/hero.mp4" type="video/mp4" />
           </video>
         </div>
         <div className="absolute inset-0 dark:bg-black/65 bg-black/45 pointer-events-none" />
