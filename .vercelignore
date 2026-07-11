@@ -1,0 +1,13 @@
+# Vercel Ignore File
+node_modules/
+.git/
+.git-old/
+.turbo/
+.next/
+dist/
+VIdeos/
+PHottos/
+apps/web/public/videos/
+*.tar.gz
+*.pem
+credentials.txt
