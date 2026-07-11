@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: mdms_dev_db
+    environment:
+      POSTGRES_USER: mdms
+      POSTGRES_PASSWORD: mdms_dev_password
+      POSTGRES_DB: mdms_dev
+    ports:
+      - "15432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: mdms_dev_redis
+    ports:
+      - "16379:6379"
+    volumes:
+      - redisdata:/data
+    restart: unless-stopped
+
+  minio:
+    image: minio/minio
+    container_name: mdms_dev_minio
+    environment:
+      MINIO_ROOT_USER: mdms_access_key
+      MINIO_ROOT_PASSWORD: mdms_secret_key
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - miniodata:/data
+    command: server /data --console-address ":9001"
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  redisdata:
+  miniodata:

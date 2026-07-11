@@ -1,0 +1,35 @@
+import { redirect } from 'next/navigation';
+import { PortalNavbar } from '@/components/ui/PortalNavbar';
+import { auth } from '@/auth';
+import { TalentRegistrationWizard } from '@/components/talent-registration/TalentRegistrationWizard';
+import { serverFetchAPI } from '@/lib/server-api-client';
+
+export default async function SetupTalentProfilePage() {
+  const session = await auth();
+  if (!session?.user?.id || session.user.role !== 'TALENT') {
+    redirect('/login');
+  }
+
+  // Double check if profile already exists. If yes, redirect to dashboard.
+  try {
+    const data = await serverFetchAPI(`/talent/me`, { next: { revalidate: 0 } });
+    if (data) {
+      redirect('/talent-dashboard');
+    }
+  } catch (error: any) {
+    // Expected to fail with 404 if profile doesn't exist
+    if (!error.message || !error.message.includes('404')) {
+      // Unhandled error
+      console.error('Error checking profile existence:', error);
+    }
+  }
+
+  return (
+    <>
+      <PortalNavbar role="TALENT" />
+      <main className="min-h-screen bg-background pt-32 pb-16">
+        <TalentRegistrationWizard />
+      </main>
+    </>
+  );
+}

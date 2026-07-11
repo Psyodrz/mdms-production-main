@@ -1,0 +1,17 @@
+export enum Permission {
+  // Content
+  MANAGE_BLOG       = 'MANAGE_BLOG',
+  MANAGE_PORTFOLIO  = 'MANAGE_PORTFOLIO',
+  MANAGE_TEAM       = 'MANAGE_TEAM',
+  MANAGE_TESTIMONIALS = 'MANAGE_TESTIMONIALS',
+  MANAGE_CONFIG     = 'MANAGE_CONFIG',       // site config — SUPER_ADMIN only
+
+  // Users
+  MANAGE_USERS      = 'MANAGE_USERS',
+  ASSIGN_SUPER_ADMIN = 'ASSIGN_SUPER_ADMIN', // SUPER_ADMIN only
+
+  // System
+  VIEW_AUDIT_LOGS   = 'VIEW_AUDIT_LOGS',
+  PURGE_RECYCLE_BIN = 'PURGE_RECYCLE_BIN',  // permanent delete — SUPER_ADMIN only
+  RESET_MFA         = 'RESET_MFA',           // SUPER_ADMIN only
+}

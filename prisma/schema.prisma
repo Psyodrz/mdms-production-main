@@ -1,0 +1,1194 @@
+// ============================================
+// MDMS — Prisma Schema
+// Media & Digital Management System
+// PostgreSQL 15+ — Full Phase 1 Schema
+// ============================================
+
+generator client {
+  provider = "prisma-client-js"
+  // output   = "../apps/api/node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ── Enums ───────────────────────────────────
+
+enum Role {
+  GUEST
+  CLIENT
+  TALENT
+  EDITOR
+  EMPLOYEE
+  PROJECT_MANAGER
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum TalentProfileStatus {
+  DRAFT
+  PENDING_REVIEW
+  ACTIVE
+  SUSPENDED
+  DEACTIVATED
+}
+
+enum BookingStatus {
+  INQUIRY
+  QUOTE_SENT
+  CONFIRMED
+  RESCHEDULED
+  CANCELLED
+  COMPLETED
+}
+
+enum ProjectStatus {
+  BOOKED
+  PRE_PRODUCTION
+  SHOOT
+  EDITING
+  REVIEW
+  REVISION
+  DELIVERED
+  COMPLETED
+  ON_HOLD
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+enum PaymentType {
+  ADVANCE
+  FULL
+  MILESTONE
+  REFUND
+}
+
+enum VersionStatus {
+  UPLOADED
+  IN_REVIEW
+  APPROVED
+  REVISION_REQUESTED
+}
+
+enum CastingCallStatus {
+  DRAFT
+  PUBLISHED
+  CLOSED
+  EXPIRED
+}
+
+enum CastingApplicationStatus {
+  APPLIED
+  SHORTLISTED
+  SELECTED
+  NOT_SELECTED
+}
+
+enum HireRequestStatus {
+  NEW
+  IN_DISCUSSION
+  CONFIRMED
+  DECLINED
+}
+
+enum NotificationChannel {
+  IN_APP
+  EMAIL
+  WHATSAPP
+  PUSH
+}
+
+enum ExpenseStatus {
+  SUBMITTED
+  APPROVED
+  REJECTED
+  PAID
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum RenderJobStatus {
+  QUEUED
+  PROCESSING
+  DONE
+  FAILED
+}
+
+enum BlogPostStatus {
+  DRAFT
+  PUBLISHED
+  SCHEDULED
+  ARCHIVED
+}
+
+// ── Core: User ──────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  phone         String?   @unique
+  passwordHash  String?
+  role          Role      @default(CLIENT)
+  firstName     String
+  lastName      String
+  dateOfBirth   DateTime?
+  gender        String?
+  country       String?
+  state         String?
+  city          String?
+  avatarUrl     String?
+  isActive      Boolean   @default(true)
+  mfaEnabled    Boolean   @default(false)
+  mfaSecret     String?
+  lastLoginAt   DateTime?
+  loginAttempts Int       @default(0)
+  lockedUntil   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  client                 Client?
+  talentProfile          TalentProfile?
+  employee               Employee?
+  sessions               Session[]
+  notifications          Notification[]
+  auditLogs              AuditLog[]     @relation("AuditActor")
+  comments               Comment[]
+  versions               Version[]
+  assignedProjectsPM     Project[]      @relation("ProjectPM")
+  assignedProjectsEditor Project[]      @relation("ProjectEditors")
+  sentMessages           Message[]      @relation("MessageSender")
+  whatsappLogs           WhatsAppLog[]
+  mediaAssets            MediaAsset[]   @relation("UserMediaAssets")
+
+  @@index([email])
+  @@index([role])
+  @@index([phone])
+}
+
+// ── Sessions ────────────────────────────────
+
+model Session {
+  id           String   @id @default(cuid())
+  userId       String
+  refreshToken String   @unique
+  userAgent    String?
+  ipAddress    String?
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+// ── Client ──────────────────────────────────
+
+model Client {
+  id               String   @id @default(cuid())
+  userId           String   @unique
+  companyName      String?
+  gstin            String?
+  preferredContact String?  @default("whatsapp")
+  address          String?
+  city             String?
+  state            String?
+  lifetimeValue    Int      @default(0) // in paise
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bookings Booking[]
+}
+
+// ── Talent Profile ──────────────────────────
+
+model TalentProfile {
+  id              String              @id @default(cuid())
+  userId          String              @unique
+  slug            String              @unique
+  bio             String?             @db.VarChar(1000)
+  stageName       String?
+  experienceLevel String? // e.g. "Fresher", "1-3 Years"
+  status          TalentProfileStatus @default(DRAFT)
+  reviewNote      String?
+
+  // Cover & Media
+  coverBannerUrl      String?
+  coverBannerType     String?   @default("image") // image or video
+  introductionVideoUrl String?
+  resumeUrl           String?
+  compCardUrl         String?
+  portfolioPdfUrl     String?
+
+  // Professional Details
+  achievements    Json?   // [{title, description, year}]
+  awards          Json?   // [{title, organization, year}]
+  education       Json?   // [{institution, degree, year}]
+  certifications  Json?   // [{name, issuer, year}]
+  projects        Json?   // [{title, role, client, year, description}]
+  brandsWorkedWith String[]
+
+  // Onboarding State
+  onboardingStep      Int     @default(1)
+  onboardingCompleted Boolean @default(false)
+  draftData           Json?   // Stores partial wizard state for resume
+
+  // Metrics
+  projectCount Int       @default(0)
+  profileViews Int       @default(0)
+  busyUntil    DateTime?
+
+  // Timestamps
+  approvedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  user                User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  castingApplications CastingApplication[]
+  hireRequests        HireRequest[]
+  pastProjects        TalentProjectTag[]
+
+  // Dynamic Relations
+  userTalents         UserTalent[]
+  userSpecializations UserSpecialization[]
+  userSkills          UserSkill[]
+  userLanguages       UserLanguage[]
+  socialLinks         SocialLink[]
+  portfolioMedia      PortfolioMedia[]
+  availability        TalentAvailability?
+  pricing             TalentPricing?
+
+  @@index([status])
+  @@index([slug])
+}
+
+// Tag linking talent to completed projects
+model TalentProjectTag {
+  id        String   @id @default(cuid())
+  talentId  String
+  projectId String
+  role      String? // e.g. "Lead Model", "Supporting Actor"
+  createdAt DateTime @default(now())
+
+  talent  TalentProfile @relation(fields: [talentId], references: [id], onDelete: Cascade)
+  project Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([talentId, projectId])
+}
+
+// ── Casting Calls ───────────────────────────
+
+model CastingCall {
+  id                  String            @id @default(cuid())
+  title               String
+  description         String            @db.Text
+  projectType         String // Reel, Brand Shoot, Competition, Production
+  requirements        Json? // age, look, skills, etc.
+  city                String?
+  shootDate           DateTime?
+  location            String?
+  compensationType    String? // Paid, Unpaid, TBD
+  compensationDetails String?
+  slotsAvailable      Int               @default(1)
+  deadline            DateTime?
+  status              CastingCallStatus @default(DRAFT)
+  createdById         String
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+
+  applications CastingApplication[]
+  categories   CastingCallCategory[]
+
+  @@index([status, deadline])
+}
+
+model CastingApplication {
+  id            String                   @id @default(cuid())
+  talentId      String
+  castingCallId String
+  status        CastingApplicationStatus @default(APPLIED)
+  message       String?
+  reviewNote    String?
+  createdAt     DateTime                 @default(now())
+  updatedAt     DateTime                 @updatedAt
+
+  talent      TalentProfile @relation(fields: [talentId], references: [id], onDelete: Cascade)
+  castingCall CastingCall   @relation(fields: [castingCallId], references: [id], onDelete: Cascade)
+
+  @@unique([talentId, castingCallId])
+  @@index([castingCallId, status])
+}
+
+// ── Hire Requests (Public) ──────────────────
+
+model HireRequest {
+  id               String            @id @default(cuid())
+  talentId         String
+  requesterName    String
+  requesterPhone   String
+  requesterEmail   String
+  projectType      String
+  city             String?
+  dateNeeded       DateTime?
+  budgetRange      String?
+  briefDescription String            @db.Text
+  status           HireRequestStatus @default(NEW)
+  adminNote        String?
+  trackingSlug     String            @unique @default(cuid())
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  talent TalentProfile @relation(fields: [talentId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@index([talentId])
+}
+
+// ── Services ────────────────────────────────
+
+model Service {
+  id            String   @id @default(cuid())
+  name          String
+  slug          String   @unique
+  description   String   @db.Text
+  shortDesc     String?
+  category      String
+  basePrice     Int // in paise
+  features      Json? // feature list for pricing cards
+  addOns        Json? // available add-ons with multipliers
+  isActive      Boolean  @default(true)
+  sortOrder     Int      @default(0)
+  imageUrl      String?
+  maxConcurrent Int      @default(2) // max bookings per day for this service
+  bufferMinutes Int      @default(120) // buffer between bookings
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  deletedAt     DateTime?
+
+  bookings Booking[]
+
+  @@index([isActive, sortOrder])
+}
+
+// ── Bookings ────────────────────────────────
+
+model Booking {
+  id                  String        @id @default(cuid())
+  clientId            String
+  serviceId           String
+  date                DateTime
+  startTime           String? // HH:mm
+  endTime             String? // HH:mm
+  status              BookingStatus @default(INQUIRY)
+  projectBrief        String?       @db.Text
+  specialRequirements String?       @db.Text
+  addOns              Json?
+  quoteAmount         Int? // in paise
+  advanceAmount       Int? // in paise
+  advancePercent      Int           @default(30)
+  quotePdfUrl         String?
+  quoteExpiresAt      DateTime?
+  confirmedAt         DateTime?
+  cancelledAt         DateTime?
+  cancellationReason  String?
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+
+  client  Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  service Service  @relation(fields: [serviceId], references: [id])
+  project Project?
+
+  @@index([status, date])
+  @@index([clientId])
+  @@index([date])
+}
+
+// ── Projects ────────────────────────────────
+
+model Project {
+  id              String        @id @default(cuid())
+  bookingId       String        @unique
+  name            String
+  status          ProjectStatus @default(BOOKED)
+  pmId            String?
+  shootDate       DateTime?
+  shootLocation   String?
+  editDeadline    DateTime?
+  reviewDeadline  DateTime?
+  deliveryDate    DateTime?
+  briefPdfUrl     String?
+  callSheetPdfUrl String?
+  equipmentNotes  String?       @db.Text
+  internalNotes   String?       @db.Text
+  completedAt     DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  booking    Booking            @relation(fields: [bookingId], references: [id])
+  pm         User?              @relation("ProjectPM", fields: [pmId], references: [id])
+  editors    User[]             @relation("ProjectEditors")
+  payments   Payment[]
+  versions   Version[]
+  comments   Comment[]
+  messages   Message[]
+  renderJobs RenderJob[]
+  milestones Milestone[]
+  tasks      Task[]
+  talentTags TalentProjectTag[]
+
+  @@index([status])
+  @@index([pmId])
+  @@index([shootDate])
+}
+
+// ── Milestones ──────────────────────────────
+
+model Milestone {
+  id        String   @id @default(cuid())
+  projectId String
+  title     String
+  dueDate   DateTime
+  completed Boolean  @default(false)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, dueDate])
+}
+
+// ── Tasks ───────────────────────────────────
+
+model Task {
+  id            String    @id @default(cuid())
+  projectId     String?
+  assigneeId    String?
+  title         String
+  description   String?   @db.Text
+  priority      String    @default("medium") // low, medium, high, urgent
+  status        String    @default("pending") // pending, in_progress, completed
+  dueDate       DateTime?
+  proofPhotoUrl String?
+  completedAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  project Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  @@index([projectId])
+  @@index([assigneeId, status])
+}
+
+// ── Payments ────────────────────────────────
+
+model Payment {
+  id                String        @id @default(cuid())
+  projectId         String
+  razorpayOrderId   String?       @unique
+  razorpayPaymentId String?       @unique
+  amount            Int // in paise
+  currency          String        @default("INR")
+  type              PaymentType
+  status            PaymentStatus @default(PENDING)
+  gatewayResponse   Json?
+  refundReason      String?
+  refundAmount      Int? // in paise (for partial refunds)
+  paidAt            DateTime?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  project Project  @relation(fields: [projectId], references: [id])
+  invoice Invoice?
+
+  @@index([status])
+  @@index([projectId])
+  @@index([razorpayOrderId])
+}
+
+// ── Invoices ────────────────────────────────
+
+model Invoice {
+  id            String   @id @default(cuid())
+  paymentId     String   @unique
+  invoiceNumber String   @unique // MPINV-{YYYY}-{0001}
+  subtotal      Int // in paise
+  gstRate       Int      @default(18) // percentage
+  gstAmount     Int // in paise
+  totalAmount   Int // in paise
+  pdfUrl        String?
+  issuedAt      DateTime @default(now())
+  createdAt     DateTime @default(now())
+
+  payment Payment @relation(fields: [paymentId], references: [id])
+
+  @@index([invoiceNumber])
+}
+
+// ── Versions (Editor Uploads) ───────────────
+
+model Version {
+  id            String        @id @default(cuid())
+  projectId     String
+  uploadedById  String
+  versionNumber Int
+  fileUrl       String // S3 key
+  fileName      String
+  fileSize      BigInt // bytes
+  fileType      String
+  status        VersionStatus @default(UPLOADED)
+  editorNotes   String?       @db.Text
+  isWatermarked Boolean       @default(true)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  project    Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  uploadedBy User      @relation(fields: [uploadedById], references: [id])
+  comments   Comment[]
+
+  @@index([projectId, versionNumber])
+}
+
+// ── Comments (Timestamp Feedback) ───────────
+
+model Comment {
+  id           String   @id @default(cuid())
+  projectId    String
+  versionId    String?
+  authorId     String
+  content      String   @db.Text
+  timestampSec Float? // video timestamp in seconds
+  resolved     Boolean  @default(false)
+  isInternal   Boolean  @default(false) // editor-only notes
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  project Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  version Version? @relation(fields: [versionId], references: [id], onDelete: SetNull)
+  author  User     @relation(fields: [authorId], references: [id])
+
+  @@index([projectId])
+  @@index([versionId])
+}
+
+// ── Messages (In-Platform Chat) ─────────────
+
+model Message {
+  id        String   @id @default(cuid())
+  projectId String
+  senderId  String
+  content   String   @db.Text
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  sender  User    @relation("MessageSender", fields: [senderId], references: [id])
+
+  @@index([projectId, createdAt])
+}
+
+// ── Render Jobs ─────────────────────────────
+
+model RenderJob {
+  id          String          @id @default(cuid())
+  projectId   String
+  inputFile   String // S3 key
+  outputFile  String? // S3 key
+  status      RenderJobStatus @default(QUEUED)
+  progress    Int             @default(0) // 0-100
+  errorLog    String?         @db.Text
+  startedAt   DateTime?
+  completedAt DateTime?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, status])
+}
+
+// ── Employee ────────────────────────────────
+
+model Employee {
+  id             String    @id @default(cuid())
+  userId         String    @unique
+  designation    String?
+  department     String?
+  joiningDate    DateTime?
+  emergencyPhone String?
+  address        String?
+  city           String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  attendance    Attendance[]
+  expenseClaims ExpenseClaim[]
+  leaveRequests LeaveRequest[]
+}
+
+// ── Attendance ──────────────────────────────
+
+model Attendance {
+  id              String    @id @default(cuid())
+  employeeId      String
+  projectId       String?
+  checkInAt       DateTime
+  checkInLat      Float?
+  checkInLng      Float?
+  checkInAccuracy Float?
+  checkOutAt      DateTime?
+  checkOutLat     Float?
+  checkOutLng     Float?
+  durationMin     Int? // auto-calculated on checkout
+  notes           String?
+  createdAt       DateTime  @default(now())
+
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@index([employeeId, checkInAt])
+}
+
+// ── Expense Claims ──────────────────────────
+
+model ExpenseClaim {
+  id           String        @id @default(cuid())
+  employeeId   String
+  projectId    String?
+  amount       Int // in paise
+  category     String
+  description  String?
+  receiptUrl   String? // S3 key
+  status       ExpenseStatus @default(SUBMITTED)
+  approvedById String?
+  approvalNote String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@index([employeeId, status])
+}
+
+// ── Leave Requests ──────────────────────────
+
+model LeaveRequest {
+  id           String      @id @default(cuid())
+  employeeId   String
+  leaveType    String // sick, casual, earned
+  startDate    DateTime
+  endDate      DateTime
+  reason       String?
+  status       LeaveStatus @default(PENDING)
+  approvedById String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@index([employeeId, status])
+}
+
+// ── Notifications ───────────────────────────
+
+model Notification {
+  id          String              @id @default(cuid())
+  userId      String
+  type        String // booking_confirmed, payment_received, etc.
+  channel     NotificationChannel @default(IN_APP)
+  title       String
+  body        String
+  payload     Json? // extra data (link, project ID, etc.)
+  read        Boolean             @default(false)
+  sentAt      DateTime            @default(now())
+  deliveredAt DateTime?
+  readAt      DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, read])
+  @@index([userId, sentAt])
+}
+
+// ── WhatsApp Log ────────────────────────────
+
+model WhatsAppLog {
+  id             String    @id @default(cuid())
+  userId         String?
+  recipientPhone String
+  templateName   String
+  variables      Json?
+  messageId      String? // Meta message ID
+  status         String    @default("sent") // sent, delivered, read, failed
+  errorMessage   String?
+  sentAt         DateTime  @default(now())
+  deliveredAt    DateTime?
+  readAt         DateTime?
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([templateName, sentAt])
+}
+
+// ── Audit Log ───────────────────────────────
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?
+  action     String // CREATE, UPDATE, DELETE, LOGIN, LOGOUT, etc.
+  resource   String // User, Project, Payment, etc.
+  resourceId String?
+  before     Json? // snapshot before change
+  after      Json? // snapshot after change
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  actor User? @relation("AuditActor", fields: [actorId], references: [id])
+
+  @@index([actorId])
+  @@index([resource, resourceId])
+  @@index([createdAt])
+}
+
+// ── CMS: Blog Posts ─────────────────────────
+
+model BlogPost {
+  id             String         @id @default(cuid())
+  title          String
+  slug           String         @unique
+  excerpt        String?
+  content        String         @db.Text
+  coverImageUrl  String?
+  authorId       String
+  category       String?
+  tags           String[]
+  status         BlogPostStatus @default(DRAFT)
+  seoTitle       String?
+  seoDescription String?
+  publishedAt    DateTime?
+  scheduledAt    DateTime?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  deletedAt      DateTime?
+  previewToken   String?        @unique
+
+  @@index([status, publishedAt])
+  @@index([slug])
+}
+
+// ── CMS: Portfolio Items ────────────────────
+
+model PortfolioItem {
+  id            String   @id @default(cuid())
+  title         String
+  slug          String   @unique
+  description   String?  @db.Text
+  category      String
+  year          Int?
+  mediaType     String   @default("image") // image, video
+  mediaUrl      String
+  thumbnailUrl  String?
+  videoStreamId String? // Cloudflare Stream ID
+  tags          String[]
+  isPublished   Boolean  @default(true)
+  sortOrder     Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  deletedAt     DateTime?
+
+  @@index([category, isPublished])
+  @@index([sortOrder])
+}
+
+// ── CMS: Testimonials ──────────────────────
+
+model Testimonial {
+  id            String   @id @default(cuid())
+  clientName    String
+  clientTitle   String?
+  clientCompany String?
+  clientPhoto   String?
+  content       String   @db.Text
+  rating        Int?     @default(5) // 1-5
+  videoUrl      String?
+  isApproved    Boolean  @default(false)
+  isPublished   Boolean  @default(false)
+  sortOrder     Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  deletedAt     DateTime?
+
+  @@index([isPublished, sortOrder])
+}
+
+// ── CMS: Team Members ──────────────────────
+
+model TeamMember {
+  id          String   @id @default(cuid())
+  name        String
+  role        String
+  bio         String?  @db.Text
+  photoUrl    String?
+  socialLinks Json? // { instagram, linkedin, twitter }
+  isPublished Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt     DateTime?
+
+  @@index([isPublished, sortOrder])
+}
+
+// ── CMS: FAQ ────────────────────────────────
+
+model FaqItem {
+  id          String   @id @default(cuid())
+  question    String
+  answer      String   @db.Text
+  category    String?
+  sortOrder   Int      @default(0)
+  isPublished Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt     DateTime?
+
+  @@index([category, isPublished])
+}
+
+// ── CMS: Contact Submissions & Newsletter ───
+
+model ContactSubmission {
+  id         String   @id @default(cuid())
+  name       String
+  email      String
+  phone      String?
+  subject    String?
+  message    String   @db.Text
+  isRead     Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  deletedAt  DateTime?
+
+  @@index([isRead, createdAt])
+}
+
+model NewsletterSubscriber {
+  id         String   @id @default(cuid())
+  email      String   @unique
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  deletedAt  DateTime?
+
+  @@index([isActive])
+}
+
+model Announcement {
+  id        String   @id @default(cuid())
+  text      String
+  type      String   @default("info") // info, warning, promo
+  isActive  Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  @@index([isActive, sortOrder])
+}
+
+// ── System: Working Hours & Blocked Dates ───
+
+model WorkingHours {
+  id        String  @id @default(cuid())
+  dayOfWeek Int // 0=Sunday ... 6=Saturday
+  startTime String // HH:mm
+  endTime   String // HH:mm
+  isWorking Boolean @default(true)
+
+  @@unique([dayOfWeek])
+}
+
+model BlockedDate {
+  id     String   @id @default(cuid())
+  date   DateTime
+  reason String?
+
+  @@unique([date])
+  @@index([date])
+}
+
+// ── System: Feature Flags ───────────────────
+
+model FeatureFlag {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  description String?
+  enabled     Boolean  @default(false)
+  environment String   @default("all") // all, development, staging, production
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ── System: Config (Key-Value) ──────────────
+
+model SystemConfig {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String @db.Text
+  type  String @default("string") // string, number, boolean, json
+
+  @@index([key])
+}
+
+// ── Dynamic Talent Categories ───────────────
+
+model TalentCategory {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  specializations Specialization[]
+  fields          CategoryField[]
+  userTalents     UserTalent[]
+  castingCalls    CastingCallCategory[]
+}
+
+model Specialization {
+  id         String @id @default(cuid())
+  categoryId String
+  name       String
+  slug       String
+
+  category            TalentCategory       @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  userSpecializations UserSpecialization[]
+
+  @@unique([categoryId, slug])
+}
+
+enum FieldType {
+  TEXT
+  NUMBER
+  SELECT
+  MULTISELECT
+  FILE
+  BOOLEAN
+}
+
+model CategoryField {
+  id         String    @id @default(cuid())
+  categoryId String
+  name       String // camelCase, e.g. "shoeSize"
+  label      String // e.g. "Shoe Size (UK)"
+  type       FieldType
+  options    Json? // e.g. ["7", "8", "9"]
+  isRequired Boolean   @default(false)
+  order      Int       @default(0)
+
+  category TalentCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([categoryId, name])
+}
+
+// ── Dynamic Talent Relations ────────────────
+
+model UserTalent {
+  id              String  @id @default(cuid())
+  talentProfileId String
+  categoryId      String
+  isPrimary       Boolean @default(false)
+  attributes      Json? // Stores CategoryField answers
+
+  talentProfile TalentProfile  @relation(fields: [talentProfileId], references: [id], onDelete: Cascade)
+  category      TalentCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([talentProfileId, categoryId])
+}
+
+model UserSpecialization {
+  id               String @id @default(cuid())
+  talentProfileId  String
+  specializationId String
+
+  talentProfile  TalentProfile  @relation(fields: [talentProfileId], references: [id], onDelete: Cascade)
+  specialization Specialization @relation(fields: [specializationId], references: [id], onDelete: Cascade)
+
+  @@unique([talentProfileId, specializationId])
+}
+
+model Skill {
+  id         String  @id @default(cuid())
+  name       String  @unique
+  isApproved Boolean @default(false)
+
+  userSkills UserSkill[]
+}
+
+model UserSkill {
+  id              String @id @default(cuid())
+  talentProfileId String
+  skillId         String
+
+  talentProfile TalentProfile @relation(fields: [talentProfileId], references: [id], onDelete: Cascade)
+  skill         Skill         @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@unique([talentProfileId, skillId])
+}
+
+model Language {
+  id   String  @id @default(cuid())
+  name String  @unique
+  code String? @unique
+
+  userLanguages UserLanguage[]
+}
+
+model UserLanguage {
+  id              String  @id @default(cuid())
+  talentProfileId String
+  languageId      String
+  proficiency     String? // e.g. "Native", "Fluent"
+
+  talentProfile TalentProfile @relation(fields: [talentProfileId], references: [id], onDelete: Cascade)
+  language      Language      @relation(fields: [languageId], references: [id], onDelete: Cascade)
+
+  @@unique([talentProfileId, languageId])
+}
+
+enum SocialPlatform {
+  INSTAGRAM
+  YOUTUBE
+  FACEBOOK
+  LINKEDIN
+  IMDB
+  WEBSITE
+  PORTFOLIO
+  BEHANCE
+  PINTEREST
+  SPOTIFY
+  TIKTOK
+  OTHER
+}
+
+model SocialLink {
+  id              String         @id @default(cuid())
+  talentProfileId String
+  platform        SocialPlatform
+  url             String
+  handle          String?
+  followersCount  Int?
+  isVerified      Boolean        @default(false)
+
+  talentProfile TalentProfile @relation(fields: [talentProfileId], references: [id], onDelete: Cascade)
+
+  @@index([talentProfileId])
+}
+
+enum MediaType {
+  PROFILE_PHOTO
+  COVER_PHOTO
+  COVER_VIDEO
+  PORTFOLIO_IMAGE
+  PORTFOLIO_VIDEO
+  INTRODUCTION_VIDEO
+  SHOWREEL
+  WALK_VIDEO
+  DANCE_VIDEO
+  DEMO_AUDIO
+  RESUME
+  COMP_CARD
+  PORTFOLIO_PDF
+  OTHER
+}
+
+model PortfolioMedia {
+  id              String    @id @default(cuid())
+  talentProfileId String
+  type            MediaType
+  url             String // S3 URL
+  fileKey         String?
+  title           String?
+  order           Int       @default(0)
+  thumbnailUrl    String?
+  duration        Int?      // duration in seconds (for video/audio)
+  mimeType        String?
+  fileSize        BigInt?   // bytes
+  category        String?   // e.g. "Showreel", "TV Commercial", "Brand Shoot"
+
+  talentProfile TalentProfile @relation(fields: [talentProfileId], references: [id], onDelete: Cascade)
+
+  @@index([talentProfileId, type])
+}
+
+model TalentAvailability {
+  id                String  @id @default(cuid())
+  talentProfileId   String  @unique
+  travelReady       Boolean @default(false)
+  passportAvailable Boolean @default(false)
+  ownVehicle        Boolean @default(false)
+  agencyRepresented Boolean @default(false)
+  freelancer        Boolean @default(true)
+  availableFullTime Boolean @default(true)
+  availablePartTime Boolean @default(false)
+
+  talentProfile TalentProfile @relation(fields: [talentProfileId], references: [id], onDelete: Cascade)
+}
+
+model TalentPricing {
+  id              String  @id @default(cuid())
+  talentProfileId String  @unique
+  perHour         Int?
+  perDay          Int?
+  isNegotiable    Boolean @default(true)
+  currency        String  @default("INR")
+
+  talentProfile TalentProfile @relation(fields: [talentProfileId], references: [id], onDelete: Cascade)
+}
+
+model CastingCallCategory {
+  id            String @id @default(cuid())
+  castingCallId String
+  categoryId    String
+
+  castingCall CastingCall    @relation(fields: [castingCallId], references: [id], onDelete: Cascade)
+  category    TalentCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([castingCallId, categoryId])
+}
+
+model MediaAsset {
+  id           String   @id @default(cuid())
+  filename     String
+  originalName String
+  url          String
+  mimeType     String
+  size         Int
+  width        Int?
+  height       Int?
+  uploadedById String
+  uploadedBy   User     @relation("UserMediaAssets", fields: [uploadedById], references: [id])
+  createdAt    DateTime @default(now())
+
+  @@index([uploadedById])
+}
+

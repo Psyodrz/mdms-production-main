@@ -1,0 +1,42 @@
+{
+  "name": "mdms",
+  "version": "1.0.0",
+  "private": true,
+  "description": "MDMS — Media & Digital Management System for MP Production",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "test:e2e": "turbo run test:e2e",
+    "db:generate": "pnpm --filter api prisma generate",
+    "db:migrate": "pnpm --filter api prisma migrate dev",
+    "db:push": "pnpm --filter api prisma db push",
+    "db:seed": "pnpm --filter api prisma db seed",
+    "db:studio": "pnpm --filter api prisma studio",
+    "docker:up": "docker compose -f docker/docker-compose.yml up -d",
+    "docker:down": "docker compose -f docker/docker-compose.yml down",
+    "clean": "turbo run clean",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,md}\""
+  },
+  "devDependencies": {
+    "@prisma/config": "^7.8.0",
+    "@types/bcrypt": "5.0.2",
+    "@types/three": "^0.185.0",
+    "prettier": "^3.5.0",
+    "prisma": "6.9.0",
+    "turbo": "^2.5.0",
+    "typescript": "^5.8.0"
+  },
+  "packageManager": "pnpm@9.15.0",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "@prisma/client": "6.9.0",
+    "@supabase/supabase-js": "^2.110.2",
+    "bcrypt": "5.1.1",
+    "dotenv": "^17.4.2"
+  }
+}
