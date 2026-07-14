@@ -35,7 +35,10 @@ const nextConfig: NextConfig = {
     ];
   },
   async rewrites() {
-    const apiBase = process.env.API_URL || 'http://127.0.0.1:4000';
+    const publicApiUrl = process.env.NEXT_PUBLIC_API_URL
+      ? process.env.NEXT_PUBLIC_API_URL.replace(/\/api\/v1\/?$/, '')
+      : '';
+    const apiBase = process.env.API_URL || publicApiUrl || 'https://mp-backend-api.onrender.com';
     return [
       {
         source: '/api/v1/:path*',
