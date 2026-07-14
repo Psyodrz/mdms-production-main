@@ -7,15 +7,10 @@ import { toast } from 'sonner';
 import { RefreshCw, Trash2, Edit3, Loader2, Plus } from 'lucide-react';
 import { fetchAPI } from '@/lib/api-client';
 
-const FALLBACK_TEAM_MEMBERS = [
-  { id: 'tm-1', name: 'Alok Verma', role: 'Executive Producer & Founder', isPublished: true },
-  { id: 'tm-2', name: 'Siddharth Roy', role: 'Lead Creative Director', isPublished: true },
-  { id: 'tm-3', name: 'Neelam Verma', role: 'Head of Brand Partnerships', isPublished: true },
-  { id: 'tm-4', name: 'Vikramaditya Bose', role: 'VFX & Post-Production Supervisor', isPublished: false },
-];
+
 
 export default function CMSTeam() {
-  const [team, setTeam] = useState<any[]>(FALLBACK_TEAM_MEMBERS);
+  const [team, setTeam] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -32,7 +27,7 @@ export default function CMSTeam() {
       const json = await fetchAPI('/cms/admin/team');
       const list = json.data || json;
       if (Array.isArray(list)) {
-        setTeam(list.length > 0 ? list : FALLBACK_TEAM_MEMBERS);
+        setTeam(list.length > 0 ? list : []);
       }
       if (isRefresh) toast.success('Team members refreshed');
     } catch (err) {

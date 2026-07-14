@@ -3,8 +3,8 @@
 import { Navbar } from "@/components/ui/Navbar";
 import { HoverFooter as Footer } from "@/components/ui/hover-footer";
 import { Reveal } from "@/components/ui/Reveal";
-import { CinematicProductScrollSection } from "@/components/ui/cinematic-product-scroll-section";
 import { CinematicViewerModal, ProjectSpec } from "@/components/ui/CinematicViewerModal";
+import { CinematicProductScrollSection } from "@/components/ui/cinematic-product-scroll-section";
 import { CinematicTestimonial } from "@/components/ui/cinematic-testimonial";
 import { MagneticButton } from "@/components/motion/MagneticButton";
 import DecryptedText from "@/components/motion/DecryptedText";
@@ -120,24 +120,24 @@ export default function Home() {
 
   useEffect(() => {
     Promise.all([
-      fetchAPI("/cms/hero?page=home").catch(() => null),
-      fetchAPI("/cms/config/intro").catch(() => null),
-      fetchAPI("/cms/stats").catch(() => null),
-      fetchAPI("/cms/services?active=true").catch(() => null),
-      fetchAPI("/cms/portfolio?featured=true&limit=6").catch(() => null),
-      fetchAPI("/talent?featured=true&limit=6").catch(() => null),
-      fetchAPI("/cms/testimonials?published=true").catch(() => null),
-      fetchAPI("/cms/faq?limit=8").catch(() => null),
+      fetchAPI("/cms/hero?page=home", { cache: "no-store" }).catch(() => null),
+      fetchAPI("/cms/config/intro", { cache: "no-store" }).catch(() => null),
+      fetchAPI("/cms/stats", { cache: "no-store" }).catch(() => null),
+      fetchAPI("/cms/services?active=true", { cache: "no-store" }).catch(() => null),
+      fetchAPI("/cms/portfolio?featured=true&limit=6", { cache: "no-store" }).catch(() => null),
+      fetchAPI("/talent/featured", { cache: "no-store" }).catch(() => null),
+      fetchAPI("/cms/testimonials?published=true", { cache: "no-store" }).catch(() => null),
+      fetchAPI("/cms/faq?limit=8", { cache: "no-store" }).catch(() => null),
     ])
       .then(([heroRes, introRes, statsRes, servRes, portRes, talentRes, testRes, faqRes]) => {
-        if (heroRes?.data) setHero(heroRes.data);
-        if (introRes?.data) setIntro(introRes.data);
-        if (statsRes?.data) setStats(statsRes.data);
-        if (servRes?.data) setServices(servRes.data);
-        if (portRes?.data) setPortfolio(portRes.data);
-        if (talentRes?.data) setTalent(talentRes.data);
-        if (testRes?.data) setTestimonials(testRes.data);
-        if (faqRes?.data) setFaqs(faqRes.data);
+        if (heroRes) setHero(heroRes.data || heroRes);
+        if (introRes) setIntro(introRes.data || introRes);
+        if (statsRes) setStats(statsRes.data || statsRes);
+        if (servRes) setServices(Array.isArray(servRes) ? servRes : (servRes.data || []));
+        if (portRes) setPortfolio(Array.isArray(portRes) ? portRes : (portRes.data || []));
+        if (talentRes) setTalent(Array.isArray(talentRes) ? talentRes : (talentRes.data || []));
+        if (testRes) setTestimonials(Array.isArray(testRes) ? testRes : (testRes.data || []));
+        if (faqRes) setFaqs(Array.isArray(faqRes) ? faqRes : (faqRes.data || []));
       })
       .catch(() => {
         toast.error("Failed to load page content");
@@ -221,10 +221,9 @@ function Hero({ hero, onOpenModal }: { hero?: any; onOpenModal?: (project: Proje
             muted={true}
             loop={true}
             playsInline={true}
-            poster="/images/about-hero.jpg"
-            preload="auto"
+            preload="none"
           >
-            <source src="https://zmpeiobdilrgtuzggzuj.supabase.co/storage/v1/object/public/mp-cms/hero.mp4" type="video/mp4" />
+            <source src="https://zmpeiobdilrgtuzggzuj.supabase.co/storage/v1/object/public/mdms/videos/hero.mp4" type="video/mp4" />
           </video>
         </div>
         <div className="absolute inset-0 dark:bg-black/65 bg-black/45 pointer-events-none" />
@@ -375,9 +374,15 @@ function ScrollyTelling() {
       <div className="sticky top-0 h-screen w-full flex items-center justify-center p-4 sm:p-6 lg:p-8">
         <div className="relative h-full w-full max-w-[1600px] overflow-hidden bg-black rounded-[2rem] sm:rounded-[3rem] border border-[var(--cinematic-border)]/50">
 
-          <motion.img style={{ scale: imageScale, opacity: img1Opacity }} src="/images/services-lighting.jpg" alt="Visual setup 1" className="absolute inset-0 h-full w-full object-cover object-center" />
-          <motion.img style={{ scale: imageScale, opacity: img2Opacity }} src="/images/about-bts.jpg" alt="Visual setup 2" className="absolute inset-0 h-full w-full object-cover object-center" />
-          <motion.img style={{ scale: imageScale, opacity: img3Opacity }} src="/images/careers-meeting.jpg" alt="Visual setup 3" className="absolute inset-0 h-full w-full object-cover object-[center_20%]" />
+          <motion.div style={{ scale: imageScale, opacity: img1Opacity }} className="absolute inset-0 h-full w-full will-change-transform">
+            <Image src="/images/services-lighting.jpg" alt="Visual setup 1" fill sizes="100vw" className="object-cover object-center" priority />
+          </motion.div>
+          <motion.div style={{ opacity: img2Opacity }} className="absolute inset-0 h-full w-full">
+            <Image src="/images/about-bts.jpg" alt="Visual setup 2" fill sizes="100vw" className="object-cover object-center" />
+          </motion.div>
+          <motion.div style={{ opacity: img3Opacity }} className="absolute inset-0 h-full w-full">
+            <Image src="/images/careers-meeting.jpg" alt="Visual setup 3" fill sizes="100vw" className="object-cover object-[center_20%]" />
+          </motion.div>
 
           <div className="absolute inset-0 z-20 flex items-center justify-center px-6">
             {acts.map((act, i) => (
@@ -473,15 +478,7 @@ function Intro({ intro }: { intro?: any }) {
    SERVICES — Bento grid (asymmetric)
    ═══════════════════════════════════════════════════════════ */
 function Services({ services = [], loading }: { services?: any[]; loading?: boolean }) {
-  const displayServices =
-    services.length > 0
-      ? services
-      : [
-          { slug: "cinematic", title: "Commercial Cinema", desc: "Premium brand commercials and high-dynamic automotive storytelling.", icon: "Film", image: "/assets/service_pre_production.png" },
-          { slug: "talent", title: "High-Fashion Lookbooks", desc: "Editorial and runway campaigns for luxury fashion ateliers.", icon: "Camera", image: "/assets/service_production.png" },
-          { slug: "post", title: "Post & Color Grade", desc: "Dolby Vision color grading, offline editing, and bespoke sound design.", icon: "Sliders", image: "/assets/service_post_production.png" },
-          { slug: "talent", title: "Casting & Roster", desc: "Direct access to over 1,200 verified models and dramatic actors.", icon: "Users", image: "/assets/service_casting.png" },
-        ];
+  const displayServices = services;
 
   return (
     <section className="pt-8 pb-16 lg:pb-24 bg-background">
@@ -520,8 +517,9 @@ function Services({ services = [], loading }: { services?: any[]; loading?: bool
                 item.image ||
                 item.imageUrl ||
                 SERVICE_FALLBACK_IMAGES[i % SERVICE_FALLBACK_IMAGES.length];
+              const serviceName = item.name || item.title || 'Production Service';
               return (
-                <Reveal key={item.id || item.title || i} direction="up" delay={0.05 * i}>
+                <Reveal key={item.id || serviceName || i} direction="up" delay={0.05 * i}>
                   <div className="group relative border border-border dark:border-white/10 rounded-[2rem] p-3 md:p-4 bg-surface shadow-sm transition-all duration-500 hover:border-foreground/30 hover:shadow-2xl hover:shadow-black/10 dark:hover:shadow-white/5">
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
                       
@@ -532,7 +530,7 @@ function Services({ services = [], loading }: { services?: any[]; loading?: bool
                             <span className="font-mono text-sm tracking-widest">0{i + 1}</span>
                           </div>
                           <h3 className="font-display text-3xl sm:text-4xl text-foreground group-hover:text-brand transition-colors leading-tight h-[90px] sm:h-[100px] flex items-center">
-                            <DecryptedText text={item.title} animateOn="hover" speed={40} sequential={true} revealDirection="start" useOriginalCharsOnly={true} />
+                            <DecryptedText text={serviceName} animateOn="hover" speed={40} sequential={true} revealDirection="start" useOriginalCharsOnly={true} />
                           </h3>
                         </div>
                         
@@ -554,7 +552,7 @@ function Services({ services = [], loading }: { services?: any[]; loading?: bool
                       <div className="lg:col-span-5 relative min-h-[220px] lg:min-h-full rounded-[1.5rem] overflow-hidden border border-border/50 group-hover:border-white/20 transition-colors duration-500">
                         <Image
                           src={imageSrc}
-                          alt={item.title}
+                          alt={serviceName}
                           fill
                           sizes="(max-width: 1024px) 100vw, 40vw"
                           className="object-cover scale-105 group-hover:scale-100 transition-transform duration-[1.5s] ease-out brightness-[0.7] group-hover:brightness-100"
@@ -586,15 +584,7 @@ function FeaturedProjects({
   loading?: boolean;
   onOpenModal?: (project: ProjectSpec) => void;
 }) {
-  const displayProjects =
-    portfolio.length > 0
-      ? portfolio
-      : [
-          { img: "/assets/project-fashion.jpg", slug: "neon-city", title: "Neon Silk Campaign", category: "High Fashion", location: "Mumbai · London", client: "ATLAS Luxury", director: "Marcus Vance", camera: "ARRI Alexa 35" },
-          { img: "/assets/project-music.jpg", slug: "midnight-run", title: "Midnight Anthem", category: "Music Cinema", location: "Delhi · Tokyo", client: "VOLT Records", director: "Elena Rostova", camera: "RED V-Raptor 8K" },
-          { img: "/assets/project-commercial.jpg", slug: "vantage-point", title: "Curinel's Reserve", category: "Commercial Film", location: "Goa · Zurich", client: "Curinel Spirits", director: "Arav Khanna", camera: "ARRI Alexa Mini LF" },
-          { img: "/assets/project-corporate.jpg", slug: "heritage-foundation", title: "Skyline Suits 2026", category: "Lookbook & Film", location: "Bangalore", client: "Skyline Couture", director: "Marcus Vance", camera: "Sony VENICE 2" },
-        ];
+  const displayProjects = portfolio;
 
   const buildModalSpec = (p: any, i: number): ProjectSpec => ({
     title: p.title,
@@ -726,17 +716,7 @@ function FeaturedProjects({
 function FeaturedTalent({ talent = [], loading }: { talent?: any[]; loading?: boolean }) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const displayTalent = (
-    talent.length > 0
-      ? talent
-      : [
-          { id: "1", slug: "aarya-k", user: { firstName: "Aarya", lastName: "K.", avatarUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=600&auto=format&fit=crop" }, talentTypes: ["INTERNATIONAL_MODEL"], instagramFollowers: 128000 },
-          { id: "2", slug: "rohan-m", user: { firstName: "Rohan", lastName: "M.", avatarUrl: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=600&auto=format&fit=crop" }, talentTypes: ["CINEMA_DIRECTOR"], instagramFollowers: 540000 },
-          { id: "3", slug: "isha-s", user: { firstName: "Isha", lastName: "S.", avatarUrl: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?q=80&w=600&auto=format&fit=crop" }, talentTypes: ["LEAD_ACTOR"], instagramFollowers: 72000 },
-          { id: "4", slug: "devansh-p", user: { firstName: "Devansh", lastName: "P.", avatarUrl: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=600&auto=format&fit=crop" }, talentTypes: ["DOP_CINEMATOGRAPHER"], instagramFollowers: 38000 },
-          { id: "5", slug: "karan-j", user: { firstName: "Karan", lastName: "J.", avatarUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=600&auto=format&fit=crop" }, talentTypes: ["EXECUTIVE_PRODUCER"], instagramFollowers: 195000 },
-        ]
-  ).slice(0, 12); // Featured strip — cap to keep the homepage light; full roster on /talent
+  const displayTalent = talent.slice(0, 12); // Featured strip — cap to keep the homepage light; full roster on /talent
 
   const scroll = (dir: "left" | "right") => {
     if (scrollRef.current) {
@@ -875,15 +855,7 @@ function Stats({ stats }: { stats?: any }) {
    PROCESS — Vertical timeline stepper
    ═══════════════════════════════════════════════════════════ */
 function Process({ process = [] }: { process?: any[] }) {
-  const displayProcess =
-    process.length > 0
-      ? process
-      : [
-          { step: "01", title: "Discovery & Brief", desc: "We unpack the creative intent, study reference cinema, and establish clear commercial targets." },
-          { step: "02", title: "Visual Treatment", desc: "Directorial vision, lighting mood boards, exclusive talent shortlists, and locations locked." },
-          { step: "03", title: "Principle Photography", desc: "Top-tier film crews, ARRI/RED cinema camera packages, and master directors on set." },
-          { step: "04", title: "Post-Production", desc: "Offline editing, theatrical color grading (Kodak/Dolby), custom sound design, and master delivery." },
-        ];
+  const displayProcess = process;
 
   return (
     <section className="py-32">
@@ -945,14 +917,7 @@ function Process({ process = [] }: { process?: any[] }) {
 function Faq({ faqs = [], loading }: { faqs?: any[]; loading?: boolean }) {
   const [open, setOpen] = useState<number | null>(0);
 
-  const displayFaqs =
-    faqs.length > 0
-      ? faqs
-      : [
-          { q: "How fast can you turn around a high-tier commercial?", a: "Most short-form campaigns and brand films ship in 2–3 weeks from concept approval. Larger theatrical productions run 4–8 weeks depending on location scouts." },
-          { q: "Do you handle talent casting and contracting in-house?", a: "Yes. We maintain an exclusive roster of over 1,200 verified international models, lead actors, and creators across India and Europe." },
-          { q: "Can new talent apply directly to join the MP roster?", a: "Absolutely — visit `/join/talent`, submit your portfolio specs, and our casting directors review applications weekly." },
-        ];
+  const displayFaqs = faqs;
 
   return (
     <section className="py-32">

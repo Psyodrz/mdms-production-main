@@ -160,15 +160,23 @@ function ProductHero({ product, reversed = false }: { product: ProductScrollItem
       active: false,
     }));
 
+    let isIntersecting = false;
     let ticking = false;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isIntersecting = entry.isIntersecting;
+      },
+      { rootMargin: "10% 0px 10% 0px" }
+    );
+    observer.observe(section);
 
     const update = () => {
       ticking = false;
+      if (!isIntersecting) return;
+
       const rect = section.getBoundingClientRect();
       const windowHeight = window.innerHeight;
-
-      // Skip work when the section is off-screen.
-      if (rect.bottom < 0 || rect.top > windowHeight) return;
 
       const isMobile = window.innerWidth < 768;
       let progress = 0;
@@ -202,6 +210,7 @@ function ProductHero({ product, reversed = false }: { product: ProductScrollItem
     };
 
     const onScroll = () => {
+      if (!isIntersecting) return;
       if (ticking) return;
       ticking = true;
       requestAnimationFrame(update);
@@ -212,6 +221,7 @@ function ProductHero({ product, reversed = false }: { product: ProductScrollItem
     window.addEventListener("resize", onScroll);
 
     return () => {
+      observer.disconnect();
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
     };

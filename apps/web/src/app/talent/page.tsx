@@ -21,59 +21,9 @@ const talentTypes = [
   { id: '04', name: "Movement & Dancers", desc: "Conceptual movement artists for music films and choreography.", icon: <Music className="w-5 h-5 text-brand" />, count: "6k+" },
 ];
 
-const FALLBACK_ROSTER = [
-  {
-    id: 't-1',
-    name: 'Ananya Sharma · Runway Muse',
-    type: 'High-Fashion Model',
-    followers: '1.2M+',
-    location: 'Mumbai / Paris',
-    img: '/assets/talent-model-1.jpg',
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
-    client: 'VOGUE · DIOR · SABYASACHI',
-    description: 'International runway model and editorial icon with over 40 magazine covers. Represented exclusively by MP Production across Asia and Europe.',
-    awards: ['Vogue Model of the Year Nominee', 'Elle Style Awards 2025'],
-  },
-  {
-    id: 't-2',
-    name: 'Kabir & Shreya · Movement Duo',
-    type: 'Contemporary Dance',
-    followers: '850K+',
-    location: 'London / New Delhi',
-    img: '/assets/talent-model-2.jpg',
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
-    client: 'ADIDAS ORIGINAL · SONY MUSIC',
-    description: 'Pioneering conceptual dance duo known for gravity-defying choreography in high-budget music videos and international arena tours.',
-    awards: ['World Choreography Awards Gold', 'MTV VMA Nominee'],
-  },
-  {
-    id: 't-3',
-    name: 'Zayn Kapoor · Lead Actor',
-    type: 'Feature Film Actor',
-    followers: '3.4M+',
-    location: 'Mumbai',
-    img: '/assets/project-fashion.jpg',
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
-    client: 'NETFLIX GLOBAL · ROLEX INDIA',
-    description: 'Critically acclaimed dramatic actor and brand ambassador. Celebrated for intense method performances and effortless sartorial elegance.',
-    awards: ['Filmfare Best Actor Critics 2025', 'GQ Man of the Year'],
-  },
-  {
-    id: 't-4',
-    name: 'Elena Rostova · Visual Artist',
-    type: 'Director & Photographer',
-    followers: '420K+',
-    location: 'Dubai / London',
-    img: '/assets/project-commercial.jpg',
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoy.mp4',
-    client: 'PORSCHE · CARTIER',
-    description: 'Master photographer and visual director specializing in hyper-surreal architectural automotive and jewelry cinematography.',
-    awards: ['Leica Hall of Fame Selection', 'Awwwards Creative Director'],
-  },
-];
 
 export default function TalentPage() {
-  const [featuredTalent, setFeaturedTalent] = useState<any[]>(FALLBACK_ROSTER);
+  const [featuredTalent, setFeaturedTalent] = useState<any[]>([]);
   const [activeCategory, setActiveCategory] = useState<string>('All');
   const [loading, setLoading] = useState(true);
   
@@ -82,22 +32,22 @@ export default function TalentPage() {
   const [isViewerOpen, setIsViewerOpen] = useState(false);
 
   useEffect(() => {
-    fetchAPI('/talent')
+    fetchAPI('/talent', { cache: 'no-store' })
       .then(res => {
         if (res && res.data && Array.isArray(res.data)) {
           const raw = res.data.slice(0, 4); // Just take first 4 for featured
           if (raw.length > 0) {
             const mapped = raw.map((t: any, i: number) => ({
               id: t.slug || t.id,
-              name: t.user ? `${t.user.firstName} ${t.user.lastName}` : FALLBACK_ROSTER[i % FALLBACK_ROSTER.length].name,
-              type: t.talentTypes && t.talentTypes.length > 0 ? t.talentTypes[0].replace('_', ' ') : FALLBACK_ROSTER[i % FALLBACK_ROSTER.length].type,
-              followers: t.profileViews ? `${t.profileViews}k+` : FALLBACK_ROSTER[i % FALLBACK_ROSTER.length].followers,
-              location: t.city || FALLBACK_ROSTER[i % FALLBACK_ROSTER.length].location,
-              img: (t.user && t.user.avatarUrl) ? t.user.avatarUrl : (t.coverBannerUrl || FALLBACK_ROSTER[i % FALLBACK_ROSTER.length].img),
-              videoUrl: t.introductionVideoUrl || FALLBACK_ROSTER[i % FALLBACK_ROSTER.length].videoUrl,
-              client: t.brandsWorkedWith ? t.brandsWorkedWith.join(' · ') : FALLBACK_ROSTER[i % FALLBACK_ROSTER.length].client,
-              description: t.bio || FALLBACK_ROSTER[i % FALLBACK_ROSTER.length].description,
-              awards: t.awards || FALLBACK_ROSTER[i % FALLBACK_ROSTER.length].awards,
+              name: t.user ? `${t.user.firstName} ${t.user.lastName}` : 'Unknown Talent',
+              type: t.talentTypes && t.talentTypes.length > 0 ? t.talentTypes[0].replace('_', ' ') : 'General Talent',
+              followers: t.profileViews ? `${t.profileViews}k+` : '0+',
+              location: t.city || 'Unknown Location',
+              img: (t.user && t.user.avatarUrl) ? t.user.avatarUrl : (t.coverBannerUrl || '/assets/placeholder.jpg'),
+              videoUrl: t.introductionVideoUrl || '',
+              client: t.brandsWorkedWith ? t.brandsWorkedWith.join(' · ') : '',
+              description: t.bio || '',
+              awards: t.awards || [],
             }));
             setFeaturedTalent(mapped);
           }

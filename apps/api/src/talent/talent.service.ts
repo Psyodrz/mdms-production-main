@@ -48,6 +48,7 @@ export class TalentService {
           select: {
             firstName: true,
             lastName: true,
+            avatarUrl: true,
           },
         },
         userTalents: {
@@ -66,6 +67,7 @@ export class TalentService {
             skill: true,
           },
         },
+        portfolioMedia: true,
       },
     });
 
@@ -272,7 +274,7 @@ export class TalentService {
   async getFeatured() {
     return this.prisma.talentProfile.findMany({
       where: { status: TalentProfileStatus.ACTIVE },
-      take: 4,
+      take: 12,
       orderBy: { profileViews: 'desc' },
       include: {
         user: {

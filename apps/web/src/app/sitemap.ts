@@ -1,5 +1,6 @@
 import { MetadataRoute } from 'next';
 import { serverFetchAPI } from '@/lib/server-api-client';
+export const dynamic = 'force-dynamic';
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://mpproduction.com';
   

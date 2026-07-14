@@ -4,6 +4,8 @@ import { Container } from '@/components/ui/Container';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 
+export const dynamic = 'force-dynamic';
+
 interface CastingCall {
   id: string;
   title: string;

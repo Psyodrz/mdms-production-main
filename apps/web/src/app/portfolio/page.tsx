@@ -24,125 +24,10 @@ interface PortfolioProject extends ProjectSpec {
   aspectRatio?: 'tall' | 'wide' | 'square';
 }
 
-export const FALLBACK_PORTFOLIO: PortfolioProject[] = [
-  {
-    id: '1',
-    slug: 'neon-city',
-    title: 'Neon Silk · The Metamorphosis',
-    category: 'Fashion Film',
-    client: 'VOGUE x DIOR ARCHIVE',
-    year: '2026',
-    mediaUrl: '/images/portfolio-hero.jpg',
-    coverImage: '/images/portfolio-hero.jpg',
-    description: 'High-fashion cinematic editorial shot across cyberpunk neon alleyways in Mumbai and nocturnal studios in London. Exploring tactile silk movement against harsh industrial concrete.',
-    videoUrl: '/videos/project_1.mp4',
-    director: 'Aarav Mehta',
-    dop: 'Elena Rostova',
-    camera: 'ARRI ALEXA 35 (8K Open Gate)',
-    lenses: 'Cooke Anamorphic /i Special Flare',
-    colorGrade: 'Dolby Vision HDR · Custom Kodak 2383 Print Emulation',
-    awards: ['Awwwards Site of the Day 2026', 'Cannes Lions Bronze Film Craft', 'Vimeo Staff Pick Premiere'],
-    aspectRatio: 'tall',
-  },
-  {
-    id: '2',
-    slug: 'midnight-run',
-    title: 'Midnight Anthem · VOLT Music',
-    category: 'Music Video',
-    client: 'VOLT RECORDS GLOBAL',
-    year: '2026',
-    mediaUrl: '/images/about-bts.jpg',
-    coverImage: '/images/about-bts.jpg',
-    description: 'A surrealist exploration of haute couture set against the stark, brutalist architecture of Eastern Europe. Shot entirely on 35mm film stock.',
-    videoUrl: '/videos/project_2.mp4',
-    director: 'Siddharth Kapoor',
-    dop: 'Marcus Vance',
-    camera: 'RED V-Raptor XL 8K VV',
-    lenses: 'Panavision C-Series Anamorphic',
-    colorGrade: 'High-Contrast Cyberpunk Technicolor Grade',
-    awards: ['UK Music Video Awards Winner', 'Berlin Commercial Best Cinematography'],
-    aspectRatio: 'wide',
-  },
-  {
-    id: '3',
-    slug: 'vantage-point',
-    title: "Curinel's Reserve · Timeless Heritage",
-    category: 'Commercial',
-    client: 'CURINEL LUXURY SPIRITS',
-    year: '2025',
-    mediaUrl: '/images/careers-meeting.jpg',
-    coverImage: '/images/careers-meeting.jpg',
-    description: 'An atmospheric brand commercial shot on location across secluded coastal cliffs in South Goa and heritage Scottish distilleries. A symphony of amber light and slow motion.',
-    videoUrl: '/videos/project_3.mp4',
-    director: 'Maya Lin & Kabir Nair',
-    dop: 'Jean-Luc Moreau',
-    camera: 'ARRI ALEXA Mini LF',
-    lenses: 'Zeiss Supreme Primes Radiance',
-    colorGrade: 'Warm Gold Organic Film Grain Grade',
-    awards: ['D&AD Yellow Pencil Cinematography', 'Clio Awards Silver Commercial'],
-    aspectRatio: 'square',
-  },
-  {
-    id: '4',
-    slug: 'heritage-foundation',
-    title: 'Skyline Suits · Executive Mastery',
-    category: 'Brand Campaign',
-    client: 'SKYLINE HAUTE COUTURE',
-    year: '2025',
-    mediaUrl: '/images/services-lighting.jpg',
-    coverImage: '/images/services-lighting.jpg',
-    description: 'Dynamic editorial campaign blending 16mm film grit with hyper-polished digital intermediate finishing, establishing a new visual standard for streetwear.',
-    videoUrl: '/videos/reel_1.mp4',
-    director: 'Kabir Nair',
-    dop: 'Aarav Mehta',
-    camera: 'Sony VENICE 2 8K',
-    lenses: 'Arri/Zeiss Master Anamorphic',
-    colorGrade: 'Monochrome Silver Retention Emulation',
-    awards: ['ADC 104th Annual Awards Gold', 'Webby Awards Best Video Campaign'],
-    aspectRatio: 'tall',
-  },
-  {
-    id: '5',
-    slug: 'echoes-of-silence',
-    title: 'Echoes of Silence · Contemporary Ballet',
-    category: 'Art & Theatre',
-    client: 'ROYAL ACADEMY OF MOTION',
-    year: '2026',
-    mediaUrl: '/images/bg-abstract.jpg',
-    coverImage: '/images/bg-abstract.jpg',
-    description: 'An immersive 360-degree sensory exploration of human movement and architectural acoustic spaces, captured with robotic motion control arms.',
-    videoUrl: '/videos/reel_2.mp4',
-    director: 'Elena Rostova',
-    dop: 'Siddharth Kapoor',
-    camera: 'ARRI ALEXA 35 + Bolt High-Speed Rig',
-    lenses: 'Canon K-35 Vintage Primes',
-    colorGrade: 'Naturalistic Chiaroscuro Profile',
-    awards: ['Tribeca X Official Selection 2026'],
-    aspectRatio: 'wide',
-  },
-  {
-    id: '6',
-    slug: 'solstice-chronicles',
-    title: 'Solstice · The Electric Odyssey',
-    category: 'Commercial',
-    client: 'SOLSTICE EV AUTOMOTIVE',
-    year: '2025',
-    mediaUrl: '/images/bg-luxury.jpg',
-    coverImage: '/images/bg-luxury.jpg',
-    description: 'High-speed precision tracking shots across salt flats at dawn, showcasing aerodynamic engineering with custom FPV cinema drone cinematography.',
-    videoUrl: '/videos/reel_3.mp4',
-    director: 'Marcus Vance',
-    dop: 'Jean-Luc Moreau',
-    camera: 'RED V-Raptor 8K + Freefly Wave',
-    lenses: 'Angenieux Optimo Ultra Compact Zooms',
-    colorGrade: 'Hyper-Clean Metallic Grade',
-    awards: ['Motor Film Festival Best Commercial'],
-    aspectRatio: 'square',
-  },
-];
+
 
 export default function PortfolioPage() {
-  const [portfolioItems, setPortfolioItems] = useState<PortfolioProject[]>(FALLBACK_PORTFOLIO);
+  const [portfolioItems, setPortfolioItems] = useState<PortfolioProject[]>([]);
   const [activeFilter, setActiveFilter] = useState('All');
   const [categories, setCategories] = useState<string[]>(['All', 'Fashion Film', 'Music Video', 'Commercial', 'Brand Campaign', 'Art & Theatre']);
   const [isLoading, setIsLoading] = useState(true);
@@ -156,18 +41,18 @@ export default function PortfolioPage() {
     async function fetchPortfolio() {
       try {
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
-        const res = await fetch(`${apiUrl}/cms/portfolio`);
+        const res = await fetch(`${apiUrl}/cms/portfolio`, { cache: 'no-store' });
         if (res.ok) {
           const json = await res.json();
           if (json.success && json.data && json.data.length > 0) {
             const mapped = json.data.map((item: any, i: number) => ({
               ...item,
-              coverImage: item.coverImage || item.mediaUrl || FALLBACK_PORTFOLIO[i % FALLBACK_PORTFOLIO.length].mediaUrl,
+              coverImage: item.coverImage || item.mediaUrl || '',
               aspectRatio: i % 3 === 0 ? 'tall' : i % 3 === 1 ? 'wide' : 'square',
-              camera: item.camera || FALLBACK_PORTFOLIO[i % FALLBACK_PORTFOLIO.length].camera,
-              lenses: item.lenses || FALLBACK_PORTFOLIO[i % FALLBACK_PORTFOLIO.length].lenses,
-              colorGrade: item.colorGrade || FALLBACK_PORTFOLIO[i % FALLBACK_PORTFOLIO.length].colorGrade,
-              awards: item.awards || FALLBACK_PORTFOLIO[i % FALLBACK_PORTFOLIO.length].awards,
+              camera: item.camera || '',
+              lenses: item.lenses || '',
+              colorGrade: item.colorGrade || '',
+              awards: item.awards || [],
             }));
             setPortfolioItems(mapped);
             const cats = Array.from(new Set(mapped.map((i: any) => i.category))) as string[];
@@ -175,7 +60,7 @@ export default function PortfolioPage() {
           }
         }
       } catch (err) {
-        toast.error('Using offline master archive');
+        toast.error('Failed to fetch portfolio data');
       } finally {
         setIsLoading(false);
       }
@@ -194,7 +79,7 @@ export default function PortfolioPage() {
       client: project.client,
       year: project.year,
       description: project.description,
-      videoUrl: project.videoUrl || '/videos/project_1.mp4',
+      videoUrl: project.videoUrl || 'https://zmpeiobdilrgtuzggzuj.supabase.co/storage/v1/object/public/mdms/videos/reel_1.mp4',
       coverImage: project.mediaUrl,
       director: project.director || 'Kabir Nair',
       dop: project.dop || 'Aarav Mehta',

@@ -11,7 +11,7 @@ import { Instagram, Youtube, Linkedin, Twitter } from 'lucide-react';
 
 async function getTalentProfile(id: string) {
   try {
-        const res = await serverFetchAPI(`/talent/${id}`, { next: { revalidate: 60 } });
+        const res = await serverFetchAPI(`/talent/${id}`, { cache: 'no-store' });
     if (res.status === 404) return null;
     
     return res.data;
@@ -31,6 +31,9 @@ export default async function TalentProfile({ params }: { params: Promise<{ id: 
   if (!profile) {
     notFound();
   }
+
+  const profileImage = profile.user.avatarUrl || profile.portfolioMedia?.find((m: any) => m.type === 'PROFILE_PHOTO')?.url || profile.coverBannerUrl;
+  const portfolioPhotos = profile.portfolioMedia?.filter((m: any) => m.type === 'PORTFOLIO_IMAGE' || m.type === 'PORTFOLIO_VIDEO') || [];
 
   return (
     <>
@@ -53,9 +56,9 @@ export default async function TalentProfile({ params }: { params: Promise<{ id: 
               <Reveal direction="up" delay={0.1}>
                 {/* Main Image */}
                 <Card padding="none" className="aspect-[3/4] bg-surface mb-8 relative group overflow-hidden border border-border">
-                  {profile.profileImageUrl ? (
+                  {profileImage ? (
                     <img 
-                      src={profile.profileImageUrl} 
+                      src={profileImage} 
                       alt={`${profile.user.firstName} ${profile.user.lastName}`} 
                       className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-1000 ease-in-out"
                     />
@@ -204,15 +207,15 @@ export default async function TalentProfile({ params }: { params: Promise<{ id: 
           </div>
 
           {/* Portfolio Gallery (Tunnel Effect) */}
-          {profile.portfolioPhotos && profile.portfolioPhotos.length > 0 && (
+          {portfolioPhotos.length > 0 && (
             <div className="mt-32 w-full max-w-full">
               <Reveal direction="up">
                 <h2 className="text-3xl font-serif text-foreground mb-4 text-center">Portfolio</h2>
               </Reveal>
               <ScrollImageTunnel 
-                images={profile.portfolioPhotos.map((photoUrl: string, index: number) => ({
-                  src: photoUrl,
-                  alt: `Portfolio item ${index + 1}`
+                images={portfolioPhotos.map((photo: any, index: number) => ({
+                  src: photo.url,
+                  alt: photo.title || `Portfolio item ${index + 1}`
                 }))} 
               />
             </div>

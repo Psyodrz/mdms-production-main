@@ -60,34 +60,13 @@ interface TalentReview {
   status: 'pending' | 'approved' | 'rejected';
 }
 
-const FALLBACK_KPIS = {
-  activeProjects: '24',
-  pendingBookings: '18',
-  totalRevenue: '$485,000',
-  totalTalent: '142',
-};
 
-const FALLBACK_BOOKINGS: Booking[] = [
-  { id: 'bk-01', client: 'Vogue India', project: 'Summer Fashion Week Campaign', talent: 'Ariya Sharma', dates: 'Aug 12 - Aug 15, 2026', budget: '$12,500', status: 'pending' },
-  { id: 'bk-02', client: 'Netflix Originals', project: 'Feature Film Casting', talent: 'Kabir Mehta', dates: 'Sep 01 - Oct 15, 2026', budget: '$45,000', status: 'confirmed' },
-  { id: 'bk-03', client: 'Harper’s Bazaar', project: 'Editorial Cover Shoot', talent: 'Zara Khan', dates: 'Jul 25 - Jul 26, 2026', budget: '$8,200', status: 'in-progress' },
-  { id: 'bk-04', client: 'Nike Athletic', project: 'Global Digital Commercial', talent: 'Rohan Singhania', dates: 'Oct 05 - Oct 10, 2026', budget: '$28,000', status: 'pending' },
-];
 
-const FALLBACK_CMS_ITEMS: CMSItem[] = [
-  { id: 'p-01', title: 'Neon Dreams Commercial', category: 'Commercial', clientOrAuthor: 'Nike', status: 'Published', type: 'portfolio' },
-  { id: 'p-02', title: 'Desert Mirage Editorial', category: 'Fashion', clientOrAuthor: 'Vogue', status: 'Published', type: 'portfolio' },
-  { id: 'p-03', title: 'Symphony in Blue Film', category: 'Feature Film', clientOrAuthor: 'Universal', status: 'Draft', type: 'portfolio' },
-  { id: 'b-01', title: 'The Evolution of Cinematic Lighting in 2026', category: 'Production', clientOrAuthor: 'Vikram Mehta', status: 'Published', type: 'blog' },
-  { id: 'b-02', title: 'Top 5 Casting Trends for Luxury Brands', category: 'Casting', clientOrAuthor: 'Ananya Rao', status: 'Published', type: 'blog' },
-  { id: 't-01', title: '“MP Productions transformed our visual identity.”', category: 'Review', clientOrAuthor: 'CEO, Harper’s Bazaar', status: 'Published', type: 'testimonial' },
-];
 
-const FALLBACK_TALENT_REVIEWS: TalentReview[] = [
-  { id: 't-rev-1', name: 'Rohan Singhania', category: 'Fashion Model', experience: '4 Years', status: 'pending' },
-  { id: 't-rev-2', name: 'Meera Kapoor', category: 'Voice Actor', experience: '6 Years', status: 'pending' },
-  { id: 't-rev-3', name: 'Alok Verma', category: 'Cinematographer', experience: '8 Years', status: 'pending' },
-];
+
+
+
+
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -97,16 +76,16 @@ export default function AdminDashboard() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // KPI Stats State
-  const [kpis, setKpis] = useState(FALLBACK_KPIS);
+  const [kpis, setKpis] = useState<any>({});
 
   // Interactive Bookings State
-  const [bookings, setBookings] = useState<Booking[]>(FALLBACK_BOOKINGS);
+  const [bookings, setBookings] = useState<any[]>([]);
 
   // Interactive CMS State
-  const [cmsItems, setCmsItems] = useState<CMSItem[]>(FALLBACK_CMS_ITEMS);
+  const [cmsItems, setCmsItems] = useState<any[]>([]);
 
   // Talent Moderation State
-  const [talentReviews, setTalentReviews] = useState<TalentReview[]>(FALLBACK_TALENT_REVIEWS);
+  const [talentReviews, setTalentReviews] = useState<any[]>([]);
 
   // Editing Modal State
   const [editingItem, setEditingItem] = useState<CMSItem | null>(null);
@@ -135,10 +114,10 @@ export default function AdminDashboard() {
         const d = kpiRes.data || kpiRes;
         if (d) {
           setKpis({
-            activeProjects: String(d.activeProjects ?? FALLBACK_KPIS.activeProjects),
-            pendingBookings: String(d.pendingBookings ?? FALLBACK_KPIS.pendingBookings),
-            totalRevenue: String(d.totalRevenue ?? FALLBACK_KPIS.totalRevenue),
-            totalTalent: String(d.totalTalent ?? FALLBACK_KPIS.totalTalent),
+            activeProjects: String(d.activeProjects ?? 0),
+            pendingBookings: String(d.pendingBookings ?? 0),
+            totalRevenue: String(d.totalRevenue ?? 0),
+            totalTalent: String(d.totalTalent ?? 0),
           });
         }
       }

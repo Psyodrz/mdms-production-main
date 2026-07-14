@@ -1,22 +1,17 @@
 import { PortalNavbar } from '@/components/ui/PortalNavbar';
 import { Reveal } from '@/components/ui/Reveal';
 
-const FALLBACK_FLAGS = [
-  { key: 'NEW_BOOKING_ENGINE_V2', description: 'Enable multi-stage escrow checkout and automated invoice generation.', enabled: true },
-  { key: 'VIRTUAL_STAGE_REALTIME_STATUS', description: 'Live IoT sensors telemetry feed on studio dashboard.', enabled: true },
-  { key: 'AI_CASTING_MATCHMAKER', description: 'AI-assisted talent recommendations for client casting briefs.', enabled: false },
-  { key: 'CLIENT_PORTAL_INSTANT_CHAT', description: 'Direct messaging channel between brand clients and studio producers.', enabled: true },
-];
+
 
 import { serverFetchAPI } from '@/lib/server-api-client';
 
 async function getFeatureFlags() {
   try {
     const res = await serverFetchAPI('/system/flags', { next: { revalidate: 0 } });
-    if (!res.success) return FALLBACK_FLAGS;
-    return (res.data && res.data.length > 0) ? res.data : FALLBACK_FLAGS;
+    if (!res.success) return [];
+    return (res.data && res.data.length > 0) ? res.data : [];
   } catch (error) {
-    return FALLBACK_FLAGS;
+    return [];
   }
 }
 

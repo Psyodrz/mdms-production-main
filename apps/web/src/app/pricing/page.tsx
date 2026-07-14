@@ -86,8 +86,15 @@ export default function Pricing() {
       fetchAPI('/cms/hero?page=pricing').catch(() => null)
     ])
       .then(([pricingRes, heroRes]) => {
-        if (pricingRes && pricingRes.success && pricingRes.data && pricingRes.data.length > 0) {
-          setPackages(pricingRes.data);
+        if (pricingRes && pricingRes.success && pricingRes.data) {
+          const fetchedTiers = Array.isArray(pricingRes.data)
+            ? pricingRes.data
+            : (pricingRes.data.tiers && Array.isArray(pricingRes.data.tiers))
+              ? pricingRes.data.tiers
+              : null;
+          if (fetchedTiers && fetchedTiers.length > 0) {
+            setPackages(fetchedTiers);
+          }
         }
         if (heroRes && heroRes.success && heroRes.data) {
           setHero(heroRes.data);

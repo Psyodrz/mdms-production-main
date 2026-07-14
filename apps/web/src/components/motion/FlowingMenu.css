@@ -98,3 +98,12 @@
   background-size: cover;
   background-position: 50% 50%;
 }
+
+@media (max-width: 768px) {
+  .marquee {
+    display: none !important;
+  }
+  .menu__item-link {
+    font-size: 3vh !important;
+  }
+}

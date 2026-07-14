@@ -2,15 +2,7 @@ import { PortalNavbar } from '@/components/ui/PortalNavbar';
 import { Reveal } from '@/components/ui/Reveal';
 import { Button } from '@/components/ui/Button';
 
-const FALLBACK_USERS = [
-  { id: '1', firstName: 'Aditya', lastName: '(Super Admin)', email: 'superadmin@mpproduction.com', role: 'SUPER_ADMIN', isActive: true },
-  { id: '2', firstName: 'Studio', lastName: 'Manager', email: 'admin@mpproduction.com', role: 'ADMIN', isActive: true },
-  { id: '3', firstName: 'Brand', lastName: 'Client', email: 'client@example.com', role: 'CLIENT', isActive: true },
-  { id: '4', firstName: 'Elena', lastName: 'Smith', email: 'talent@example.com', role: 'TALENT', isActive: true },
-  { id: '5', firstName: 'Vikram', lastName: 'Singhania', email: 'vikram@vogueindia.in', role: 'CLIENT', isActive: true },
-  { id: '6', firstName: 'Ariya', lastName: 'Sharma', email: 'ariya.model@talent.mp', role: 'TALENT', isActive: true },
-  { id: '7', firstName: 'Rohan', lastName: 'Mehta', email: 'rohan@mpproduction.com', role: 'ADMIN', isActive: true },
-];
+
 
 import { serverFetchAPI } from '@/lib/server-api-client';
 
@@ -19,9 +11,9 @@ async function getUsers() {
     const json = await serverFetchAPI('/admin/users?limit=50', { cache: 'no-store' });
     // /admin/users returns a paginated envelope: { data: { data: [...], total } }
     const list = Array.isArray(json?.data) ? json.data : json?.data?.data;
-    return Array.isArray(list) && list.length > 0 ? list : FALLBACK_USERS;
+    return Array.isArray(list) && list.length > 0 ? list : [];
   } catch (error) {
-    return FALLBACK_USERS;
+    return [];
   }
 }
 

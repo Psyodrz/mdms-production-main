@@ -58,6 +58,7 @@ export function CinematicViewerModal({
           transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
           className="fixed inset-0 z-10000 flex items-start justify-center bg-(--cinematic-bg)/95 backdrop-blur-2xl p-4 md:p-8 overflow-y-auto"
           onClick={onClose}
+          data-lenis-prevent="true"
         >
           {/* Close Button */}
           <div className="fixed top-6 right-6 z-10001">

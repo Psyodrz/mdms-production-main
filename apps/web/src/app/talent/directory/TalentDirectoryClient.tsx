@@ -105,7 +105,7 @@ export default function TalentDirectoryClient({ initialTalents }: { initialTalen
                 <Card padding="none" hover className="group cursor-pointer overflow-hidden border border-border">
                   <div className="relative aspect-[3/4] overflow-hidden bg-surface">
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10 opacity-60 group-hover:opacity-90 transition-opacity duration-300" />
-                    <img src={imageUrl} alt={name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                    <img src={imageUrl} alt={name || 'Talent profile'} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                     
                     {/* Availability Badge */}
                     <div className={`absolute top-3 right-3 z-20 px-2 py-1 rounded-sm text-[10px] uppercase tracking-wider font-semibold ${

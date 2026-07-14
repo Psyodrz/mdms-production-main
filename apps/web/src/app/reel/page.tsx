@@ -13,7 +13,7 @@ const REELS = [
     title: 'Cinematic Master Reel 2026',
     category: 'Commercial & Narrative',
     description: 'Our primary showcase featuring a high-octane blend of commercial narrative campaigns, automotive sequences, and stylized fashion segments. Shot on location across Mumbai, London, and Berlin.',
-    videoUrl: '/videos/reel_1.mp4',
+    videoUrl: 'https://zmpeiobdilrgtuzggzuj.supabase.co/storage/v1/object/public/mdms/videos/reel_1.mp4',
     coverImage: '/images/portfolio-hero.jpg',
     duration: '0:39',
     camera: 'ARRI ALEXA 35 (8K Open Gate)',
@@ -25,7 +25,7 @@ const REELS = [
     title: 'Midnight Anthem & Editorial Showreel',
     category: 'Music Video & Fashion',
     description: 'Deep exploration of lighting setups, shadow manipulation, and hyper-stylized editorial world-building. Focusing on rapid pacing and music synchronization.',
-    videoUrl: '/videos/reel_2.mp4',
+    videoUrl: 'https://zmpeiobdilrgtuzggzuj.supabase.co/storage/v1/object/public/mdms/videos/reel_2.mp4',
     coverImage: '/images/about-bts.jpg',
     duration: '0:42',
     camera: 'RED V-Raptor XL 8K VV',
@@ -37,7 +37,7 @@ const REELS = [
     title: 'Commercial Narrative & Organic Showreel',
     category: 'Brand Campaign',
     description: 'Stark coastal vistas, warm organic textures, and documentary-style cinematography. Highlighting natural light control and intimate human stories.',
-    videoUrl: '/videos/reel_3.mp4',
+    videoUrl: 'https://zmpeiobdilrgtuzggzuj.supabase.co/storage/v1/object/public/mdms/videos/reel_3.mp4',
     coverImage: '/images/services-lighting.jpg',
     duration: '0:35',
     camera: 'ARRI ALEXA Mini LF',
@@ -49,7 +49,7 @@ const REELS = [
     title: 'Skyline & Architectural Showcase',
     category: 'Documentary & Corporate',
     description: 'Dynamic framing, corporate branding, and precision motion control. Focused on high-concept architectural design and modern technical execution.',
-    videoUrl: '/videos/reel_4.mp4',
+    videoUrl: 'https://zmpeiobdilrgtuzggzuj.supabase.co/storage/v1/object/public/mdms/videos/reel_4.mp4',
     coverImage: '/images/careers-meeting.jpg',
     duration: '0:38',
     camera: 'Sony VENICE 2 8K',
@@ -92,7 +92,8 @@ export default function ReelPage() {
   // Sync play state when active reel changes
   useEffect(() => {
     if (videoRef.current) {
-      videoRef.current.load();
+      // Don't call .load() — changing src attribute already resets the video.
+      // Just attempt playback; if paused let user control.
       if (isPlaying) {
         videoRef.current.play().catch(() => setIsPlaying(false));
       }

@@ -159,9 +159,9 @@ export function ScrollImageTunnel({
   if (prefersReducedMotion) {
     return (
       <div className={cn("grid gap-4 bg-muted p-6", className)}>
-        {images.map((image) => (
+        {images.map((image, index) => (
           <div
-            key={image.src}
+            key={`${image.src}-${index}`}
             className="mx-auto aspect-[3/4] w-full max-w-xl overflow-hidden bg-background"
             data-theme="dark"
           >
@@ -194,7 +194,7 @@ export function ScrollImageTunnel({
         <section className="sticky top-0 left-0 h-screen w-full overflow-hidden bg-background" data-theme="dark">
           {images.map((image, index) => (
             <TunnelFrame
-              key={image.src}
+              key={`${image.src}-${index}`}
               src={image.src}
               alt={image.alt}
               index={index}

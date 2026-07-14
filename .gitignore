@@ -54,9 +54,11 @@ docker/miniodata/
 credentials.txt
 deploy.tar.gz
 
-# Local logs & large videos
+# Local logs
 push_log.txt
 push_progress.txt
-apps/web/public/videos/
 VIdeos/
 PHottos/
+
+# Large media files — serve from CDN/Supabase Storage, not Git
+apps/web/public/videos/*.mp4

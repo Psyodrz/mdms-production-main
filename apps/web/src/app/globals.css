@@ -123,7 +123,8 @@
 }
 
 :root.dark,
-:root[data-theme="midnight-navy"] {
+:root[data-theme="midnight-navy"],
+.dark {
   /* Scoped Cinematic Variables (Always Dark/High Contrast) */
   --cinematic-bg: oklch(0.08 0 0);           /* Pure Cinematic Black #060608 */
   --cinematic-bg-elevated: oklch(0.13 0.006 260); /* Obsidian Glass #0D0E12 */

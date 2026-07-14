@@ -6,15 +6,10 @@ import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { RefreshCw, Loader2, Plus } from 'lucide-react';
 
-const FALLBACK_FLAGS = [
-  { key: 'NEW_BOOKING_ENGINE_V2', description: 'Enable multi-stage escrow checkout and automated invoice generation.', enabled: true },
-  { key: 'VIRTUAL_STAGE_REALTIME_STATUS', description: 'Live IoT sensors telemetry feed on studio dashboard.', enabled: true },
-  { key: 'AI_CASTING_MATCHMAKER', description: 'AI-assisted talent recommendations for client casting briefs.', enabled: false },
-  { key: 'CLIENT_PORTAL_INSTANT_CHAT', description: 'Direct messaging channel between brand clients and studio producers.', enabled: true },
-];
+
 
 export default function AdminSettings() {
-  const [flags, setFlags] = useState<any[]>(FALLBACK_FLAGS);
+  const [flags, setFlags] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -37,7 +32,7 @@ export default function AdminSettings() {
         const json = await res.json();
         const list = json.data || json;
         if (Array.isArray(list)) {
-          setFlags(list.length > 0 ? list : FALLBACK_FLAGS);
+          setFlags(list.length > 0 ? list : []);
         }
         if (isRefresh) toast.success('Feature flags refreshed');
       } else {

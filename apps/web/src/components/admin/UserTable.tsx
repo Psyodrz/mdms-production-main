@@ -54,7 +54,10 @@ export function UserTable({ currentUserRole }: UserTableProps) {
     setLoading(true);
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') || localStorage.getItem('mdms_auth_token') : null;
+      const { createClient } = await import('@/utils/supabase/client');
+      const supabase = createClient();
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
       const headers: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
 
       const queryParams = new URLSearchParams({
@@ -92,7 +95,10 @@ export function UserTable({ currentUserRole }: UserTableProps) {
 
     const { type, userId, payload } = confirmAction;
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
-    const token = typeof window !== 'undefined' ? localStorage.getItem('token') || localStorage.getItem('mdms_auth_token') : null;
+    const { createClient } = await import('@/utils/supabase/client');
+    const supabase = createClient();
+    const { data: { session } } = await supabase.auth.getSession();
+    const token = session?.access_token;
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       ...(token && { Authorization: `Bearer ${token}` }),

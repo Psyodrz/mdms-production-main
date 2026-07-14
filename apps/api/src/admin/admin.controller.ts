@@ -13,7 +13,8 @@ export class AdminController {
   @Get('users')
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   async listUsers(@Query() dto: PaginateUsersDto) {
-    return this.adminService.listUsers(dto);
+    const data = await this.adminService.listUsers(dto);
+    return { success: true, ...data };
   }
 
   @Post('users')

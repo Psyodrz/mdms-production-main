@@ -5,21 +5,18 @@ import { Container } from '@/components/ui/Container';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 
-const FALLBACK_ASSIGNED_PROJECTS = [
-  { id: 'proj_edit_1', name: 'Vogue Autumn Editorial Film', status: 'POST_PRODUCTION', editDeadline: '2026-07-25', internalNotes: 'Color grade in Davinci Resolve, emphasis on warm autumn tones.', client: { user: { companyName: 'Vogue India' } } },
-  { id: 'proj_edit_2', name: 'Air Max Pulse Campaign Cut', status: 'EDITING', editDeadline: '2026-07-18', internalNotes: 'Sync cuts to 140 BPM electronic soundtrack.', client: { user: { companyName: 'Nike APAC' } } }
-];
+
 
 async function getAssignedProjects() {
   try {
     
     // Requires Editor token in production
     const res = await serverFetchAPI(`/editor/projects`, { next: { revalidate: 0 } });
-    if (!res.ok) return FALLBACK_ASSIGNED_PROJECTS;
+    if (!res.ok) return [];
     const json = res;
-    return (json.data && json.data.length > 0) ? json.data : FALLBACK_ASSIGNED_PROJECTS;
+    return (json.data && json.data.length > 0) ? json.data : [];
   } catch (error) {
-    return FALLBACK_ASSIGNED_PROJECTS;
+    return [];
   }
 }
 

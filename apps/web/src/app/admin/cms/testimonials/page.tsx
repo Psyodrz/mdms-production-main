@@ -7,14 +7,10 @@ import { toast } from 'sonner';
 import { RefreshCw, Trash2, Edit3, Loader2, Plus, Star } from 'lucide-react';
 import { fetchAPI } from '@/lib/api-client';
 
-const FALLBACK_TESTIMONIALS = [
-  { id: 't-1', clientName: 'Vikram Singhania', clientTitle: 'Creative Director', clientCompany: 'Vogue India', content: 'MP Production delivered an extraordinary lookbook film for our autumn collection. Their attention to detail and color grading is unmatched.', rating: 5, isApproved: true, isPublished: true },
-  { id: 't-2', clientName: 'Aria Mehta', clientTitle: 'Brand VP', clientCompany: 'Nike APAC', content: 'The virtual production soundstage and crew made filming our commercial seamless. Delivered 3 days ahead of schedule!', rating: 5, isApproved: true, isPublished: true },
-  { id: 't-3', clientName: 'Rohan Kapoor', clientTitle: 'Founder', clientCompany: 'Urban Footwear', content: 'A truly world-class production partner. The escrow billing and live shoot status tracking made collaboration effortless.', rating: 5, isApproved: true, isPublished: false },
-];
+
 
 export default function CMSTestimonials() {
-  const [testimonials, setTestimonials] = useState<any[]>(FALLBACK_TESTIMONIALS);
+  const [testimonials, setTestimonials] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -34,7 +30,7 @@ export default function CMSTestimonials() {
       const json = await fetchAPI('/cms/admin/testimonials');
       const list = json.data || json;
       if (Array.isArray(list)) {
-        setTestimonials(list.length > 0 ? list : FALLBACK_TESTIMONIALS);
+        setTestimonials(list.length > 0 ? list : []);
       }
       if (isRefresh) toast.success('Testimonials refreshed');
     } catch (err) {

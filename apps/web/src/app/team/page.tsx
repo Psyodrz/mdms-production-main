@@ -19,20 +19,16 @@ interface TeamMember {
   };
 }
 
-const FALLBACK_TEAM: TeamMember[] = [
-  { id: '1', name: 'Maya Lin', role: 'Executive Producer', photoUrl: '/images/team-1.jpg', bio: 'With 15+ years of production experience, Maya leads our global film and commercial campaigns.', socialLinks: { linkedin: 'https://linkedin.com' } },
-  { id: '2', name: 'Aarav Mehta', role: 'Director of Photography', photoUrl: '/images/team-2.jpg', bio: 'Aarav specializes in anamorphic high-speed cinematography and cinematic visual storytelling.', socialLinks: { instagram: 'https://instagram.com' } },
-  { id: '3', name: 'Elena Rostova', role: 'Art Director', photoUrl: '/images/team-3.jpg', bio: 'Elena curates the visual aesthetic for our highest-profile fashion and editorial clients.', socialLinks: { instagram: 'https://instagram.com' } },
-];
+
 
 async function getTeamMembers(): Promise<TeamMember[]> {
   try {
-    const res = await serverFetchAPI('/cms/team', { next: { revalidate: 300 } });
-    if (!res.success || !res.data || res.data.length === 0) return FALLBACK_TEAM;
+    const res = await serverFetchAPI('/cms/team', { cache: 'no-store' });
+    if (!res.success || !res.data || res.data.length === 0) return [];
     return res.data;
   } catch (error) {
     console.error('Error fetching team members:', error);
-    return FALLBACK_TEAM;
+    return [];
   }
 }
 

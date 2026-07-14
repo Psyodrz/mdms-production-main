@@ -7,7 +7,7 @@ import { serverFetchAPI } from '@/lib/server-api-client';
 
 async function getTalentProfile(id: string) {
   try {
-    const data = await serverFetchAPI(`/talent/${id}`, { next: { revalidate: 60 } });
+    const data = await serverFetchAPI(`/talent/${id}`, { cache: 'no-store' });
     if (!data) return null;
     return data.data ? data.data : data;
   } catch (error) {

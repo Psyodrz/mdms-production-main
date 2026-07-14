@@ -8,15 +8,9 @@ import { Card } from '@/components/ui/Card';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 
-const FALLBACK_PORTFOLIO = [
-  { id: '1', slug: 'neon-city', title: 'Neon Silk', category: 'Fashion', year: '2026', mediaUrl: '/images/project_1.jpg', description: 'High-fashion editorial campaign shot in Mumbai.' },
-  { id: '2', slug: 'midnight-run', title: 'Midnight Anthem', category: 'Music Video', year: '2026', mediaUrl: '/images/project_2.jpg', description: 'Concept-to-cut music video for VOLT Music.' },
-  { id: '3', slug: 'vantage-point', title: "Curinel's Reserve", category: 'Commercial', year: '2025', mediaUrl: '/images/project_3.jpg', description: 'Brand commercial shot on location in Goa.' },
-  { id: '4', slug: 'heritage-foundation', title: 'Skyline Suits', category: 'Corporate', year: '2025', mediaUrl: '/images/project_4.jpg', description: 'Executive brand film for Skyline Suits.' },
-];
 
 export default function Portfolio() {
-  const [portfolioItems, setPortfolioItems] = useState<any[]>(FALLBACK_PORTFOLIO);
+  const [portfolioItems, setPortfolioItems] = useState<any[]>([]);
   const [activeFilter, setActiveFilter] = useState('All');
   const [categories, setCategories] = useState<string[]>(['All', 'Fashion', 'Music Video', 'Commercial', 'Corporate']);
   const [isLoading, setIsLoading] = useState(false);
@@ -25,7 +19,7 @@ export default function Portfolio() {
     async function fetchPortfolio() {
       try {
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1';
-        const res = await fetch(`${apiUrl}/cms/portfolio`);
+        const res = await fetch(`${apiUrl}/cms/portfolio`, { cache: 'no-store' });
         if (res.ok) {
           const json = await res.json();
           if (json.success && json.data && json.data.length > 0) {

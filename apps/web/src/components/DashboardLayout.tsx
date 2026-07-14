@@ -84,9 +84,9 @@ export function DashboardLayout({ children, user, title }: DashboardLayoutProps)
   );
 
   return (
-    <div className="min-h-screen bg-[#08080C] text-white flex flex-col font-sans select-none">
+    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans select-none">
       {/* Top Header Navbar */}
-      <header className="h-20 bg-[#08080C]/85 backdrop-blur-3xl border-b border-white/10 px-6 sm:px-8 flex items-center justify-between sticky top-0 z-40 shadow-2xl">
+      <header className="h-20 bg-background/85 backdrop-blur-3xl border-b border-border px-6 sm:px-8 flex items-center justify-between sticky top-0 z-40 shadow-2xl">
         <div className="flex items-center gap-6 sm:gap-10">
           <Link href="/" data-cursor="hover" data-cursor-label="HOME" className="flex items-center gap-3 group">
             <img 
@@ -94,8 +94,8 @@ export function DashboardLayout({ children, user, title }: DashboardLayoutProps)
               alt="MP Production Logo" 
               className="h-14 w-auto object-contain transition-transform group-hover:scale-105 drop-shadow-[0_0_15px_rgba(235,61,38,0.3)]"
             />
-            <div className="hidden sm:flex flex-col border-l border-white/10 pl-3.5">
-              <span className="font-semibold text-xs uppercase tracking-widest text-white/50">
+            <div className="hidden sm:flex flex-col border-l border-border pl-3.5">
+              <span className="font-semibold text-xs uppercase tracking-widest text-muted-foreground">
                 MP PRODUCTION OS
               </span>
             </div>
@@ -106,13 +106,13 @@ export function DashboardLayout({ children, user, title }: DashboardLayoutProps)
             onClick={() => setIsCmdOpen(true)}
             data-cursor="hover"
             data-cursor-label="SEARCH"
-            className="hidden md:flex items-center justify-between w-64 lg:w-80 px-4 py-2.5 rounded-full bg-white/[0.04] border border-white/15 hover:border-[#eb3d26]/60 hover:bg-white/[0.07] transition-all text-sm text-white/60 group shadow-md"
+            className="hidden md:flex items-center justify-between w-64 lg:w-80 px-4 py-2.5 rounded-full bg-surface border border-border hover:border-primary/60 hover:bg-surface/80 transition-all text-sm text-muted-foreground group shadow-md"
           >
             <div className="flex items-center gap-2.5">
               <Search className="w-4 h-4 text-[#eb3d26] group-hover:scale-110 transition-transform" />
               <span className="font-medium tracking-wide">Search portal or commands...</span>
             </div>
-            <div className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-white/10 border border-white/15 text-xs font-bold text-white/80">
+            <div className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-muted/20 border border-border text-xs font-bold text-muted-foreground">
               <Command className="w-2.5 h-2.5" />
               <span>K</span>
             </div>
@@ -122,7 +122,7 @@ export function DashboardLayout({ children, user, title }: DashboardLayoutProps)
         <div className="flex items-center gap-4 sm:gap-6">
           <button
             onClick={() => setIsCmdOpen(true)}
-            className="md:hidden p-2.5 rounded-xl bg-white/10 border border-white/15 text-white"
+            className="md:hidden p-2.5 rounded-xl bg-surface border border-border text-foreground"
             title="Search"
           >
             <Search className="w-4 h-4 text-[#eb3d26]" />
@@ -131,12 +131,12 @@ export function DashboardLayout({ children, user, title }: DashboardLayoutProps)
           
 
           {/* User Profile Badge */}
-          <div className="flex items-center gap-3.5 border-l border-white/10 pl-4 sm:pl-6">
+          <div className="flex items-center gap-3.5 border-l border-border pl-4 sm:pl-6">
             <div className="w-10 h-10 rounded-full bg-[#eb3d26]/15 border border-[#eb3d26]/40 flex items-center justify-center text-[#eb3d26] font-bold text-base shrink-0 shadow-glow">
               {user.name ? user.name[0].toUpperCase() : <UserIcon className="w-4 h-4" />}
             </div>
             <div className="hidden lg:flex flex-col text-right">
-              <span className="text-xs font-mono font-bold text-white truncate max-w-[160px]">
+              <span className="text-xs font-mono font-bold text-foreground truncate max-w-[160px]">
                 {user.name || user.email}
               </span>
               <span
@@ -159,7 +159,7 @@ export function DashboardLayout({ children, user, title }: DashboardLayoutProps)
             }}
             data-cursor="hover"
             data-cursor-label="SIGN OUT"
-            className="flex items-center gap-2 bg-white/[0.04] hover:bg-[#eb3d26] text-white/80 hover:text-white border border-white/15 hover:border-[#eb3d26] px-4 py-2.5 rounded-full text-xs font-mono font-bold uppercase tracking-widest transition-all shadow-md"
+            className="flex items-center gap-2 bg-surface hover:bg-primary text-muted-foreground hover:text-white border border-border hover:border-primary px-4 py-2.5 rounded-full text-xs font-mono font-bold uppercase tracking-widest transition-all shadow-md"
             title="Sign Out"
           >
             <LogOut className="w-3.5 h-3.5" />
@@ -170,13 +170,13 @@ export function DashboardLayout({ children, user, title }: DashboardLayoutProps)
 
       {/* Main Content Body */}
       <div className="flex flex-1 flex-col md:flex-row">
-        <Suspense fallback={<aside className="w-full md:w-64 bg-[#08080C] border-r border-white/10 shrink-0" />}>
+        <Suspense fallback={<aside className="w-full md:w-64 bg-background border-r border-border shrink-0" />}>
           <div className="md:sticky md:top-20 md:h-[calc(100vh-5rem)] shrink-0 z-30">
             <Sidebar role={user.role} />
           </div>
         </Suspense>
 
-        <main className="flex-1 p-6 sm:p-10 lg:p-14 bg-[#08080C] min-w-0">
+        <main className="flex-1 p-6 sm:p-10 lg:p-14 bg-background min-w-0">
           <div className="max-w-7xl mx-auto">{children}</div>
         </main>
       </div>
@@ -189,7 +189,7 @@ export function DashboardLayout({ children, user, title }: DashboardLayoutProps)
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-50 flex items-start justify-center pt-24 px-4 bg-black/85 backdrop-blur-2xl"
+            className="fixed inset-0 z-50 flex items-start justify-center pt-24 px-4 bg-black/50 backdrop-blur-2xl"
             onClick={() => setIsCmdOpen(false)}
           >
             <motion.div
@@ -197,10 +197,10 @@ export function DashboardLayout({ children, user, title }: DashboardLayoutProps)
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.95, y: -20 }}
               transition={{ duration: 0.2 }}
-              className="w-full max-w-2xl bg-[#08080C] border border-white/20 rounded-3xl shadow-[0_0_80px_rgba(235,61,38,0.2)] overflow-hidden"
+              className="w-full max-w-2xl bg-background border border-border rounded-3xl shadow-2xl overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="p-5 border-b border-white/10 flex items-center gap-3">
+              <div className="p-5 border-b border-border flex items-center gap-3">
                 <Search className="w-5 h-5 text-[#eb3d26]" />
                 <input
                   type="text"
@@ -208,22 +208,22 @@ export function DashboardLayout({ children, user, title }: DashboardLayoutProps)
                   placeholder="Type a command or search portal sections..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-transparent border-none outline-none font-mono text-sm text-white placeholder:text-white/40"
+                  className="w-full bg-transparent border-none outline-none font-mono text-sm text-foreground placeholder:text-muted-foreground"
                 />
                 <button
                   onClick={() => setIsCmdOpen(false)}
-                  className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white/60 hover:text-white transition-colors"
+                  className="p-1.5 rounded-lg bg-surface hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
 
               <div className="p-4 max-h-[400px] overflow-y-auto space-y-2">
-                <div className="px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#eb3d26]">
+                <div className="px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
                   ● Quick Jump Commands
                 </div>
                 {filteredCommands.length === 0 ? (
-                  <div className="p-6 text-center text-white/50 font-mono text-xs">
+                  <div className="p-6 text-center text-muted-foreground font-mono text-xs">
                     No matching commands found.
                   </div>
                 ) : (
@@ -234,29 +234,29 @@ export function DashboardLayout({ children, user, title }: DashboardLayoutProps)
                         setIsCmdOpen(false);
                         router.push(cmd.href);
                       }}
-                      className="w-full p-3.5 rounded-2xl bg-white/[0.03] hover:bg-[#eb3d26] text-white/80 hover:text-white border border-white/10 hover:border-[#eb3d26] flex items-center justify-between transition-all group"
+                      className="w-full p-3.5 rounded-2xl bg-surface hover:bg-primary text-muted-foreground hover:text-white border border-border hover:border-primary flex items-center justify-between transition-all group"
                     >
                       <div className="flex items-center gap-3">
-                        <span className="p-2 rounded-xl bg-white/10 group-hover:bg-black/30 transition-colors">
+                        <span className="p-2 rounded-xl bg-background group-hover:bg-black/20 transition-colors">
                           {cmd.icon}
                         </span>
                         <span className="font-mono text-xs font-bold tracking-wider">{cmd.label}</span>
                       </div>
-                      <ArrowRight className="w-4 h-4 text-white/40 group-hover:text-white group-hover:translate-x-1 transition-transform" />
+                      <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-white group-hover:translate-x-1 transition-transform" />
                     </button>
                   ))
                 )}
               </div>
 
-              <div className="p-4 bg-white/[0.02] border-t border-white/10 flex items-center justify-between text-[11px] font-mono text-white/40">
+              <div className="p-4 bg-surface/50 border-t border-border flex items-center justify-between text-[11px] font-mono text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <span>Navigation shortcuts:</span>
-                  <kbd className="px-1.5 py-0.5 rounded bg-white/10 border border-white/20 text-white">↑↓</kbd>
+                  <kbd className="px-1.5 py-0.5 rounded bg-surface border border-border text-foreground">↑↓</kbd>
                   <span>to select</span>
-                  <kbd className="px-1.5 py-0.5 rounded bg-white/10 border border-white/20 text-white">ESC</kbd>
+                  <kbd className="px-1.5 py-0.5 rounded bg-surface border border-border text-foreground">ESC</kbd>
                   <span>to exit</span>
                 </div>
-                <span className="text-[#eb3d26] font-bold uppercase tracking-wider">MP Studio v2.6</span>
+                <span className="text-primary font-bold uppercase tracking-wider">MP Studio v2.6</span>
               </div>
             </motion.div>
           </motion.div>

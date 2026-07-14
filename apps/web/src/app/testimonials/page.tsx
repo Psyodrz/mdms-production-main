@@ -7,20 +7,16 @@ import { Card } from '@/components/ui/Card';
 import { serverFetchAPI } from '@/lib/server-api-client';
 import Image from 'next/image';
 
-const FALLBACK_TESTIMONIALS = [
-  { id: '1', clientName: 'Sarah Jenkins', clientTitle: 'Marketing Director', clientCompany: 'Volt Music', content: 'MP Productions completely elevated our brand with their cinematic vision. The Midnight Anthem video exceeded all expectations.', rating: 5 },
-  { id: '2', clientName: 'David Chen', clientTitle: 'CEO', clientCompany: 'Skyline Suits', content: 'Their attention to detail and precision in capturing the essence of our brand was truly remarkable. An absolute pleasure to work with.', rating: 5 },
-  { id: '3', clientName: 'Priya Sharma', clientTitle: 'Creative Lead', clientCompany: 'Curinel', content: 'From concept to final grade, the team delivered a masterpiece. The bespoke anamorphic optics made all the difference.', rating: 5 }
-];
+
 
 async function getTestimonials() {
   try {
     const res = await serverFetchAPI('/cms/testimonials', { cache: 'no-store' });
-    if (!res.success || !res.data || res.data.length === 0) return FALLBACK_TESTIMONIALS;
+    if (!res.success || !res.data || res.data.length === 0) return [];
     return res.data;
   } catch (error) {
     console.error('Error fetching testimonials:', error);
-    return FALLBACK_TESTIMONIALS;
+    return [];
   }
 }
 

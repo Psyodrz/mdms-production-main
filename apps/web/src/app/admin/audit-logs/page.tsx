@@ -6,15 +6,10 @@ import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { RefreshCw, Search, ShieldCheck } from 'lucide-react';
 
-const FALLBACK_AUDIT_LOGS = [
-  { id: 'log-1', createdAt: new Date(Date.now() - 3600000).toISOString(), actor: { firstName: 'Aditya', lastName: '(Super Admin)' }, action: 'ROLE_UPDATE', resource: 'User', resourceId: 'usr_02', ipAddress: '192.168.1.100' },
-  { id: 'log-2', createdAt: new Date(Date.now() - 7200000).toISOString(), actor: { firstName: 'Studio', lastName: 'Manager' }, action: 'CMS_PUBLISH', resource: 'Portfolio', resourceId: 'proj_89', ipAddress: '192.168.1.104' },
-  { id: 'log-3', createdAt: new Date(Date.now() - 14400000).toISOString(), actor: { firstName: 'System', lastName: '' }, action: 'ESCROW_RELEASE', resource: 'Invoice', resourceId: 'inv_402', ipAddress: '10.0.0.1' },
-  { id: 'log-4', createdAt: new Date(Date.now() - 28800000).toISOString(), actor: { firstName: 'Aditya', lastName: '(Super Admin)' }, action: 'SETTINGS_UPDATE', resource: 'Config', resourceId: 'sys_01', ipAddress: '192.168.1.100' },
-];
+
 
 export default function AuditLogs() {
-  const [logs, setLogs] = useState<any[]>(FALLBACK_AUDIT_LOGS);
+  const [logs, setLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [filterQuery, setFilterQuery] = useState('');
@@ -33,7 +28,7 @@ export default function AuditLogs() {
       if (res.ok) {
         const json = await res.json();
         if (json.data && Array.isArray(json.data)) {
-          setLogs(json.data.length > 0 ? json.data : FALLBACK_AUDIT_LOGS);
+          setLogs(json.data.length > 0 ? json.data : []);
         }
         if (isRefresh) toast.success('Audit trail refreshed');
       } else {

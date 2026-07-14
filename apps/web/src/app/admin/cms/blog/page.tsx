@@ -7,15 +7,10 @@ import { toast } from 'sonner';
 import { RefreshCw, Trash2, Edit3, Loader2, Plus } from 'lucide-react';
 import { fetchAPI } from '@/lib/api-client';
 
-const FALLBACK_BLOG_POSTS = [
-  { id: 'b-1', title: 'The Evolution of Virtual Production in Luxury Advertising', slug: 'evolution-virtual-production', category: 'Technology', publishedAt: '2026-06-15', status: 'PUBLISHED', isPublished: true },
-  { id: 'b-2', title: 'Casting for Global Brands: Diversity & Authenticity in 2026', slug: 'casting-global-brands-2026', category: 'Casting & Talent', publishedAt: '2026-05-28', status: 'PUBLISHED', isPublished: true },
-  { id: 'b-3', title: 'Behind the Scenes: Designing Soundstages for High-Speed Robotics', slug: 'behind-the-scenes-robotics', category: 'Studio Production', publishedAt: '2026-04-10', status: 'PUBLISHED', isPublished: true },
-  { id: 'b-4', title: 'Color Grading Secrets: Achieving the Cinematic Look', slug: 'color-grading-secrets', category: 'Post-Production', publishedAt: null, status: 'DRAFT', isPublished: false },
-];
+
 
 export default function CMSBlog() {
-  const [posts, setPosts] = useState<any[]>(FALLBACK_BLOG_POSTS);
+  const [posts, setPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -32,7 +27,7 @@ export default function CMSBlog() {
       const json = await fetchAPI('/cms/admin/blog');
       const list = json.data || json;
       if (Array.isArray(list)) {
-        setPosts(list.length > 0 ? list : FALLBACK_BLOG_POSTS);
+        setPosts(list.length > 0 ? list : []);
       }
       if (isRefresh) toast.success('Blog posts refreshed');
     } catch (err) {

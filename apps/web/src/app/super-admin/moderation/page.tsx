@@ -1,10 +1,7 @@
 import { PortalNavbar } from '@/components/ui/PortalNavbar';
 import { Reveal } from '@/components/ui/Reveal';
 
-const FALLBACK_PENDING_PROFILES = [
-  { id: 'tal-1', user: { firstName: 'Kavya', lastName: 'Nair' }, city: 'Mumbai', talentTypes: ['HIGH_FASHION', 'RUNWAY'], bio: 'Fashion model with experience in editorial print and luxury brand runways across Mumbai and Paris.' },
-  { id: 'tal-2', user: { firstName: 'Sameer', lastName: 'Khanna' }, city: 'Delhi', talentTypes: ['COMMERCIAL_ACTOR', 'VOICEOVER'], bio: 'Commercial actor featured in national television advertisements and bilingual voiceover campaigns.' },
-];
+
 
 import { serverFetchAPI } from '@/lib/server-api-client';
 
@@ -13,9 +10,9 @@ async function getPendingProfiles() {
     // Authenticated call — pending talent queue requires ADMIN/SUPER_ADMIN.
     const json = await serverFetchAPI('/talent/pending', { cache: 'no-store' });
     const list = Array.isArray(json?.data) ? json.data : json?.data?.data;
-    return Array.isArray(list) && list.length > 0 ? list : FALLBACK_PENDING_PROFILES;
+    return Array.isArray(list) && list.length > 0 ? list : [];
   } catch (error) {
-    return FALLBACK_PENDING_PROFILES;
+    return [];
   }
 }
 

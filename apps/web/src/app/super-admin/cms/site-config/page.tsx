@@ -82,6 +82,7 @@ function SiteConfigContent() {
           { label: "About Us", href: "/about" },
           { label: "Services", href: "/services" },
           { label: "Meet the Team", href: "/team" },
+          { label: "Testimonials", href: "/testimonials" },
           { label: "Careers", href: "/careers" },
           { label: "Blog", href: "/blog" },
         ],
@@ -91,6 +92,7 @@ function SiteConfigContent() {
         links: [
           { label: "Portfolio", href: "/portfolio" },
           { label: "Showreels", href: "/reel" },
+          { label: "Pricing", href: "/pricing" },
           { label: "Talent Directory", href: "/talent/directory" },
           { label: "Join as Talent", href: "/join/talent" },
           { label: "Client Portal", href: "/client-portal" },
@@ -98,13 +100,15 @@ function SiteConfigContent() {
         ],
       },
       {
-        title: "Legal & Support",
+        title: "Support & Legal",
         links: [
+          { label: "Contact Us", href: "/contact" },
+          { label: "FAQs", href: "/faq" },
+          { label: "Live Chat", href: "/contact" },
           { label: "Privacy Policy", href: "/privacy" },
           { label: "Terms of Service", href: "/terms" },
           { label: "Security & Compliance", href: "/security" },
           { label: "Help Center", href: "/help" },
-          { label: "Contact Us", href: "/contact" },
         ],
       },
     ] as Array<{ title: string; links: Array<{ label: string; href: string }> }>,
@@ -148,7 +152,13 @@ function SiteConfigContent() {
         } else if (tab === 'stats') {
           setStats(Array.isArray(val) ? val : []);
         } else if (tab === 'pricing') {
-          setPricing(Array.isArray(val) ? val : []);
+          if (Array.isArray(val)) {
+            setPricing(val);
+          } else if (val && typeof val === 'object' && Array.isArray(val.tiers)) {
+            setPricing(val.tiers);
+          } else {
+            setPricing([]);
+          }
         } else if (tab === 'navbar') {
           if (Array.isArray(val)) {
             setNavbar(prev => ({
@@ -208,7 +218,7 @@ function SiteConfigContent() {
     let configKey = activeTab as string;
     if (activeTab === 'hero') payload = hero;
     else if (activeTab === 'stats') payload = stats;
-    else if (activeTab === 'pricing') payload = pricing;
+    else if (activeTab === 'pricing') payload = { tiers: pricing };
     else if (activeTab === 'navbar') {
       configKey = 'navigation';
       payload = navbar;

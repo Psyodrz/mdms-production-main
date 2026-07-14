@@ -28,7 +28,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, { rawBody: true });
 
   const configService = app.get(ConfigService);
-  const port = configService.get<number>('API_PORT', 4000);
+  const port = process.env.PORT ? parseInt(process.env.PORT, 10) : configService.get<number>('API_PORT', 4000);
   const appUrl = configService.get<string>('APP_URL', 'http://localhost:3000');
 
   // Security

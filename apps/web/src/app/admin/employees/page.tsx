@@ -6,15 +6,10 @@ import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { RefreshCw, Trash2, Edit3, Loader2, Plus } from 'lucide-react';
 
-const FALLBACK_EMPLOYEES = [
-  { id: 'emp-1', user: { firstName: 'Siddharth', lastName: 'Roy', email: 's.roy@mpproduction.com' }, designation: 'Senior Producer & Studio Head', department: 'Production', joiningDate: '2023-01-15' },
-  { id: 'emp-2', user: { firstName: 'Ananya', lastName: 'Iyer', email: 'ananya@mpproduction.com' }, designation: 'Lead Casting Director', department: 'Talent & Casting', joiningDate: '2023-04-10' },
-  { id: 'emp-3', user: { firstName: 'Vikramaditya', lastName: 'Bose', email: 'vikram@mpproduction.com' }, designation: 'Head of VFX & Color Grading', department: 'Post-Production', joiningDate: '2023-08-01' },
-  { id: 'emp-4', user: { firstName: 'Neelam', lastName: 'Verma', email: 'neelam@mpproduction.com' }, designation: 'Client Accounts Manager', department: 'Client Relations', joiningDate: '2024-02-15' },
-];
+
 
 export default function EmployeeRoster() {
-  const [employees, setEmployees] = useState<any[]>(FALLBACK_EMPLOYEES);
+  const [employees, setEmployees] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -39,7 +34,7 @@ export default function EmployeeRoster() {
         const json = await res.json();
         const list = json.data || json;
         if (Array.isArray(list)) {
-          setEmployees(list.length > 0 ? list : FALLBACK_EMPLOYEES);
+          setEmployees(list.length > 0 ? list : []);
         }
         if (isRefresh) toast.success('Employee roster refreshed');
       } else {

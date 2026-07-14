@@ -70,8 +70,8 @@ export function ResourceManager({ config }: { config: ResourceConfig }) {
       setItems(res.data);
       setDemo(false);
     } else {
-      setItems(config.sample as Item[]);
-      setDemo(true);
+      setItems([]);
+      setDemo(false);
     }
     setLoading(false);
   }, [config]);

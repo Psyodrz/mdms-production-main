@@ -6,13 +6,10 @@ import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { RefreshCw, Loader2, Check, X, Eye } from 'lucide-react';
 
-const FALLBACK_PENDING_PROFILES = [
-  { id: 'tal-1', user: { firstName: 'Kavya', lastName: 'Nair' }, city: 'Mumbai', talentTypes: ['HIGH_FASHION', 'RUNWAY'], bio: 'Fashion model with experience in editorial print and luxury brand runways across Mumbai and Paris.' },
-  { id: 'tal-2', user: { firstName: 'Sameer', lastName: 'Khanna' }, city: 'Delhi', talentTypes: ['COMMERCIAL_ACTOR', 'VOICEOVER'], bio: 'Commercial actor featured in national television advertisements and bilingual voiceover campaigns.' },
-];
+
 
 export default function ContentModeration() {
-  const [pendingProfiles, setPendingProfiles] = useState<any[]>(FALLBACK_PENDING_PROFILES);
+  const [pendingProfiles, setPendingProfiles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [actionLoading, setActionLoading] = useState<Record<string, boolean>>({});
@@ -32,7 +29,7 @@ export default function ContentModeration() {
         const json = await res.json();
         const list = json.data || json;
         if (Array.isArray(list)) {
-          setPendingProfiles(list.length > 0 ? list : FALLBACK_PENDING_PROFILES);
+          setPendingProfiles(list.length > 0 ? list : []);
         }
         if (isRefresh) toast.success('Pending profiles refreshed');
       } else {

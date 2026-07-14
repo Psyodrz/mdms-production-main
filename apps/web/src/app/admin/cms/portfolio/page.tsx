@@ -8,15 +8,10 @@ import { toast } from 'sonner';
 import { RefreshCw, Trash2, Edit3, Loader2 } from 'lucide-react';
 import { fetchAPI } from '@/lib/api-client';
 
-const FALLBACK_PORTFOLIO_ITEMS = [
-  { id: 'p-1', title: 'Vogue Autumn Editorial Lookbook', slug: 'vogue-autumn-2026', category: 'Fashion', mediaType: 'video', isFeatured: true },
-  { id: 'p-2', title: 'Air Max Pulse Campaign', slug: 'air-max-pulse', category: 'Commercial', mediaType: 'video', isFeatured: true },
-  { id: 'p-3', title: 'Monochrome Studio Series', slug: 'monochrome-series', category: 'Portrait', mediaType: 'image', isFeatured: true },
-  { id: 'p-4', title: 'Virtual Stage Showreel 2026', slug: 'virtual-stage-showreel', category: 'Virtual Production', mediaType: 'video', isFeatured: false },
-];
+
 
 export default function CMSPortfolio() {
-  const [items, setItems] = useState<any[]>(FALLBACK_PORTFOLIO_ITEMS);
+  const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -28,7 +23,7 @@ export default function CMSPortfolio() {
       const json = await fetchAPI('/cms/admin/portfolio');
       const list = json.data || json;
       if (Array.isArray(list)) {
-        setItems(list.length > 0 ? list : FALLBACK_PORTFOLIO_ITEMS);
+        setItems(list.length > 0 ? list : []);
       }
       if (isRefresh) toast.success('Portfolio items refreshed');
     } catch (err) {

@@ -11,27 +11,16 @@ import { toast } from 'sonner';
 import { fetchAPI } from '@/lib/api-client';
 import Image from 'next/image';
 
-const FALLBACK_BLOG = [
-  {
-    id: '1', slug: 'cinema-color-grade', title: 'The Science of Color Grading', excerpt: 'Deep dive into creating iconic cinematic looks using DaVinci Resolve.', category: 'Post-Production', author: 'Aarav Mehta', coverImageUrl: '/images/about-bts.jpg', publishedAt: new Date().toISOString()
-  },
-  {
-    id: '2', slug: 'high-speed-motion', title: 'Mastering High-Speed Motion Control', excerpt: 'Behind the scenes on configuring robotic arms for fluid dynamic shots.', category: 'Cinematography', author: 'Elena Rostova', coverImageUrl: '/images/portfolio-equipment.jpg', publishedAt: new Date().toISOString()
-  },
-  {
-    id: '3', slug: 'anamorphic-lens-guide', title: 'Anamorphic Lens Selection', excerpt: 'How to choose the perfect anamorphic lens for your next narrative film.', category: 'Gear', author: 'Maya Lin', coverImageUrl: '/images/services-lighting.jpg', publishedAt: new Date().toISOString()
-  }
-];
 
 export default function Blog() {
-  const [posts, setPosts] = useState<any[]>(FALLBACK_BLOG);
+  const [posts, setPosts] = useState<any[]>([]);
   const [hero, setHero] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     Promise.all([
-      fetchAPI('/cms/blog').catch(() => null),
-      fetchAPI('/cms/hero?page=blog').catch(() => null)
+      fetchAPI('/cms/blog', { cache: 'no-store' }).catch(() => null),
+      fetchAPI('/cms/hero?page=blog', { cache: 'no-store' }).catch(() => null)
     ])
       .then(([blogRes, heroRes]) => {
         if (blogRes && blogRes.success && blogRes.data && blogRes.data.length > 0) {
@@ -61,7 +50,7 @@ export default function Blog() {
           {/* Header Section */}
         <section className="relative w-full h-[60vh] flex items-center justify-center overflow-hidden mb-20 text-center -mx-4 sm:-mx-8 lg:-mx-12 px-4 sm:px-8 lg:px-12 w-[calc(100%+2rem)] sm:w-[calc(100%+4rem)] lg:w-[calc(100%+6rem)] rounded-none">
           <Image 
-            src="/images/portfolio-hero.jpg" 
+            src="/images/about-hero.jpg" 
             alt="The Journal" 
             fill 
             className="object-cover" 

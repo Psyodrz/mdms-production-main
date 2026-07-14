@@ -165,8 +165,12 @@ export function HoverFooter() {
   React.useEffect(() => {
     fetchAPI('/cms/config/footer')
       .then(json => {
-        if (json?.success && json?.data?.value) {
-          const val = typeof json.data.value === 'string' ? JSON.parse(json.data.value) : json.data.value;
+        if (json?.success && json?.data) {
+          const val = typeof json.data === 'string'
+            ? JSON.parse(json.data)
+            : typeof json.data.value === 'string'
+              ? JSON.parse(json.data.value)
+              : json.data.value || json.data;
           setFooterConfig((prev: any) => ({ ...prev, ...val }));
         }
       })
@@ -181,6 +185,7 @@ export function HoverFooter() {
         { label: "About Us", href: "/about" },
         { label: "Services", href: "/services" },
         { label: "Meet the Team", href: "/team" },
+        { label: "Testimonials", href: "/testimonials" },
         { label: "Careers", href: "/careers" },
         { label: "Blog", href: "/blog" },
       ],
@@ -190,6 +195,7 @@ export function HoverFooter() {
       links: [
         { label: "Portfolio", href: "/portfolio" },
         { label: "Showreels", href: "/reel" },
+        { label: "Pricing", href: "/pricing" },
         { label: "Talent Directory", href: "/talent/directory" },
         { label: "Join as Talent", href: "/join/talent" },
         { label: "Client Portal", href: "/client-portal" },
@@ -197,7 +203,7 @@ export function HoverFooter() {
       ],
     },
     {
-      title: "Support",
+      title: "Support & Legal",
       links: [
         { label: "Contact Us", href: "/contact" },
         { label: "FAQs", href: "/faq" },
@@ -206,6 +212,10 @@ export function HoverFooter() {
           href: "/contact",
           pulse: true,
         },
+        { label: "Privacy Policy", href: "/privacy" },
+        { label: "Terms of Service", href: "/terms" },
+        { label: "Security & Compliance", href: "/security" },
+        { label: "Help Center", href: "/help" },
       ],
     },
   ];

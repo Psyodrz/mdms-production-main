@@ -1,12 +1,7 @@
 import { PortalNavbar } from '@/components/ui/PortalNavbar';
 import { Reveal } from '@/components/ui/Reveal';
 
-const FALLBACK_EMPLOYEES = [
-  { id: 'emp-1', user: { firstName: 'Siddharth', lastName: 'Roy', email: 's.roy@mpproduction.com' }, designation: 'Senior Producer & Studio Head', department: 'Production', joiningDate: '2023-01-15' },
-  { id: 'emp-2', user: { firstName: 'Ananya', lastName: 'Iyer', email: 'ananya@mpproduction.com' }, designation: 'Lead Casting Director', department: 'Talent & Casting', joiningDate: '2023-04-10' },
-  { id: 'emp-3', user: { firstName: 'Vikramaditya', lastName: 'Bose', email: 'vikram@mpproduction.com' }, designation: 'Head of VFX & Color Grading', department: 'Post-Production', joiningDate: '2023-08-01' },
-  { id: 'emp-4', user: { firstName: 'Neelam', lastName: 'Verma', email: 'neelam@mpproduction.com' }, designation: 'Client Accounts Manager', department: 'Client Relations', joiningDate: '2024-02-15' },
-];
+
 
 import { serverFetchAPI } from '@/lib/server-api-client';
 
@@ -15,9 +10,9 @@ async function getEmployees() {
     // Authenticated call — employee roster requires ADMIN/SUPER_ADMIN.
     const json = await serverFetchAPI('/employee', { cache: 'no-store' });
     const list = Array.isArray(json?.data) ? json.data : json?.data?.data;
-    return Array.isArray(list) && list.length > 0 ? list : FALLBACK_EMPLOYEES;
+    return Array.isArray(list) && list.length > 0 ? list : [];
   } catch (error) {
-    return FALLBACK_EMPLOYEES;
+    return [];
   }
 }
 

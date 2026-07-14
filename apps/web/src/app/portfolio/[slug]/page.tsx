@@ -7,8 +7,6 @@ import { Container } from '@/components/ui/Container';
 import { VideoPlayer } from '@/components/ui/VideoPlayer';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { FALLBACK_PORTFOLIO } from '../page';
-
 export default function ProjectDetails({ params }: { params: { slug: string } }) {
   const [slug, setSlug] = useState<string>('');
   const [project, setProject] = useState<any>(null);
@@ -24,18 +22,12 @@ export default function ProjectDetails({ params }: { params: { slug: string } })
           if (json.success && json.data) {
             setProject(json.data);
           } else {
-            const fallback = FALLBACK_PORTFOLIO.find(item => item.slug === p.slug); // match current slug
-            if (fallback) setProject(fallback);
-            else setProject(null);
+            setProject(null);
           }
         })
         .catch(() => {
-          const fallback = FALLBACK_PORTFOLIO.find(item => item.slug === p.slug);
-          if (fallback) setProject(fallback);
-          else {
-            toast.error('Failed to load project details');
-            setProject(null);
-          }
+          toast.error('Failed to load project details');
+          setProject(null);
         })
         .finally(() => {
           setLoading(false);

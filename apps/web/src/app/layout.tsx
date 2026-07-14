@@ -49,7 +49,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${outfit.variable} ${cormorant.variable}`} suppressHydrationWarning>
       <body className="bg-background text-foreground antialiased selection:bg-[#eb3d26] selection:text-white">
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           <AuthProvider>
             <LenisProvider>
               <CinematicAtmosphere />

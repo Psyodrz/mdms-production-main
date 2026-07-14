@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
 import { fetchAPI } from '@/lib/api-client';
 import Link from 'next/link';
 import { PortalNavbar } from '@/components/ui/PortalNavbar';
@@ -86,7 +85,6 @@ function toBookingStatus(status: Booking['status']): string {
 
 export default function SuperAdminDashboard() {
   const router = useRouter();
-  const { data: session } = useSession();
   const [activeTab, setActiveTab] = useState<'overview' | 'cms' | 'bookings' | 'users' | 'settings'>('overview');
   const [isLoadingLive, setIsLoadingLive] = useState(true);
   const [isLiveDb, setIsLiveDb] = useState(false);
