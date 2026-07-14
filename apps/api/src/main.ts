@@ -32,7 +32,12 @@ async function bootstrap() {
   const appUrl = configService.get<string>('APP_URL', 'http://localhost:3000');
 
   // Security
-  app.use(helmet());
+  app.use(
+    helmet({
+      crossOriginResourcePolicy: { policy: 'cross-origin' },
+      crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' },
+    }),
+  );
   app.use(cookieParser());
 
   // CORS — strict origin allowlist
