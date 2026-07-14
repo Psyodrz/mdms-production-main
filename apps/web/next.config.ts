@@ -35,9 +35,10 @@ const nextConfig: NextConfig = {
     ];
   },
   async rewrites() {
-    const publicApiUrl = process.env.NEXT_PUBLIC_API_URL
-      ? process.env.NEXT_PUBLIC_API_URL.replace(/\/api\/v1\/?$/, '')
-      : '';
+    const rawPublic = process.env.NEXT_PUBLIC_API_URL || '';
+    const publicApiUrl = rawPublic.includes('vercel.app') || rawPublic.includes('localhost:3000') || rawPublic.includes('mpproductions')
+      ? ''
+      : rawPublic.replace(/\/api\/v1\/?$/, '');
     const apiBase = process.env.API_URL || publicApiUrl || 'https://mp-backend-api.onrender.com';
     return [
       {
