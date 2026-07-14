@@ -1,8 +1,8 @@
-﻿services:
+services:
   - type: web
     name: mp-backend-api
     env: node
-    buildCommand: "npm install -g pnpm && pnpm install && npx prisma generate && pnpm --filter @mdms/api build"
+    buildCommand: "npm install -g pnpm && pnpm install && npx prisma generate && pnpm --filter @mdms/types build && pnpm --filter @mdms/api build"
     startCommand: "pnpm --filter @mdms/api start:prod"
     envVars:
       - key: NODE_ENV
