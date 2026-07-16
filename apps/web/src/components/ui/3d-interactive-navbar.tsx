@@ -9,9 +9,10 @@ import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useTheme } from "next-themes";
 import FlowingMenu from "@/components/motion/FlowingMenu";
+import { fetchAPI } from "@/lib/api-client";
 
-/* ─── Nav items ─── */
-const navItems = [
+/* ─── Default nav items (structural fallback while CMS loads) ─── */
+const DEFAULT_NAV_ITEMS = [
   { title: "Home", href: "/" },
   { title: "Showreels", href: "/reel" },
   { title: "Portfolio", href: "/portfolio" },
@@ -22,16 +23,17 @@ const navItems = [
   { title: "Contact", href: "/contact" },
 ];
 
-const flowingMenuData = [
-  { link: "/", text: "Home", image: "/assets/cinematic-16-9.png" },
-  { link: "/reel", text: "Showreels", image: "/images/about-bts.jpg" },
-  { link: "/portfolio", text: "Portfolio", image: "/assets/project-fashion.jpg" },
-  { link: "/services", text: "Services", image: "/assets/service_pre_production.png" },
-  { link: "/talent", text: "Talent", image: "/assets/service_casting.png" },
-  { link: "/about", text: "About", image: "/assets/project-corporate.jpg" },
-  { link: "/blog", text: "Blog", image: "/assets/project-music.jpg" },
-  { link: "/contact", text: "Contact", image: "/assets/project-commercial.jpg" },
-];
+/* Default image map for flowing menu — maps href to image */
+const DEFAULT_MENU_IMAGES: Record<string, string> = {
+  "/": "/assets/cinematic-16-9.png",
+  "/reel": "/images/about-bts.jpg",
+  "/portfolio": "/assets/project-fashion.jpg",
+  "/services": "/assets/service_pre_production.png",
+  "/talent": "/assets/service_casting.png",
+  "/about": "/assets/project-corporate.jpg",
+  "/blog": "/assets/project-music.jpg",
+  "/contact": "/assets/project-commercial.jpg",
+};
 
 /* ─── Navbar ─── */
 export function Navbar() {
@@ -39,6 +41,7 @@ export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const { resolvedTheme } = useTheme();
+  const [navItems, setNavItems] = useState(DEFAULT_NAV_ITEMS);
   
   const isForcedDark = false; // Deprecated, theme variables are now light-aware
   const useLightText = resolvedTheme === "dark";
@@ -56,6 +59,34 @@ export function Navbar() {
   useEffect(() => {
     setMobileOpen(false);
   }, [pathname]);
+
+  // Fetch navigation config from CMS
+  useEffect(() => {
+    fetchAPI('/cms/config/navigation')
+      .then((res) => {
+        if (res?.success && res?.data) {
+          const val = typeof res.data === 'string' ? JSON.parse(res.data) : res.data;
+          // Support: { links: [{ label, href }] } or direct array [{ label, href }]
+          const links = Array.isArray(val) ? val : (val.links && Array.isArray(val.links)) ? val.links : null;
+          if (links && links.length > 0) {
+            setNavItems(links.map((item: any) => ({
+              title: item.title || item.label || item.text || '',
+              href: item.href || item.url || item.link || '/',
+            })));
+          }
+        }
+      })
+      .catch(() => {
+        // Silently keep defaults — navbar should never break
+      });
+  }, []);
+
+  // Build flowing menu data from current navItems
+  const flowingMenuData = navItems.map((item) => ({
+    link: item.href,
+    text: item.title,
+    image: DEFAULT_MENU_IMAGES[item.href] || "/assets/cinematic-16-9.png",
+  }));
 
   return (
     <>

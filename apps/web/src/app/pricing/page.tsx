@@ -1,103 +1,72 @@
 "use client";
 
 import { Navbar } from '@/components/ui/Navbar';
-import { Footer } from '@/components/ui/Footer';
 import { Reveal } from '@/components/ui/Reveal';
 import { Container } from '@/components/ui/Container';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { fetchAPI } from '@/lib/api-client';
 import Image from 'next/image';
 
-const defaultPackages = [
-  {
-    name: "Starter",
-    price: "₹25,000",
-    period: "per project",
-    description: "Perfect for social media content and short-form brand videos.",
-    features: [
-      "Up to 1 shoot day",
-      "1 Cinematographer",
-      "Basic color grading",
-      "3 final deliverables",
-      "5 business day turnaround",
-      "1 revision round",
-    ],
-    highlighted: false,
-    cta: "Get Started"
-  },
-  {
-    name: "Professional",
-    price: "₹75,000",
-    period: "per project",
-    description: "Full-service production for brand campaigns and premium content.",
-    features: [
-      "Up to 3 shoot days",
-      "Full crew (DOP, Sound, PA)",
-      "Professional color grading",
-      "10 final deliverables",
-      "10 business day turnaround",
-      "3 revision rounds",
-      "Drone footage included",
-      "Licensed music",
-    ],
-    highlighted: true,
-    cta: "Most Popular"
-  },
-  {
-    name: "Enterprise",
-    price: "Custom",
-    period: "quoted",
-    description: "Large-scale productions, documentaries, and multi-day shoots.",
-    features: [
-      "Unlimited shoot days",
-      "Full crew + talent sourcing",
-      "Cinema-grade color grading",
-      "Unlimited deliverables",
-      "Custom timeline",
-      "Unlimited revisions",
-      "VFX & motion graphics",
-      "Dedicated project manager",
-      "Priority support",
-    ],
-    highlighted: false,
-    cta: "Contact Sales"
-  },
-];
+interface PricingTier {
+  name: string;
+  price: string;
+  period?: string;
+  description?: string;
+  features: string[];
+  highlighted?: boolean;
+  cta?: string;
+}
 
-const faqs = [
-  { q: "What's included in the base price?", a: "Every package includes professional cinematography, basic editing, and digital delivery via our client portal. Equipment, crew, and post-production scope vary by tier." },
-  { q: "Can I customize a package?", a: "Absolutely. Our pricing packages are starting points. We tailor every proposal to your project's specific needs after a discovery call." },
-  { q: "What payment methods do you accept?", a: "We accept UPI, Net Banking, Credit/Debit Cards, and EMI options through our secure Razorpay gateway. A 30% advance is required to confirm your booking." },
-  { q: "What is your cancellation policy?", a: "Cancellations 72+ hours before the shoot date receive a full refund of the advance. Within 72 hours, 50% of the advance is retained as a scheduling fee." },
-];
+interface PricingFaq {
+  q: string;
+  a: string;
+}
 
 export default function Pricing() {
-  const [packages, setPackages] = useState<any[]>(defaultPackages);
+  const [packages, setPackages] = useState<PricingTier[]>([]);
+  const [faqs, setFaqs] = useState<PricingFaq[]>([]);
   const [hero, setHero] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     Promise.all([
       fetchAPI('/cms/pricing').catch(() => null),
-      fetchAPI('/cms/hero?page=pricing').catch(() => null)
+      fetchAPI('/cms/hero?page=pricing').catch(() => null),
+      fetchAPI('/cms/config/pricing-faqs').catch(() => null),
     ])
-      .then(([pricingRes, heroRes]) => {
+      .then(([pricingRes, heroRes, faqRes]) => {
+        // ── Parse pricing tiers ──
         if (pricingRes && pricingRes.success && pricingRes.data) {
-          const fetchedTiers = Array.isArray(pricingRes.data)
-            ? pricingRes.data
-            : (pricingRes.data.tiers && Array.isArray(pricingRes.data.tiers))
-              ? pricingRes.data.tiers
+          const d = pricingRes.data;
+          // Support both { tiers: [...] } and direct array formats
+          const fetchedTiers: PricingTier[] | null = Array.isArray(d)
+            ? d
+            : (d.tiers && Array.isArray(d.tiers))
+              ? d.tiers
               : null;
           if (fetchedTiers && fetchedTiers.length > 0) {
             setPackages(fetchedTiers);
           }
         }
+
+        // ── Parse hero ──
         if (heroRes && heroRes.success && heroRes.data) {
           setHero(heroRes.data);
+        }
+
+        // ── Parse FAQs ──
+        if (faqRes && faqRes.success && faqRes.data) {
+          const faqData = Array.isArray(faqRes.data)
+            ? faqRes.data
+            : (faqRes.data.faqs && Array.isArray(faqRes.data.faqs))
+              ? faqRes.data.faqs
+              : null;
+          if (faqData && faqData.length > 0) {
+            setFaqs(faqData);
+          }
         }
       })
       .catch(() => {
@@ -159,10 +128,23 @@ export default function Pricing() {
                 </div>
               ))}
             </div>
+          ) : packages.length === 0 ? (
+            /* Empty state — no pricing configured in CMS yet */
+            <div className="text-center py-20 mb-32">
+              <Reveal direction="up">
+                <h2 className="text-3xl font-serif text-foreground mb-4">Pricing Coming Soon</h2>
+                <p className="text-muted-foreground font-light max-w-lg mx-auto mb-8">
+                  Our pricing packages are being finalized. Contact us for a custom quote.
+                </p>
+                <Button href="/contact" variant="primary" size="lg">
+                  Request a Quote
+                </Button>
+              </Reveal>
+            </div>
           ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-32">
+            <div className={`grid grid-cols-1 ${packages.length === 2 ? 'lg:grid-cols-2 max-w-4xl mx-auto' : packages.length >= 3 ? 'lg:grid-cols-3' : 'max-w-lg mx-auto'} gap-8 mb-32`}>
               {packages.map((pkg, idx) => (
-                <Reveal key={pkg.id || idx} direction="up" delay={idx * 0.1}>
+                <Reveal key={idx} direction="up" delay={idx * 0.1}>
                   <Card padding="none" hover className={`flex flex-col h-full overflow-hidden ${
                     pkg.highlighted 
                       ? 'border-2 border-primary shadow-xl relative' 
@@ -177,9 +159,13 @@ export default function Pricing() {
                       <h3 className="text-lg uppercase tracking-widest text-muted-foreground font-medium mb-2">{pkg.name}</h3>
                       <div className="flex items-baseline gap-2 mb-2">
                         <span className="text-4xl font-serif text-foreground">{pkg.price}</span>
-                        <span className="text-sm text-muted-foreground/70">{pkg.period}</span>
+                        {pkg.period && (
+                          <span className="text-sm text-muted-foreground/70">{pkg.period}</span>
+                        )}
                       </div>
-                      <p className="text-muted-foreground font-light text-sm mb-8">{pkg.description}</p>
+                      {pkg.description && (
+                        <p className="text-muted-foreground font-light text-sm mb-8">{pkg.description}</p>
+                      )}
 
                       <ul className="space-y-4 mb-10 flex-grow">
                         {(pkg.features || []).map((feature: string, i: number) => (
@@ -191,7 +177,7 @@ export default function Pricing() {
                       </ul>
 
                       <Button 
-                        href={pkg.price === "Custom" ? "/contact" : "/login"} 
+                        href={pkg.cta?.toLowerCase().includes('contact') ? "/contact" : "/login"} 
                         variant={pkg.highlighted ? "primary" : "outline"}
                         size="lg"
                         className="w-full justify-center"
@@ -205,25 +191,27 @@ export default function Pricing() {
             </div>
           )}
 
-          {/* FAQ Section */}
-          <Reveal direction="up">
-            <div className="max-w-3xl mx-auto">
-              <h2 className="text-3xl font-serif text-foreground text-center mb-12">Frequently Asked Questions</h2>
-              <div className="space-y-4">
-                {faqs.map((faq, idx) => (
-                  <details key={idx} className="group accordion-item">
-                    <summary className="flex items-center justify-between px-8 py-6 cursor-pointer text-foreground font-medium hover:text-primary transition-colors list-none [&::-webkit-details-marker]:hidden">
-                      <span>{faq.q}</span>
-                      <svg className="w-5 h-5 text-muted-foreground/70 group-open:rotate-180 transition-transform duration-300 flex-shrink-0 ml-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
-                    </summary>
-                    <div className="px-8 pb-6 text-muted-foreground font-light leading-relaxed border-t border-border pt-4">
-                      {faq.a}
-                    </div>
-                  </details>
-                ))}
+          {/* FAQ Section — only show if FAQs exist in CMS */}
+          {faqs.length > 0 && (
+            <Reveal direction="up">
+              <div className="max-w-3xl mx-auto">
+                <h2 className="text-3xl font-serif text-foreground text-center mb-12">Frequently Asked Questions</h2>
+                <div className="space-y-4">
+                  {faqs.map((faq, idx) => (
+                    <details key={idx} className="group accordion-item">
+                      <summary className="flex items-center justify-between px-8 py-6 cursor-pointer text-foreground font-medium hover:text-primary transition-colors list-none [&::-webkit-details-marker]:hidden">
+                        <span>{faq.q}</span>
+                        <svg className="w-5 h-5 text-muted-foreground/70 group-open:rotate-180 transition-transform duration-300 flex-shrink-0 ml-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                      </summary>
+                      <div className="px-8 pb-6 text-muted-foreground font-light leading-relaxed border-t border-border pt-4">
+                        {faq.a}
+                      </div>
+                    </details>
+                  ))}
+                </div>
               </div>
-            </div>
-          </Reveal>
+            </Reveal>
+          )}
 
           {/* Custom Quote CTA */}
           <Reveal direction="up">

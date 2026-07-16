@@ -45,7 +45,7 @@ function SiteConfigContent() {
 
   const [stats, setStats] = useState<Array<{ label: string; value: string }>>([]);
 
-  const [pricing, setPricing] = useState<Array<{ name: string; price: string; features: string[] }>>([]);
+  const [pricing, setPricing] = useState<Array<{ name: string; price: string; period?: string; description?: string; highlighted?: boolean; cta?: string; features: string[] }>>([]);
 
   const [navbar, setNavbar] = useState({
     logoUrl: '/logo.png',
@@ -452,7 +452,7 @@ function SiteConfigContent() {
                     type="button"
                     variant="outline"
                     size="sm"
-                    onClick={() => setPricing(prev => [...prev, { name: '', price: '', features: [''] }])}
+                    onClick={() => setPricing(prev => [...prev, { name: '', price: '', period: '', description: '', highlighted: false, cta: 'Get Started', features: [''] }])}
                   >
                     <Plus className="w-4 h-4 mr-2" /> Add Tier
                   </Button>
@@ -486,7 +486,7 @@ function SiteConfigContent() {
                                 copy[idx].name = e.target.value;
                                 setPricing(copy);
                               }}
-                              placeholder="e.g. Standard"
+                              placeholder="e.g. Essential"
                               required
                             />
                           </div>
@@ -499,10 +499,61 @@ function SiteConfigContent() {
                                 copy[idx].price = e.target.value;
                                 setPricing(copy);
                               }}
-                              placeholder="e.g. $499/mo"
+                              placeholder="e.g. ₹1.5L"
                               required
                             />
                           </div>
+                          <div className="flex flex-col gap-1.5">
+                            <Label>Period <span className="text-muted-foreground text-xs">(optional)</span></Label>
+                            <Input
+                              value={tier.period || ''}
+                              onChange={(e) => {
+                                const copy = [...pricing];
+                                copy[idx].period = e.target.value;
+                                setPricing(copy);
+                              }}
+                              placeholder="e.g. per project"
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1.5">
+                            <Label>CTA Button Text</Label>
+                            <Input
+                              value={tier.cta || ''}
+                              onChange={(e) => {
+                                const copy = [...pricing];
+                                copy[idx].cta = e.target.value;
+                                setPricing(copy);
+                              }}
+                              placeholder="e.g. Get Started"
+                            />
+                          </div>
+                        </div>
+                        <div className="max-w-[85%] space-y-4">
+                          <div className="flex flex-col gap-1.5">
+                            <Label>Description <span className="text-muted-foreground text-xs">(optional)</span></Label>
+                            <Input
+                              value={tier.description || ''}
+                              onChange={(e) => {
+                                const copy = [...pricing];
+                                copy[idx].description = e.target.value;
+                                setPricing(copy);
+                              }}
+                              placeholder="Short description of this tier"
+                            />
+                          </div>
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={tier.highlighted || false}
+                              onChange={(e) => {
+                                const copy = [...pricing];
+                                copy[idx].highlighted = e.target.checked;
+                                setPricing(copy);
+                              }}
+                              className="rounded border-border"
+                            />
+                            <span className="text-sm font-medium">Highlight this tier (show as recommended)</span>
+                          </label>
                         </div>
 
                         {/* Features Repeater */}

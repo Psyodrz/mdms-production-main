@@ -1,45 +1,25 @@
 "use client";
 
 import { Navbar } from '@/components/ui/Navbar';
-import { Footer } from '@/components/ui/Footer';
 import { Reveal } from '@/components/ui/Reveal';
 import { Container } from '@/components/ui/Container';
 import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { fetchAPI } from '@/lib/api-client';
 import Image from 'next/image';
 
-export default function Services() {
-  const defaultServices = [
-    {
-      id: "cinematic",
-      title: "Cinematic Production",
-      desc: "Full-scale commercial, narrative, and documentary production utilizing industry-leading cinema cameras and lighting.",
-      img: "/images/services-hero.jpg",
-      features: ["RED & ARRI Camera Packages", "Professional Crew & Lighting", "Location Scouting", "Full Production Insurance"],
-      pricing: "Starts at ₹50,000 / Day"
-    },
-    {
-      id: "talent",
-      title: "Talent Management",
-      desc: "Exclusive representation of elite models, actors, and digital creators worldwide. Bridging the gap between brands and the perfect face.",
-      img: "/images/join-hero.jpg",
-      features: ["Access to 50k+ Roster", "Casting Direction", "Contract Negotiation", "On-set Talent Handling"],
-      pricing: "Custom Quote"
-    },
-    {
-      id: "post",
-      title: "Post-Production",
-      desc: "High-end color grading, VFX, sound design, and editorial finishing. We deliver the final polish that turns footage into cinema.",
-      img: "/images/portfolio-equipment.jpg",
-      features: ["DaVinci Resolve Color Grading", "Offline & Online Editing", "Sound Mixing & Foley", "VFX & Compositing"],
-      pricing: "Starts at ₹20,000 / Project"
-    }
-  ];
+interface ServiceItem {
+  id: string;
+  title: string;
+  desc: string;
+  img: string;
+  features: string[];
+  pricing: string;
+}
 
-  const [services, setServices] = useState<any[]>(defaultServices);
+export default function Services() {
+  const [services, setServices] = useState<ServiceItem[]>([]);
   const [hero, setHero] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
@@ -50,13 +30,15 @@ export default function Services() {
     ])
       .then(([servicesRes, heroRes]) => {
         if (servicesRes?.data && Array.isArray(servicesRes.data) && servicesRes.data.length > 0) {
-          const mapped = servicesRes.data.map((s: any, idx: number) => ({
-            id: s.id || s.slug,
-            title: s.title || s.name,
-            desc: s.desc || s.description || s.shortDesc,
-            img: s.img || s.imageUrl || s.coverImage || defaultServices[idx % defaultServices.length].img,
-            features: s.features && Array.isArray(s.features) ? s.features : (typeof s.features === 'string' ? JSON.parse(s.features || '[]') : defaultServices[idx % defaultServices.length].features),
-            pricing: s.pricing || s.price || "Custom Quote"
+          const mapped: ServiceItem[] = servicesRes.data.map((s: any) => ({
+            id: s.id || s.slug || '',
+            title: s.title || s.name || '',
+            desc: s.desc || s.description || s.shortDesc || '',
+            img: s.img || s.imageUrl || s.coverImage || '/images/services-hero.jpg',
+            features: Array.isArray(s.features)
+              ? s.features
+              : (typeof s.features === 'string' ? (() => { try { return JSON.parse(s.features); } catch { return []; } })() : []),
+            pricing: s.pricing || s.price || s.basePrice ? `₹${(s.basePrice / 100).toLocaleString('en-IN')}` : 'Custom Quote'
           }));
           setServices(mapped);
         }
@@ -127,10 +109,23 @@ export default function Services() {
                   </div>
                 ))}
               </div>
+            ) : services.length === 0 ? (
+              /* Empty state — no services configured in CMS */
+              <div className="text-center py-20">
+                <Reveal direction="up">
+                  <h2 className="text-3xl font-serif text-foreground mb-4">Services Coming Soon</h2>
+                  <p className="text-muted-foreground font-light max-w-lg mx-auto mb-8">
+                    Our service offerings are being finalized. Contact us for a custom quote.
+                  </p>
+                  <Button href="/contact" variant="primary" size="lg">
+                    Contact Us
+                  </Button>
+                </Reveal>
+              </div>
             ) : (
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <div className={`grid grid-cols-1 ${services.length >= 3 ? 'lg:grid-cols-3' : services.length === 2 ? 'lg:grid-cols-2 max-w-4xl mx-auto' : 'max-w-lg mx-auto'} gap-8`}>
                 {services.map((svc, idx) => (
-                  <Reveal key={idx} direction="up" delay={idx * 0.1}>
+                  <Reveal key={svc.id || idx} direction="up" delay={idx * 0.1}>
                     <div id={svc.id} className="h-full scroll-mt-24">
                       <div className="relative overflow-hidden flex flex-col h-full min-h-[500px] rounded-[2rem] border border-border group shadow-2xl">
                         {/* Background Image */}

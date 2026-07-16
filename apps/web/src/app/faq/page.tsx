@@ -1,63 +1,19 @@
 'use client';
 
 import { Navbar } from '@/components/ui/Navbar';
-import { Footer } from '@/components/ui/Footer';
 import { Reveal } from '@/components/ui/Reveal';
 import { Container } from '@/components/ui/Container';
 import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
-import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { HelpCircle, CreditCard, Film, Award, Package } from 'lucide-react';
+import { HelpCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { fetchAPI } from '@/lib/api-client';
 import Image from 'next/image';
 
-const defaultCategories = [
-  { name: "General", icon: <HelpCircle className="w-4 h-4" /> },
-  { name: "Booking & Payments", icon: <CreditCard className="w-4 h-4" /> },
-  { name: "Production", icon: <Film className="w-4 h-4" /> },
-  { name: "Talent", icon: <Award className="w-4 h-4" /> },
-  { name: "Deliverables", icon: <Package className="w-4 h-4" /> },
-];
-
-const defaultFaqs: Record<string, { q: string; a: string }[]> = {
-  "General": [
-    { q: "What services does MP Productions offer?", a: "We offer cinematic production (commercials, narratives, documentaries), talent management (models, influencers, actors), and full post-production services (color grading, VFX, sound design, editorial finishing)." },
-    { q: "Where is MP Productions based?", a: "Our headquarters are in Los Angeles, CA with satellite studios in Mumbai and Dubai. We operate globally and have executed projects across 15+ countries." },
-    { q: "How do I get started with a project?", a: "The fastest way is to book through our client portal. Select your service, pick a date, and we'll generate an instant quote. Alternatively, contact us directly for a discovery call." },
-    { q: "What industries do you serve?", a: "We serve fashion, automotive, FMCG, tech, real estate, entertainment, and lifestyle brands. Our portfolio spans from Fortune 500 campaigns to independent short films." },
-  ],
-  "Booking & Payments": [
-    { q: "How does the booking process work?", a: "Select a service → choose a date from our live availability calendar → fill in your project brief → receive an auto-generated quote → pay the advance (30%) → booking confirmed. The entire process takes under 5 minutes." },
-    { q: "What payment methods are accepted?", a: "We accept UPI, Net Banking, Credit/Debit Cards, Wallets, and EMI through our secure Razorpay gateway. All payments are PCI-DSS compliant — we never store card data." },
-    { q: "Can I reschedule my booking?", a: "Yes. Rescheduling is free if done 72+ hours before the shoot date. Within 72 hours, a 10% rescheduling fee applies. Contact your project manager or use the client portal." },
-    { q: "What is your refund policy?", a: "Cancellations 72+ hours before the shoot receive a full advance refund. Within 72 hours, 50% of the advance is retained. No refunds after the shoot date." },
-  ],
-  "Production": [
-    { q: "What cameras and equipment do you use?", a: "We shoot on RED Komodo, ARRI Alexa Mini LF, and Sony Venice 2. Our lighting inventory includes ARRI SkyPanels, Aputure 600d's, and Nanlite PavoTube series. Drone footage is captured on DJI Inspire 3." },
-    { q: "Do you provide crew and location?", a: "All packages include a core crew (cinematographer, sound, PA). Location scouting, talent, drone operators, and specialized crew are available as add-ons or included in Professional/Enterprise packages." },
-    { q: "What's the typical turnaround time?", a: "Starter packages: 5 business days. Professional: 10 business days. Enterprise: custom timeline agreed during onboarding. Rush delivery available for an additional fee." },
-    { q: "Can I attend the shoot?", a: "Absolutely. Clients are welcome on set. Your project manager will provide a call sheet with the location, parking, and call time 48 hours before the shoot." },
-  ],
-  "Talent": [
-    { q: "How do I join the talent network?", a: "Visit our Talent page and click 'Join as Talent'. Fill in your profile, upload portfolio items, and submit. Our team will review your application within 48 hours." },
-    { q: "Is registration free for talent?", a: "Yes. Talent registration and profile hosting on our marketplace is completely free. MP Productions earns through production bookings, not talent fees." },
-    { q: "How does the casting board work?", a: "We publish open casting calls for active projects. Registered talent matching the requirements can apply with a single click. You'll be notified of your application status via WhatsApp." },
-    { q: "Can external clients hire talent directly?", a: "Yes. Anyone can browse our public talent directory and submit a 'Hire Request' for any artist. Our team coordinates the engagement, scheduling, and payment." },
-  ],
-  "Deliverables": [
-    { q: "How do I receive my final files?", a: "All deliverables are uploaded to your secure client portal. You'll receive a WhatsApp notification when files are ready. Download links are valid for 90 days." },
-    { q: "What formats do you deliver in?", a: "Standard delivery includes MP4 (H.264 for web, ProRes for broadcast), with aspect ratios for 16:9, 9:16, and 1:1 as needed. RAW files available on request for Enterprise clients." },
-    { q: "How do revisions work?", a: "You can provide timestamped feedback directly in our video player. Each comment pins to the exact frame. Revision rounds are defined by your package tier." },
-    { q: "How long do you store my files?", a: "Deliverables are stored for 90 days post-delivery. After 1 year, files are archived. Permanent storage is available as an add-on for Enterprise clients." },
-  ],
-};
-
 export default function FAQ() {
-  const [activeCategory, setActiveCategory] = useState("General");
-  const [faqs, setFaqs] = useState<Record<string, { q: string; a: string }[]>>(defaultFaqs);
-  const [categories, setCategories] = useState<any[]>(defaultCategories);
+  const [activeCategory, setActiveCategory] = useState<string>('');
+  const [faqs, setFaqs] = useState<Record<string, { q: string; a: string }[]>>({});
+  const [categories, setCategories] = useState<string[]>([]);
   const [hero, setHero] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
@@ -67,17 +23,33 @@ export default function FAQ() {
       fetchAPI('/cms/hero?page=faq').catch(() => null)
     ])
       .then(([faqRes, heroRes]) => {
-        if (faqRes && faqRes.success && faqRes.data && Object.keys(faqRes.data).length > 0) {
-          setFaqs(faqRes.data);
-          if (Array.isArray(faqRes.categories)) {
-            const mappedCats = faqRes.categories.map((c: string) => {
-              const existing = defaultCategories.find(dc => dc.name === c);
-              return existing || { name: c, icon: <HelpCircle className="w-4 h-4" /> };
+        if (faqRes && faqRes.success && faqRes.data) {
+          // Handle grouped FAQ data: { "Category": [{ q, a }], ... }
+          if (typeof faqRes.data === 'object' && !Array.isArray(faqRes.data) && Object.keys(faqRes.data).length > 0) {
+            setFaqs(faqRes.data);
+            const cats = Object.keys(faqRes.data);
+            setCategories(cats);
+            setActiveCategory(cats[0] || '');
+          }
+          // Handle flat FAQ array: [{ question, answer, category }]
+          else if (Array.isArray(faqRes.data) && faqRes.data.length > 0) {
+            const grouped: Record<string, { q: string; a: string }[]> = {};
+            faqRes.data.forEach((item: any) => {
+              const cat = item.category || 'General';
+              if (!grouped[cat]) grouped[cat] = [];
+              grouped[cat].push({ q: item.question || item.q, a: item.answer || item.a });
             });
-            setCategories(mappedCats);
-            if (mappedCats.length > 0 && !mappedCats.some((c: any) => c.name === activeCategory)) {
-              setActiveCategory(mappedCats[0].name);
-            }
+            setFaqs(grouped);
+            const cats = Object.keys(grouped);
+            setCategories(cats);
+            setActiveCategory(cats[0] || '');
+          }
+        }
+        // Also try CMS categories list
+        if (faqRes?.categories && Array.isArray(faqRes.categories)) {
+          setCategories(faqRes.categories);
+          if (!activeCategory && faqRes.categories.length > 0) {
+            setActiveCategory(faqRes.categories[0]);
           }
         }
         if (heroRes && heroRes.success && heroRes.data) {
@@ -124,27 +96,6 @@ export default function FAQ() {
           </Container>
         </section>
 
-          {/* Category Filters */}
-          <Reveal direction="up" delay={0.1}>
-            <div className="flex flex-wrap gap-3 justify-center mb-12">
-              {categories.map((cat) => (
-                <button
-                  key={cat.name}
-                  onClick={() => setActiveCategory(cat.name)}
-                  className={`pill-btn flex items-center gap-2 ${
-                    activeCategory === cat.name
-                      ? 'pill-btn-active'
-                      : 'text-muted-foreground bg-surface'
-                  }`}
-                >
-                  <span>{cat.icon}</span>
-                  {cat.name}
-                </button>
-              ))}
-            </div>
-          </Reveal>
-
-          {/* FAQ Accordion */}
           {loading ? (
             <div className="space-y-4 py-6">
               {[1, 2, 3, 4].map((n) => (
@@ -153,22 +104,59 @@ export default function FAQ() {
                 </div>
               ))}
             </div>
-          ) : (
-            <div className="space-y-3">
-              {(faqs[activeCategory] || []).map((faq, idx) => (
-                <Reveal key={`${activeCategory}-${idx}`} direction="up" delay={idx * 0.05}>
-                  <details className="group accordion-item">
-                    <summary className="flex items-center justify-between px-8 py-6 cursor-pointer text-foreground font-medium hover:text-primary transition-colors list-none [&::-webkit-details-marker]:hidden">
-                      <span>{faq.q}</span>
-                      <svg className="w-5 h-5 text-muted-foreground/70 group-open:rotate-180 transition-transform duration-300 flex-shrink-0 ml-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
-                    </summary>
-                    <div className="px-8 pb-6 text-muted-foreground font-light leading-relaxed border-t border-border pt-4">
-                      {faq.a}
-                    </div>
-                  </details>
-                </Reveal>
-              ))}
+          ) : categories.length === 0 ? (
+            /* Empty state — no FAQs configured */
+            <div className="text-center py-20">
+              <Reveal direction="up">
+                <HelpCircle className="w-12 h-12 text-muted-foreground/40 mx-auto mb-4" />
+                <h2 className="text-3xl font-serif text-foreground mb-4">FAQs Coming Soon</h2>
+                <p className="text-muted-foreground font-light max-w-lg mx-auto mb-8">
+                  Our FAQ section is being prepared. In the meantime, feel free to contact us directly.
+                </p>
+                <Button href="/contact" variant="primary" size="lg">
+                  Contact Us
+                </Button>
+              </Reveal>
             </div>
+          ) : (
+            <>
+              {/* Category Filters */}
+              <Reveal direction="up" delay={0.1}>
+                <div className="flex flex-wrap gap-3 justify-center mb-12">
+                  {categories.map((catName) => (
+                    <button
+                      key={catName}
+                      onClick={() => setActiveCategory(catName)}
+                      className={`pill-btn flex items-center gap-2 ${
+                        activeCategory === catName
+                          ? 'pill-btn-active'
+                          : 'text-muted-foreground bg-surface'
+                      }`}
+                    >
+                      <HelpCircle className="w-4 h-4" />
+                      {catName}
+                    </button>
+                  ))}
+                </div>
+              </Reveal>
+
+              {/* FAQ Accordion */}
+              <div className="space-y-3">
+                {(faqs[activeCategory] || []).map((faq, idx) => (
+                  <Reveal key={`${activeCategory}-${idx}`} direction="up" delay={idx * 0.05}>
+                    <details className="group accordion-item">
+                      <summary className="flex items-center justify-between px-8 py-6 cursor-pointer text-foreground font-medium hover:text-primary transition-colors list-none [&::-webkit-details-marker]:hidden">
+                        <span>{faq.q}</span>
+                        <svg className="w-5 h-5 text-muted-foreground/70 group-open:rotate-180 transition-transform duration-300 flex-shrink-0 ml-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                      </summary>
+                      <div className="px-8 pb-6 text-muted-foreground font-light leading-relaxed border-t border-border pt-4">
+                        {faq.a}
+                      </div>
+                    </details>
+                  </Reveal>
+                ))}
+              </div>
+            </>
           )}
 
           {/* WhatsApp Support CTA */}
