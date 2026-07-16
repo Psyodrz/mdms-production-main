@@ -374,22 +374,22 @@ function ScrollyTelling() {
       <div className="sticky top-0 h-screen w-full flex items-center justify-center p-4 sm:p-6 lg:p-8">
         <div className="relative h-full w-full max-w-[1600px] overflow-hidden bg-black rounded-[2rem] sm:rounded-[3rem] border border-[var(--cinematic-border)]/50">
 
-          <motion.div style={{ scale: imageScale, opacity: img1Opacity }} className="absolute inset-0 h-full w-full will-change-transform">
+          <motion.div style={{ scale: imageScale, opacity: img1Opacity }} className="absolute inset-0 h-full w-full transform-gpu will-change-[transform,opacity]">
             <Image src="/images/services-lighting.jpg" alt="Visual setup 1" fill sizes="100vw" className="object-cover object-center" priority />
           </motion.div>
-          <motion.div style={{ opacity: img2Opacity }} className="absolute inset-0 h-full w-full">
+          <motion.div style={{ opacity: img2Opacity }} className="absolute inset-0 h-full w-full transform-gpu will-change-[opacity]">
             <Image src="/images/about-bts.jpg" alt="Visual setup 2" fill sizes="100vw" className="object-cover object-center" />
           </motion.div>
-          <motion.div style={{ opacity: img3Opacity }} className="absolute inset-0 h-full w-full">
+          <motion.div style={{ opacity: img3Opacity }} className="absolute inset-0 h-full w-full transform-gpu will-change-[opacity]">
             <Image src="/images/careers-meeting.jpg" alt="Visual setup 3" fill sizes="100vw" className="object-cover object-[center_20%]" />
           </motion.div>
 
-          <div className="absolute inset-0 z-20 flex items-center justify-center px-6">
+          <div className="absolute inset-0 z-20 flex items-center justify-center px-6 pointer-events-none">
             {acts.map((act, i) => (
               <motion.div
                 key={i}
                 style={{ opacity: act.opacity, y: act.y }}
-                className="absolute text-center max-w-xl"
+                className="absolute text-center max-w-xl transform-gpu will-change-[transform,opacity] pointer-events-auto"
               >
                 <span className="inline-block text-xs font-bold tracking-[0.3em] uppercase text-brand mb-4 drop-shadow-xl">
                   {act.label}

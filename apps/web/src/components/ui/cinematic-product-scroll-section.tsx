@@ -162,10 +162,21 @@ function ProductHero({ product, reversed = false }: { product: ProductScrollItem
 
     let isIntersecting = false;
     let ticking = false;
+    let offsetTop = 0;
+    let sectionHeight = 0;
+
+    const calculateLayout = () => {
+      const rect = section.getBoundingClientRect();
+      offsetTop = rect.top + window.scrollY;
+      sectionHeight = rect.height;
+    };
 
     const observer = new IntersectionObserver(
       ([entry]) => {
         isIntersecting = entry.isIntersecting;
+        if (isIntersecting) {
+          calculateLayout();
+        }
       },
       { rootMargin: "10% 0px 10% 0px" }
     );
@@ -175,19 +186,20 @@ function ProductHero({ product, reversed = false }: { product: ProductScrollItem
       ticking = false;
       if (!isIntersecting) return;
 
-      const rect = section.getBoundingClientRect();
+      const currentScrollY = window.scrollY;
       const windowHeight = window.innerHeight;
-
       const isMobile = window.innerWidth < 768;
+      
       let progress = 0;
+      const currentRectTop = offsetTop - currentScrollY;
 
       if (isMobile) {
         const startReveal = windowHeight;
         const endReveal = windowHeight * 0.25;
-        progress = (startReveal - rect.top) / (startReveal - endReveal);
-      } else if (rect.top <= 0) {
-        const total = rect.height - windowHeight;
-        if (total > 0) progress = Math.abs(rect.top) / total;
+        progress = (startReveal - currentRectTop) / (startReveal - endReveal);
+      } else if (currentRectTop <= 0) {
+        const total = sectionHeight - windowHeight;
+        if (total > 0) progress = Math.abs(currentRectTop) / total;
       }
 
       progress = Math.min(Math.max(progress, 0), 1);
@@ -216,14 +228,20 @@ function ProductHero({ product, reversed = false }: { product: ProductScrollItem
       requestAnimationFrame(update);
     };
 
+    const onResize = () => {
+      calculateLayout();
+      onScroll();
+    };
+
+    calculateLayout();
     update();
     window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
+    window.addEventListener("resize", onResize);
 
     return () => {
       observer.disconnect();
       window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
+      window.removeEventListener("resize", onResize);
     };
   }, []);
 
