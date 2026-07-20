@@ -105,7 +105,7 @@ function SearchableDropdown({
 
   return (
     <div className="relative" ref={dropdownRef}>
-      <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">
+      <label className="block text-xs font-bold text-white/90 uppercase tracking-wider mb-2">
         {label} {required && <span className="text-[#E50914]">*</span>}
       </label>
       <div
@@ -113,8 +113,8 @@ function SearchableDropdown({
           setIsOpen(!isOpen);
           if (!isOpen) setSearch('');
         }}
-        className={`input-premium bg-white/5 border text-white w-full py-3.5 px-4 cursor-pointer flex justify-between items-center transition-all ${
-          error ? 'border-[#E50914]' : isOpen ? 'border-[#F59E0B] shadow-[0_0_15px_rgba(245,158,11,0.2)] bg-black/80' : 'border-white/20 hover:border-white/40'
+        className={`input-premium bg-black/60 border text-white font-medium w-full py-3.5 px-4 cursor-pointer flex justify-between items-center transition-all ${
+          error ? 'border-[#E50914]' : isOpen ? 'border-[#F59E0B] shadow-[0_0_15px_rgba(245,158,11,0.2)] bg-black/90' : 'border-white/25 hover:border-white/40'
         } rounded-xl`}
       >
         <span className={value ? 'text-white font-medium truncate pr-2' : 'text-gray-500 truncate pr-2'}>
@@ -329,7 +329,7 @@ export function SimpleTalentRegistrationForm() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.15 }}
-          className="card-awwwards rounded-3xl p-6 sm:p-10 md:p-12 relative overflow-hidden border border-white/15"
+          className="bg-[#0e0e14]/95 backdrop-blur-2xl shadow-[0_20px_70px_rgba(0,0,0,0.9)] rounded-3xl p-6 sm:p-10 md:p-12 relative overflow-hidden border border-white/20 text-white"
         >
           {/* Subtle Top Gradient Bar */}
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#E50914] via-[#F59E0B] to-[#38BDF8]" />
@@ -338,13 +338,13 @@ export function SimpleTalentRegistrationForm() {
             
             {/* Section 1: Basic Identity */}
             <div className="space-y-6">
-              <div className="flex items-center gap-2 pb-3 border-b border-white/10 text-xs font-bold tracking-widest uppercase text-[#38BDF8]">
+              <div className="flex items-center gap-2 pb-3 border-b border-white/15 text-xs font-extrabold tracking-widest uppercase text-[#38BDF8]">
                 <User className="w-4 h-4" /> 01. Personal Identification
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">
+                  <label className="block text-xs font-bold text-white/90 uppercase tracking-wider mb-2">
                     First Name <span className="text-[#E50914]">*</span>
                   </label>
                   <input
@@ -352,13 +352,13 @@ export function SimpleTalentRegistrationForm() {
                     placeholder="e.g. Aditya"
                     value={formData.firstName}
                     onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                    className="input-premium bg-white/5 border border-white/20 focus:border-[#E50914] rounded-xl text-white placeholder-white/50 focus:bg-black/80 w-full py-3.5 px-4"
+                    className="input-premium bg-black/60 border border-white/25 focus:border-[#E50914] rounded-xl text-white font-medium placeholder-white/40 focus:bg-black/90 w-full py-3.5 px-4"
                   />
                   {errors.firstName && <p className="text-[#E50914] text-xs mt-1.5 font-medium">{errors.firstName}</p>}
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">
+                  <label className="block text-xs font-bold text-white/90 uppercase tracking-wider mb-2">
                     Last Name <span className="text-[#E50914]">*</span>
                   </label>
                   <input
@@ -366,7 +366,7 @@ export function SimpleTalentRegistrationForm() {
                     placeholder="e.g. Sharma"
                     value={formData.lastName}
                     onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                    className="input-premium bg-white/5 border border-white/20 focus:border-[#E50914] rounded-xl text-white placeholder-white/50 focus:bg-black/80 w-full py-3.5 px-4"
+                    className="input-premium bg-black/60 border border-white/25 focus:border-[#E50914] rounded-xl text-white font-medium placeholder-white/40 focus:bg-black/90 w-full py-3.5 px-4"
                   />
                   {errors.lastName && <p className="text-[#E50914] text-xs mt-1.5 font-medium">{errors.lastName}</p>}
                 </div>
@@ -374,34 +374,34 @@ export function SimpleTalentRegistrationForm() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">
+                  <label className="block text-xs font-bold text-white/90 uppercase tracking-wider mb-2">
                     Mobile Number <span className="text-[#E50914]">*</span>
                   </label>
                   <div className="relative">
-                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <input
                       type="text"
                       placeholder="+91 9876543210"
                       value={formData.mobile}
                       onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
-                      className="input-premium bg-white/5 border border-white/20 focus:border-[#E50914] rounded-xl text-white placeholder-white/50 focus:bg-black/80 w-full py-3.5 pl-11 pr-4"
+                      className="input-premium bg-black/60 border border-white/25 focus:border-[#E50914] rounded-xl text-white font-medium placeholder-white/40 focus:bg-black/90 w-full py-3.5 pl-11 pr-4"
                     />
                   </div>
                   {errors.mobile && <p className="text-[#E50914] text-xs mt-1.5 font-medium">{errors.mobile}</p>}
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">
+                  <label className="block text-xs font-bold text-white/90 uppercase tracking-wider mb-2">
                     Email Address <span className="text-[#E50914]">*</span>
                   </label>
                   <div className="relative">
-                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <input
                       type="email"
                       placeholder="talent@mpproductions.com"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="input-premium bg-white/5 border border-white/20 focus:border-[#E50914] rounded-xl text-white placeholder-white/50 focus:bg-black/80 w-full py-3.5 pl-11 pr-4"
+                      className="input-premium bg-black/60 border border-white/25 focus:border-[#E50914] rounded-xl text-white font-medium placeholder-white/40 focus:bg-black/90 w-full py-3.5 pl-11 pr-4"
                     />
                   </div>
                   {errors.email && <p className="text-[#E50914] text-xs mt-1.5 font-medium">{errors.email}</p>}
@@ -409,17 +409,17 @@ export function SimpleTalentRegistrationForm() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">
+                <label className="block text-xs font-bold text-white/90 uppercase tracking-wider mb-2">
                   Create Account Password <span className="text-[#E50914]">*</span>
                 </label>
                 <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input
                     type="password"
                     placeholder="Min. 6 characters for login"
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    className="input-premium bg-white/5 border border-white/20 focus:border-[#E50914] rounded-xl text-white placeholder-white/50 focus:bg-black/80 w-full py-3.5 pl-11 pr-4"
+                    className="input-premium bg-black/60 border border-white/25 focus:border-[#E50914] rounded-xl text-white font-medium placeholder-white/40 focus:bg-black/90 w-full py-3.5 pl-11 pr-4"
                   />
                 </div>
                 {errors.password && <p className="text-[#E50914] text-xs mt-1.5 font-medium">{errors.password}</p>}
@@ -428,19 +428,19 @@ export function SimpleTalentRegistrationForm() {
 
             {/* Section 2: Professional Profile */}
             <div className="space-y-6 pt-4">
-              <div className="flex items-center gap-2 pb-3 border-b border-white/10 text-xs font-bold tracking-widest uppercase text-[#F59E0B]">
+              <div className="flex items-center gap-2 pb-3 border-b border-white/15 text-xs font-extrabold tracking-widest uppercase text-[#F59E0B]">
                 <Film className="w-4 h-4" /> 02. Professional Specialization
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">
+                  <label className="block text-xs font-bold text-white/90 uppercase tracking-wider mb-2">
                     Primary Talent Category <span className="text-[#E50914]">*</span>
                   </label>
                   <select
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    className="input-premium bg-white/5 border border-white/20 focus:border-[#F59E0B] rounded-xl text-white w-full py-3.5 px-4 cursor-pointer"
+                    className="input-premium bg-black/60 border border-white/25 focus:border-[#F59E0B] rounded-xl text-white font-medium w-full py-3.5 px-4 cursor-pointer"
                   >
                     {TALENT_CATEGORIES.map((cat) => (
                       <option key={cat.id} value={cat.id} className="bg-[#0A0A0C] text-white py-2">
@@ -451,13 +451,13 @@ export function SimpleTalentRegistrationForm() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">
+                  <label className="block text-xs font-bold text-white/90 uppercase tracking-wider mb-2">
                     Experience Level <span className="text-[#E50914]">*</span>
                   </label>
                   <select
                     value={formData.experience}
                     onChange={(e) => setFormData({ ...formData, experience: e.target.value })}
-                    className="input-premium bg-white/5 border border-white/20 focus:border-[#F59E0B] rounded-xl text-white w-full py-3.5 px-4 cursor-pointer"
+                    className="input-premium bg-black/60 border border-white/25 focus:border-[#F59E0B] rounded-xl text-white font-medium w-full py-3.5 px-4 cursor-pointer"
                   >
                     {EXPERIENCE_LEVELS.map((level) => (
                       <option key={level.id} value={level.id} className="bg-[#0A0A0C] text-white py-2">
@@ -496,7 +496,7 @@ export function SimpleTalentRegistrationForm() {
                 />
 
                 <div>
-                  <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">
+                  <label className="block text-xs font-bold text-white/90 uppercase tracking-wider mb-2">
                     Pincode <span className="text-[#E50914]">*</span>
                   </label>
                   <input
@@ -505,23 +505,23 @@ export function SimpleTalentRegistrationForm() {
                     placeholder="e.g. 400001"
                     value={formData.pincode}
                     onChange={(e) => setFormData({ ...formData, pincode: e.target.value.replace(/\D/g, '') })}
-                    className="input-premium bg-white/5 border border-white/20 focus:border-[#F59E0B] rounded-xl text-white placeholder-white/50 focus:bg-black/80 w-full py-3.5 px-4 tracking-wider"
+                    className="input-premium bg-black/60 border border-white/25 focus:border-[#F59E0B] rounded-xl text-white font-medium placeholder-white/40 focus:bg-black/90 w-full py-3.5 px-4 tracking-wider"
                   />
                   {errors.pincode && <p className="text-[#E50914] text-xs mt-1.5 font-medium">{errors.pincode}</p>}
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2 flex justify-between items-center">
+                <label className="block text-xs font-bold text-white/90 uppercase tracking-wider mb-2 flex justify-between items-center">
                   <span>About You / Quick Summary</span>
-                  <span className="text-gray-500 text-[11px] font-normal">Can be edited anytime later</span>
+                  <span className="text-white/60 text-[11px] font-normal">Can be edited anytime later</span>
                 </label>
                 <textarea
                   rows={3}
                   placeholder="Tell our casting directors a bit about your passions, past projects, or training..."
                   value={formData.bio}
                   onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-                  className="input-premium bg-white/5 border border-white/20 focus:border-[#E50914] rounded-xl text-white placeholder-white/50 focus:bg-black/80 w-full p-4 resize-y"
+                  className="input-premium bg-black/60 border border-white/25 focus:border-[#E50914] rounded-xl text-white font-medium placeholder-white/40 focus:bg-black/90 w-full p-4 resize-y"
                 />
               </div>
             </div>

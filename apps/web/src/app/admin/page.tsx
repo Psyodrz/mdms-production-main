@@ -129,15 +129,21 @@ export default function AdminDashboard() {
       if (bookingsRes) {
         const bList = bookingsRes.data || bookingsRes;
         if (Array.isArray(bList) && bList.length > 0) {
-          setBookings(bList.map((b: any) => ({
-            id: b.id,
-            client: b.client?.user?.firstName ? `${b.client.user.firstName} ${b.client.user.lastName}` : b.clientName || 'Corporate Client',
-            project: b.projectTitle || b.service?.title || 'Production Project',
-            talent: b.talentName || 'Assigned Talent',
-            dates: b.dateRange || new Date(b.createdAt || Date.now()).toLocaleDateString(),
-            budget: b.budget || b.amount ? `₹${(b.budget || b.amount).toLocaleString('en-IN')}` : '$12,500',
-            status: (b.status ? b.status.toLowerCase() : 'pending') as any,
-          })));
+          setBookings(bList.map((b: any) => {
+            const u = b.client?.user;
+            const clientName = u ? `${u.firstName ?? ''} ${u.lastName ?? ''}`.trim() || 'Client' : b.clientName || 'Client';
+            const talentName = b.talentName || (b.talent?.user ? `${b.talent.user.firstName || ''} ${b.talent.user.lastName || ''}`.trim() : 'Assigned Talent');
+            const bookingDate = b.dateNeeded || b.date;
+            return {
+              id: String(b.id),
+              client: clientName,
+              project: String(b.service?.name || b.projectBrief || b.projectTitle || 'Production Booking'),
+              talent: talentName,
+              dates: bookingDate ? new Date(bookingDate).toLocaleDateString() : new Date(b.createdAt || Date.now()).toLocaleDateString(),
+              budget: b.budget && b.budget !== '—' ? b.budget : (b.service?.basePrice ? `₹${Math.round(b.service.basePrice / 100).toLocaleString('en-IN')}` : '—'),
+              status: (b.status ? b.status.toLowerCase() : 'pending') as any,
+            };
+          }));
         }
       }
 

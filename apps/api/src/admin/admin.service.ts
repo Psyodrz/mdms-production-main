@@ -158,7 +158,7 @@ export class AdminService {
   }
 
   async getDashboardKpis() {
-    const [activeProjects, pendingBookings, totalTalent, payments, totalPortfolio, totalBlog, totalTestimonials, totalServices, unreadContacts] = await Promise.all([
+    const [activeProjects, pendingBookingsCount, pendingHireRequestsCount, totalTalent, payments, totalPortfolio, totalBlog, totalTestimonials, totalServices, unreadContacts] = await Promise.all([
       this.prisma.project.count({
         where: {
           status: {
@@ -169,6 +169,11 @@ export class AdminService {
       this.prisma.booking.count({
         where: {
           status: 'INQUIRY'
+        }
+      }),
+      this.prisma.hireRequest.count({
+        where: {
+          status: 'NEW'
         }
       }),
       this.prisma.user.count({
@@ -191,7 +196,7 @@ export class AdminService {
 
     return {
       activeProjects,
-      pendingBookings,
+      pendingBookings: pendingBookingsCount + pendingHireRequestsCount,
       totalTalent,
       totalRevenue: formattedRevenue,
       totalPortfolio,
@@ -203,16 +208,57 @@ export class AdminService {
   }
 
   async getRecentBookings() {
-    return this.prisma.booking.findMany({
-      take: 5,
-      orderBy: { createdAt: 'desc' },
-      include: {
-        service: true,
-        client: {
-          include: { user: true }
+    const [bookings, hireRequests] = await Promise.all([
+      this.prisma.booking.findMany({
+        take: 10,
+        orderBy: { createdAt: 'desc' },
+        include: {
+          service: true,
+          client: {
+            include: { user: true }
+          }
         }
-      }
-    });
+      }),
+      this.prisma.hireRequest.findMany({
+        take: 10,
+        orderBy: { createdAt: 'desc' },
+        include: {
+          talent: {
+            include: { user: true }
+          }
+        }
+      })
+    ]);
+
+    const formattedBookings = bookings.map(b => ({ ...b, type: 'BOOKING' }));
+    const formattedHireRequests = hireRequests.map(hr => ({
+      id: hr.id,
+      client: {
+        user: {
+          firstName: hr.requesterName,
+          lastName: '',
+          email: hr.requesterEmail,
+          phone: hr.requesterPhone
+        }
+      },
+      service: {
+        name: hr.projectType || 'Talent Inquiry',
+        basePrice: null
+      },
+      projectBrief: hr.briefDescription,
+      dateNeeded: hr.dateNeeded,
+      budget: hr.budgetRange || '—',
+      status: hr.status === 'NEW' ? 'INQUIRY' : hr.status === 'CONFIRMED' ? 'CONFIRMED' : hr.status === 'DECLINED' ? 'CANCELLED' : 'RESCHEDULED',
+      createdAt: hr.createdAt,
+      talentName: hr.talent?.user ? `${hr.talent.user.firstName || ''} ${hr.talent.user.lastName || ''}`.trim() : 'Talent',
+      type: 'HIRE_REQUEST'
+    }));
+
+    const merged = [...formattedBookings, ...formattedHireRequests].sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+
+    return merged.slice(0, 15);
   }
 
   async getAuditLogs(page = 1, limit = 50, action?: string, userId?: string) {

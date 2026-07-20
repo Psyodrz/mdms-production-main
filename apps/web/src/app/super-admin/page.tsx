@@ -167,19 +167,22 @@ export default function SuperAdminDashboard() {
       }
       setCmsItems(liveCmsItems);
 
-      // ── Recent bookings (real) ──
+      // ── Recent bookings & HireInquiries (real) ──
       const recentBookings = recentBookingsRes?.data ?? recentBookingsRes;
       if (Array.isArray(recentBookings)) {
         connected = true;
         setBookings(recentBookings.map((b: any) => {
           const u = b.client?.user;
+          const clientName = u ? `${u.firstName ?? ''} ${u.lastName ?? ''}`.trim() || 'Client' : 'Client';
+          const talentName = b.talentName || (b.talent?.user ? `${b.talent.user.firstName || ''} ${b.talent.user.lastName || ''}`.trim() : 'Assigned Talent');
+          const bookingDate = b.dateNeeded || b.date;
           return {
             id: String(b.id),
-            client: u ? `${u.firstName ?? ''} ${u.lastName ?? ''}`.trim() || 'Client' : 'Client',
+            client: clientName,
             project: String(b.service?.name || b.projectBrief || 'Production Booking'),
-            talent: 'Assigned Talent',
-            dates: b.date ? new Date(b.date).toLocaleDateString() : new Date(b.createdAt).toLocaleDateString(),
-            budget: b.service?.basePrice ? `₹${Math.round(b.service.basePrice / 100).toLocaleString('en-IN')}` : '—',
+            talent: talentName,
+            dates: bookingDate ? new Date(bookingDate).toLocaleDateString() : new Date(b.createdAt).toLocaleDateString(),
+            budget: b.budget && b.budget !== '—' ? b.budget : (b.service?.basePrice ? `₹${Math.round(b.service.basePrice / 100).toLocaleString('en-IN')}` : '—'),
             status: mapBookingStatus(b.status),
           };
         }));
