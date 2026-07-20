@@ -552,7 +552,16 @@ function Services({ services = [], loading }: { services?: any[]; loading?: bool
               const tags = Array.isArray(rawTags)
                 ? rawTags
                 : (typeof rawTags === 'string' ? (() => { try { return JSON.parse(rawTags); } catch { return ["Cinematic", "Global"]; } })() : ["Cinematic"]);
-              const imageSrc = s.imageUrl || s.coverImage || s.img || `/images/services-${(idx % 3) + 1}.jpg`;
+              const FALLBACK_POOL = [
+                "/images/services-lighting.jpg",
+                "/images/portfolio-equipment.jpg",
+                "/images/about-bts.jpg",
+                "/images/projects-outdoor.jpg"
+              ];
+              const rawImg = s.imageUrl || s.coverImage || s.img || s.image;
+              const imageSrc = (rawImg && typeof rawImg === 'string' && rawImg.length > 5)
+                ? rawImg
+                : FALLBACK_POOL[idx % FALLBACK_POOL.length];
 
               return (
                 <Reveal key={s.id || idx} direction="up" delay={idx * 0.05}>
