@@ -240,15 +240,15 @@ function Hero({ hero, onOpenModal }: { hero?: any; onOpenModal?: (project: Proje
           transition={{ duration: 0.6, delay: 0.1 }}
           className="flex items-center gap-3 mb-8"
         >
-          <span className="h-[1px] w-12 bg-brand" />
-          <span className="text-[11px] font-medium tracking-[0.25em] uppercase text-[var(--hero-text-muted)]">
+          <span className="h-[2px] w-12 bg-brand" />
+          <span className="text-xs sm:text-sm font-bold tracking-[0.25em] uppercase text-white drop-shadow-sm">
             Production House · Est. 2018
           </span>
         </motion.div>
 
         {/* Heading */}
         <div className="max-w-4xl">
-          <h1 className="font-display text-5xl sm:text-7xl lg:text-[5.5rem] xl:text-[6.5rem] text-[var(--hero-text)] leading-[0.95] tracking-tight">
+          <h1 className="font-display text-5xl sm:text-7xl lg:text-[5.5rem] xl:text-[6.5rem] text-white leading-[0.95] tracking-tight drop-shadow-md">
             {headingWords.map((word: string, i: number) => {
               if (word.match(/\s+/)) {
                 if (word.includes("\n")) return <br key={i} />;
@@ -274,7 +274,7 @@ function Hero({ hero, onOpenModal }: { hero?: any; onOpenModal?: (project: Proje
           initial={{ y: 30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.5 }}
-          className="mt-8 max-w-xl text-base sm:text-lg text-[var(--hero-text-muted)] leading-relaxed font-light"
+          className="mt-8 max-w-2xl text-lg sm:text-2xl text-white leading-relaxed font-medium drop-shadow-md"
         >
           {subheadingText}
         </motion.p>
@@ -284,24 +284,24 @@ function Hero({ hero, onOpenModal }: { hero?: any; onOpenModal?: (project: Proje
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.6 }}
-          className="mt-10 flex flex-wrap items-center gap-4"
+          className="mt-10 flex flex-wrap items-center gap-4 z-20 relative"
         >
           <MagneticButton strength={20}>
             <Link
               href={ctaUrl}
-              className="group inline-flex items-center gap-3 rounded-full bg-brand hover:bg-[var(--hero-text)] hover:text-black px-8 py-4 text-sm font-semibold tracking-wide text-[var(--primary-foreground)] transition-all duration-300"
+              className="group inline-flex items-center gap-3 rounded-full bg-brand hover:bg-white hover:text-black px-9 py-4 text-base sm:text-lg font-bold tracking-wide text-white transition-all duration-300 shadow-glow cursor-pointer"
             >
               <span>{ctaText}</span>
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
             </Link>
           </MagneticButton>
 
           <MagneticButton strength={20}>
             <Link
               href="/reel"
-              className="group bg-[var(--hero-bg-elevated)]/40 hover:bg-[var(--hero-bg-elevated)]/85 text-[var(--hero-text)] inline-flex items-center gap-3 rounded-full border border-[var(--hero-border)] px-8 py-4 text-sm font-medium tracking-wide transition-all cursor-pointer"
+              className="group bg-white/20 hover:bg-white/35 text-white inline-flex items-center gap-3 rounded-full border border-white/30 px-9 py-4 text-base sm:text-lg font-bold tracking-wide backdrop-blur-md transition-all cursor-pointer shadow-md"
             >
-              <Play className="h-3.5 w-3.5 fill-[var(--hero-text)] text-[var(--hero-text)]" />
+              <Play className="h-4 w-4 fill-white text-white" />
               <span>Play Reel</span>
             </Link>
           </MagneticButton>
@@ -309,7 +309,7 @@ function Hero({ hero, onOpenModal }: { hero?: any; onOpenModal?: (project: Proje
           <MagneticButton strength={20}>
             <Link
               href="/join/talent"
-              className="group bg-[var(--hero-bg-elevated)]/40 hover:bg-[var(--hero-bg-elevated)]/85 text-[var(--hero-text)] inline-flex items-center gap-3 rounded-full border border-[var(--hero-border)] px-8 py-4 text-sm font-medium tracking-wide transition-all cursor-pointer"
+              className="group bg-white/20 hover:bg-white/35 text-white inline-flex items-center gap-3 rounded-full border border-white/30 px-9 py-4 text-base sm:text-lg font-bold tracking-wide backdrop-blur-md transition-all cursor-pointer shadow-md"
             >
               <span>Register as Talent</span>
             </Link>
@@ -321,7 +321,7 @@ function Hero({ hero, onOpenModal }: { hero?: any; onOpenModal?: (project: Proje
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.8 }}
-          className="mt-20 pt-8 border-t border-[var(--hero-border)] flex flex-wrap items-center gap-x-12 gap-y-6"
+          className="mt-20 pt-8 border-t border-white/20 flex flex-wrap items-center gap-x-12 gap-y-6"
         >
           {[
             { n: 500, s: "+", label: "Productions" },
@@ -330,10 +330,10 @@ function Hero({ hero, onOpenModal }: { hero?: any; onOpenModal?: (project: Proje
             { n: 18, s: "M+", label: "Impressions" },
           ].map(({ n, s, label }) => (
             <div key={label} className="flex items-baseline gap-2">
-              <span className="text-2xl sm:text-3xl font-display font-semibold text-[var(--hero-text)] drop-shadow-sm">
+              <span className="text-3xl sm:text-4xl font-display font-bold text-white drop-shadow-sm">
                 <Counter n={n} suffix={s} />
               </span>
-              <span className="text-[11px] text-[var(--hero-text)]/80 font-medium tracking-wider uppercase drop-shadow-sm">{label}</span>
+              <span className="text-xs sm:text-sm text-white font-bold tracking-wider uppercase drop-shadow-sm">{label}</span>
             </div>
           ))}
         </motion.div>
@@ -430,29 +430,29 @@ function Intro({ intro }: { intro?: any }) {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-start">
           {/* Left — Pull quote */}
           <div>
-            <span className="h-[1px] w-16 bg-brand block mb-8" />
-            <h2 className="font-display text-4xl sm:text-5xl lg:text-[3.5rem] text-foreground leading-[1.1] tracking-tight">
+            <span className="h-[2px] w-16 bg-brand block mb-8" />
+            <h2 className="font-display text-4xl sm:text-5xl lg:text-[3.5rem] text-white leading-[1.1] tracking-tight drop-shadow-sm">
               {heading}{" "}
-              <span className="italic text-muted-foreground">{italic}</span>
+              <span className="italic text-white/90">{italic}</span>
             </h2>
           </div>
 
           {/* Right — Body */}
           <div className="lg:pt-4">
-            <p className="text-base sm:text-lg text-muted-foreground leading-relaxed font-light whitespace-pre-wrap">
+            <p className="text-lg sm:text-xl text-white leading-relaxed font-medium whitespace-pre-wrap drop-shadow-sm">
               {body}
             </p>
             {extraContent && (
-              <p className="mt-6 text-sm text-muted-foreground leading-relaxed font-light whitespace-pre-wrap">
+              <p className="mt-6 text-base text-white/90 leading-relaxed font-medium whitespace-pre-wrap">
                 {extraContent}
               </p>
             )}
-            <div className="mt-8 flex items-center flex-wrap gap-6 text-[11px] tracking-[0.2em] uppercase text-muted-foreground/50">
+            <div className="mt-8 flex items-center flex-wrap gap-6 text-xs sm:text-sm tracking-[0.2em] uppercase font-bold text-white">
               {locations.map((loc: string, idx: number) => (
                 <div key={idx} className="flex items-center gap-6">
                   <span>{loc}</span>
                   {idx < locations.length - 1 && (
-                    <span className="h-1 w-1 rounded-full bg-foreground/20" />
+                    <span className="h-1.5 w-1.5 rounded-full bg-brand" />
                   )}
                 </div>
               ))}
@@ -486,10 +486,10 @@ function Services({ services = [], loading }: { services?: any[]; loading?: bool
         {/* Header */}
         <Reveal direction="up" className="max-w-xl mb-16">
           <div className="flex items-center gap-3 mb-4">
-            <span className="h-[1px] w-12 bg-brand" />
-            <span className="text-[11px] font-medium tracking-[0.25em] uppercase text-brand">Capabilities</span>
+            <span className="h-[2px] w-12 bg-brand" />
+            <span className="text-xs sm:text-sm font-bold tracking-[0.25em] uppercase text-brand">Capabilities</span>
           </div>
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-display text-foreground leading-tight">
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-display text-white leading-tight">
             <DecryptedText text="Our Creative" animateOn="view" speed={50} sequential={true} revealDirection="start" /><br />
             <DecryptedText text="Disciplines" animateOn="view" speed={50} sequential={true} revealDirection="start" />
           </h2>
@@ -498,53 +498,47 @@ function Services({ services = [], loading }: { services?: any[]; loading?: bool
         {/* Boxed Layout */}
         <div className="flex flex-col gap-6">
           {loading && services.length === 0 ? (
-            Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="animate-pulse h-40 rounded-2xl border border-border bg-card" />
-            ))
+            <div className="h-64 rounded-3xl bg-white/[0.03] animate-pulse" />
           ) : (
-            displayServices.map((item, i) => {
-              const Icon = getServiceIcon(item.icon);
-              // CMS Service model stores the image under `imageUrl`; the static
-              // fallback list uses `image`. When neither is set, rotate through
-              // distinct default assets by index so cards aren't all identical.
-              const SERVICE_FALLBACK_IMAGES = [
-                "/assets/service_pre_production.png",
-                "/assets/service_production.png",
-                "/assets/service_post_production.png",
-                "/assets/service_casting.png",
-              ];
-              const imageSrc =
-                item.image ||
-                item.imageUrl ||
-                SERVICE_FALLBACK_IMAGES[i % SERVICE_FALLBACK_IMAGES.length];
-              const serviceName = item.name || item.title || 'Production Service';
+            displayServices.map((s, idx) => {
+              const serviceName = s.title || s.name || `Service 0${idx + 1}`;
+              const desc = s.description || s.desc || "High-end production discipline designed for maximum brand impact.";
+              const tags = s.tags || s.features || ["Cinematic", "Global", "Luxury"];
+              const imageSrc = s.imageUrl || s.coverImage || `/images/services-${(idx % 3) + 1}.jpg`;
+
               return (
-                <Reveal key={item.id || serviceName || i} direction="up" delay={0.05 * i}>
-                  <div className="group relative border border-border dark:border-white/10 rounded-[2rem] p-3 md:p-4 bg-surface shadow-sm transition-all duration-500 hover:border-foreground/30 hover:shadow-2xl hover:shadow-black/10 dark:hover:shadow-white/5">
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+                <Reveal key={s.id || idx} direction="up" delay={idx * 0.05}>
+                  <div className="group relative rounded-[2rem] border border-white/20 bg-card hover:border-brand/60 transition-all duration-500 overflow-hidden shadow-2xl p-8 sm:p-12">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
                       
-                      {/* Left: Content */}
-                      <div className="lg:col-span-7 flex flex-col justify-center p-6 md:p-8">
-                        <div className="flex items-center gap-6 mb-6">
-                          <div className="flex items-center justify-center w-12 h-12 rounded-full border border-border bg-muted/50 text-brand opacity-80 group-hover:opacity-100 group-hover:border-brand/30 group-hover:bg-brand/10 transition-all duration-300 shrink-0">
-                            <span className="font-mono text-sm tracking-widest">0{i + 1}</span>
+                      {/* Left: Metadata & Titles */}
+                      <div className="lg:col-span-7 flex flex-col justify-between h-full">
+                        <div>
+                          <div className="flex items-center gap-4 mb-6">
+                            <span className="text-sm sm:text-base font-bold text-brand tracking-widest font-mono">/ 0{idx + 1}</span>
+                            <span className="h-1 w-1 rounded-full bg-white/40" />
+                            <span className="text-xs sm:text-sm font-bold text-white tracking-widest uppercase">Verified Discipline</span>
                           </div>
-                          <h3 className="font-display text-3xl sm:text-4xl text-foreground group-hover:text-brand transition-colors leading-tight h-[90px] sm:h-[100px] flex items-center">
-                            <DecryptedText text={serviceName} animateOn="hover" speed={40} sequential={true} revealDirection="start" useOriginalCharsOnly={true} />
+
+                          <h3 className="font-display text-3xl sm:text-4xl lg:text-5xl text-white group-hover:text-brand transition-colors leading-tight mb-6">
+                            {serviceName}
                           </h3>
-                        </div>
-                        
-                        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 pl-[4.5rem]">
-                          <p className="text-base text-muted-foreground font-light leading-relaxed max-w-sm group-hover:text-foreground/80 transition-colors">
-                            {item.description || item.desc}
+
+                          <p className="text-base sm:text-lg text-white leading-relaxed font-medium mb-8 max-w-xl">
+                            {desc}
                           </p>
-                          
-                          <Link href={`/services${item.slug ? `#${item.slug}` : ''}`} className="shrink-0 flex items-center gap-3 text-[11px] font-medium tracking-widest uppercase text-muted-foreground group-hover:text-foreground transition-colors cursor-pointer">
-                            <span className="hidden sm:inline-block">Explore</span>
-                            <div className="h-10 w-10 rounded-full border border-border flex items-center justify-center group-hover:border-brand group-hover:bg-brand group-hover:text-primary-foreground transition-all duration-300">
-                              <ArrowRight className="h-4 w-4 group-hover:-rotate-45 transition-transform duration-300" />
-                            </div>
-                          </Link>
+                        </div>
+
+                        {/* Tags */}
+                        <div className="flex flex-wrap gap-2.5 pt-6 border-t border-white/20">
+                          {tags.map((tag: string, tIdx: number) => (
+                            <span
+                              key={tIdx}
+                              className="px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-xs sm:text-sm font-bold uppercase tracking-wider text-white"
+                            >
+                              {tag}
+                            </span>
+                          ))}
                         </div>
                       </div>
 
@@ -607,17 +601,17 @@ function FeaturedProjects({
       <Reveal direction="up" className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-6 mb-16">
         <div>
           <div className="flex items-center gap-3 mb-4">
-            <span className="h-[1px] w-12 bg-brand" />
-            <span className="text-[11px] font-medium tracking-[0.25em] uppercase text-brand">Selected Work</span>
+            <span className="h-[2px] w-12 bg-brand" />
+            <span className="text-xs sm:text-sm font-bold tracking-[0.25em] uppercase text-brand">Selected Work</span>
           </div>
-          <h2 className="font-display text-4xl sm:text-5xl text-foreground leading-tight">Featured Productions</h2>
+          <h2 className="font-display text-4xl sm:text-5xl text-white leading-tight">Featured Productions</h2>
         </div>
         <Link
           href="/portfolio"
-          className="text-sm text-muted-foreground hover:text-[#eb3d26] transition-colors flex items-center gap-2"
+          className="text-base font-bold text-white hover:text-brand transition-colors flex items-center gap-2"
         >
           <span>View All</span>
-          <ArrowRight className="h-3.5 w-3.5" />
+          <ArrowRight className="h-4 w-4" />
         </Link>
       </Reveal>
 
@@ -653,20 +647,21 @@ function FeaturedProjects({
                       sizes="(max-width: 768px) 100vw, 66vw"
                       className="object-cover object-[center_30%] transition-transform duration-[1200ms] ease-out group-hover:scale-[1.03]"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                    <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent" />
 
                     <div className="absolute bottom-0 left-0 p-8 sm:p-12 z-10 max-w-2xl">
                       <div className="flex items-center gap-3 mb-3">
-                        <span className="text-[11px] font-medium tracking-[0.2em] uppercase text-[#eb3d26]">{p.category}</span>
-                        <span className="h-1 w-1 rounded-full bg-white/30" />
-                        <span className="text-[11px] tracking-wider uppercase text-white/40">{p.client || p.location}</span>
+                        <span className="text-xs sm:text-sm font-bold tracking-[0.2em] uppercase text-brand">{p.category}</span>
+                        <span className="h-1.5 w-1.5 rounded-full bg-white" />
+                        <span className="text-xs sm:text-sm font-bold uppercase text-white">{p.client || p.location}</span>
                       </div>
-                      <h3 className="font-display text-3xl sm:text-4xl lg:text-5xl text-white leading-tight group-hover:text-[#eb3d26] transition-colors">
+                      <h3 className="font-display text-3xl sm:text-4xl lg:text-5xl text-white leading-tight group-hover:text-brand transition-colors">
                         {p.title}
                       </h3>
-                      <p className="mt-4 text-sm text-white/40 group-hover:text-white/60 transition-colors">
-                        View production details →
+                      <p className="mt-4 text-base sm:text-lg text-white font-semibold group-hover:text-brand transition-colors flex items-center gap-2">
+                        <span>View production details</span>
+                        <ArrowRight className="w-4 h-4" />
                       </p>
                     </div>
 
@@ -692,11 +687,11 @@ function FeaturedProjects({
                     sizes="(max-width: 768px) 100vw, 33vw"
                     className="object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-[1.04]"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
 
                   <div className="absolute bottom-0 left-0 p-6 z-10">
-                    <span className="text-[10px] font-medium tracking-[0.2em] uppercase text-[#eb3d26] block mb-2">{p.category}</span>
-                    <h3 className="font-display text-xl sm:text-2xl text-white leading-tight group-hover:text-[#eb3d26] transition-colors">
+                    <span className="text-xs font-bold tracking-[0.2em] uppercase text-brand block mb-2">{p.category}</span>
+                    <h3 className="font-display text-xl sm:text-2xl text-white font-bold leading-tight group-hover:text-brand transition-colors">
                       {p.title}
                     </h3>
                   </div>
@@ -732,21 +727,21 @@ function FeaturedTalent({ talent = [], loading }: { talent?: any[]; loading?: bo
         <Reveal direction="up" className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-6 mb-12">
           <div>
             <div className="flex items-center gap-3 mb-4">
-              <span className="h-[1px] w-12 bg-brand" />
-              <span className="text-[11px] font-medium tracking-[0.25em] uppercase text-brand">Exclusive Roster</span>
+              <span className="h-[2px] w-12 bg-brand" />
+              <span className="text-xs sm:text-sm font-bold tracking-[0.25em] uppercase text-brand">Exclusive Roster</span>
             </div>
-            <h2 className="font-display text-4xl sm:text-5xl text-foreground leading-tight">Featured Talent</h2>
+            <h2 className="font-display text-4xl sm:text-5xl text-white leading-tight">Featured Talent</h2>
           </div>
           <div className="flex items-center gap-3">
-            <button onClick={() => scroll("left")} className="h-10 w-10 rounded-full border border-border grid place-items-center text-muted-foreground hover:text-foreground hover:border-border transition-colors">
+            <button onClick={() => scroll("left")} className="h-10 w-10 rounded-full border border-white/20 grid place-items-center text-white hover:text-brand hover:border-brand transition-colors">
               <ChevronLeft className="w-4 h-4" />
             </button>
-            <button onClick={() => scroll("right")} className="h-10 w-10 rounded-full border border-border grid place-items-center text-muted-foreground hover:text-foreground hover:border-border transition-colors">
+            <button onClick={() => scroll("right")} className="h-10 w-10 rounded-full border border-white/20 grid place-items-center text-white hover:text-brand hover:border-brand transition-colors">
               <ChevronRight className="w-4 h-4" />
             </button>
-            <Link href="/talent" className="hidden sm:flex items-center gap-2 text-sm text-muted-foreground hover:text-[#eb3d26] transition-colors ml-2">
+            <Link href="/talent" className="hidden sm:flex items-center gap-2 text-base font-bold text-white hover:text-brand transition-colors ml-2">
               <span>View All</span>
-              <ArrowRight className="h-3.5 w-3.5" />
+              <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
         </Reveal>
@@ -777,7 +772,7 @@ function FeaturedTalent({ talent = [], loading }: { talent?: any[]; loading?: bo
                   {t.user?.avatarUrl ? (
                     <Image src={t.user.avatarUrl} alt={`${t.user.firstName ?? ''} ${t.user.lastName ?? ''}`.trim() || 'Talent'} fill className="object-cover" sizes="(max-width: 640px) 192px, 224px" />
                   ) : (
-                    <div className="text-4xl font-display text-foreground/30 group-hover:text-[#eb3d26] transition-colors duration-500">
+                    <div className="text-4xl font-display text-white/40 group-hover:text-brand transition-colors duration-500">
                       {t.user?.firstName?.[0] || "T"}
                       {t.user?.lastName?.[0] || "M"}
                     </div>
@@ -824,7 +819,7 @@ function Stats({ stats }: { stats?: any }) {
   ];
 
   return (
-    <section className="border-y border-border bg-white/[0.01]">
+    <section className="border-y border-white/20 bg-white/[0.02]">
       <div className="mx-auto max-w-7xl px-6 sm:px-10 py-20">
         <Reveal direction="up">
           <div className="flex flex-wrap justify-between items-center gap-y-10">
@@ -832,15 +827,15 @@ function Stats({ stats }: { stats?: any }) {
               <div key={label} className="flex items-center gap-8">
                 <div className="text-center">
                   <div className="flex items-center justify-center gap-3 mb-2">
-                    <Icon className="h-5 w-5 text-brand" />
-                    <span className="font-display text-4xl sm:text-5xl font-semibold text-foreground">
+                    <Icon className="h-6 w-6 text-brand" />
+                    <span className="font-display text-4xl sm:text-5xl font-bold text-white drop-shadow-sm">
                       <Counter n={n} suffix={s} />
                     </span>
                   </div>
-                  <span className="text-[11px] tracking-[0.2em] uppercase text-foreground/25 block">{label}</span>
+                  <span className="text-xs sm:text-sm font-bold tracking-[0.2em] uppercase text-white block drop-shadow-sm">{label}</span>
                 </div>
                 {i < items.length - 1 && (
-                  <div className="hidden md:block h-12 w-[1px] bg-white/[0.08]" />
+                  <div className="hidden md:block h-12 w-[1px] bg-white/20" />
                 )}
               </div>
             ))}
@@ -865,13 +860,13 @@ function Process({ process = [] }: { process?: any[] }) {
           <div className="lg:col-span-4">
             <Reveal direction="up" className="lg:sticky lg:top-32">
               <div className="flex items-center gap-3 mb-4">
-                <span className="h-[1px] w-12 bg-brand" />
-                <span className="text-[11px] font-medium tracking-[0.25em] uppercase text-brand">Methodology</span>
+                <span className="h-[2px] w-12 bg-brand" />
+                <span className="text-xs sm:text-sm font-bold tracking-[0.25em] uppercase text-brand">Methodology</span>
               </div>
-              <h2 className="font-display text-4xl sm:text-5xl text-foreground leading-tight">
+              <h2 className="font-display text-4xl sm:text-5xl text-white leading-tight">
                 Production Process
               </h2>
-              <p className="mt-6 text-sm text-foreground/35 font-light leading-relaxed">
+              <p className="mt-6 text-base sm:text-lg text-white font-medium leading-relaxed drop-shadow-sm">
                 A rigorous four-phase pipeline that eliminates friction between
                 creative ambition and technical execution.
               </p>
@@ -883,18 +878,18 @@ function Process({ process = [] }: { process?: any[] }) {
             <div className="space-y-16">
               {displayProcess.map((p, i) => (
                 <Reveal key={p.step || i} direction="up" delay={0.05 * i}>
-                  <div className="group flex flex-col md:flex-row md:items-start gap-6 md:gap-12 border border-border dark:border-white/10 rounded-3xl p-6 sm:p-8 md:p-10 bg-surface shadow-sm transition-all duration-500 hover:border-foreground/30 hover:shadow-xl hover:shadow-black/5 dark:hover:shadow-white/5 min-h-[280px] md:min-h-[220px]">
+                  <div className="group flex flex-col md:flex-row md:items-start gap-6 md:gap-12 border border-white/20 rounded-3xl p-6 sm:p-8 md:p-10 bg-card shadow-2xl transition-all duration-500 hover:border-brand/60 min-h-[280px] md:min-h-[220px]">
                     {/* Number */}
-                    <div className="text-brand font-mono text-xl md:text-2xl tracking-widest pt-2 opacity-50 group-hover:opacity-100 transition-opacity">
+                    <div className="text-brand font-mono text-xl md:text-2xl font-bold tracking-widest pt-2 opacity-80 group-hover:opacity-100 transition-opacity">
                       {p.step || `0${i + 1}`}
                     </div>
 
                     {/* Content */}
                     <div>
-                      <h3 className="font-display text-3xl md:text-4xl text-foreground group-hover:text-brand transition-colors leading-tight mb-4 h-[90px] md:h-[100px] flex items-center">
+                      <h3 className="font-display text-3xl md:text-4xl text-white font-bold group-hover:text-brand transition-colors leading-tight mb-4 h-[90px] md:h-[100px] flex items-center">
                         <DecryptedText text={p.title} animateOn="hover" speed={40} sequential={true} revealDirection="start" useOriginalCharsOnly={true} />
                       </h3>
-                      <p className="text-base md:text-lg text-muted-foreground font-light leading-relaxed max-w-xl">
+                      <p className="text-base md:text-xl text-white font-medium leading-relaxed max-w-xl">
                         {p.desc || p.description}
                       </p>
                     </div>
@@ -909,8 +904,6 @@ function Process({ process = [] }: { process?: any[] }) {
   );
 }
 
-
-
 /* ═══════════════════════════════════════════════════════════
    FAQ — Clean accordion (no card wrapper)
    ═══════════════════════════════════════════════════════════ */
@@ -923,7 +916,7 @@ function Faq({ faqs = [], loading }: { faqs?: any[]; loading?: boolean }) {
     <section className="py-32">
       <div className="mx-auto max-w-3xl px-6 sm:px-10">
         <Reveal direction="up" className="text-center mb-16">
-          <h2 className="font-display text-4xl sm:text-5xl text-foreground leading-tight">
+          <h2 className="font-display text-4xl sm:text-5xl text-white leading-tight">
             Frequently Asked Questions
           </h2>
         </Reveal>
@@ -940,26 +933,26 @@ function Faq({ faqs = [], loading }: { faqs?: any[]; loading?: boolean }) {
               {displayFaqs.map((f, i) => {
                 const isOpen = open === i;
                 return (
-                  <div key={f.id || f.q || f.question} className="border border-border dark:border-white/10 rounded-2xl p-6 md:p-8 bg-surface shadow-sm transition-all duration-300 hover:border-foreground/30 hover:shadow-md dark:hover:shadow-white/5">
+                  <div key={f.id || f.q || f.question} className="border border-white/20 rounded-2xl p-6 md:p-8 bg-card shadow-2xl transition-all duration-300 hover:border-brand/60">
                     <button
                       className="group flex w-full items-center justify-between gap-6 text-left transition"
                       onClick={() => setOpen(isOpen ? null : i)}
                     >
-                      <span className="font-display text-xl md:text-2xl text-foreground font-light group-hover:text-brand transition-colors">{f.q || f.question}</span>
+                      <span className="font-display text-xl md:text-2xl text-white font-bold group-hover:text-brand transition-colors">{f.q || f.question}</span>
                       <span
                         className={`grid h-7 w-7 shrink-0 place-items-center rounded-full border transition-all duration-300 ${
-                          isOpen ? "border-brand bg-brand text-foreground rotate-0" : "border-border text-muted-foreground"
+                          isOpen ? "border-brand bg-brand text-white rotate-0" : "border-white/30 text-white"
                         }`}
                       >
-                        {isOpen ? <Minus className="h-3 w-3" /> : <Plus className="h-3 w-3" />}
+                        {isOpen ? <Minus className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}
                       </span>
                     </button>
                     <div
-                      className="grid overflow-hidden text-sm text-muted-foreground font-light transition-all duration-300"
+                      className="grid overflow-hidden text-base md:text-lg text-white font-medium transition-all duration-300"
                       style={{ gridTemplateRows: isOpen ? "1fr" : "0fr" }}
                     >
                       <div className="min-h-0">
-                        <p className="pt-6 pb-2 leading-relaxed">{f.a || f.answer}</p>
+                        <p className="pt-6 pb-2 leading-relaxed text-white/95">{f.a || f.answer}</p>
                       </div>
                     </div>
                   </div>
@@ -979,25 +972,25 @@ function Faq({ faqs = [], loading }: { faqs?: any[]; loading?: boolean }) {
 function ContactCta() {
   return (
     <section className="px-4 sm:px-6 lg:px-8 pb-12 md:pb-16">
-      <div className="relative overflow-hidden rounded-[2rem] md:rounded-[3rem] py-16 md:py-24 bg-gradient-to-br from-[var(--cinematic-bg)] via-[#0e0810] to-[var(--cinematic-bg)]">
+      <div className="relative overflow-hidden rounded-[2rem] md:rounded-[3rem] py-16 md:py-24 bg-gradient-to-br from-[var(--cinematic-bg)] via-[#0e0810] to-[var(--cinematic-bg)] border border-white/20">
       {/* Ambient glow */}
       <div className="pointer-events-none absolute -right-40 -top-40 h-[500px] w-[500px] rounded-full bg-brand/10 blur-[160px]" />
       <div className="pointer-events-none absolute -left-20 bottom-0 h-80 w-80 rounded-full bg-brand/5 blur-[120px]" />
 
       <div className="relative mx-auto max-w-4xl px-6 sm:px-10 text-center">
         <Reveal direction="up">
-          <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-[11px] font-medium tracking-[0.2em] uppercase text-white/50 border border-white/[0.08] mb-8">
-            <span className="pulse-dot inline-block h-1.5 w-1.5 rounded-full bg-brand" />
+          <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs sm:text-sm font-bold tracking-[0.2em] uppercase text-white border border-white/20 mb-8 backdrop-blur-md">
+            <span className="pulse-dot inline-block h-2 w-2 rounded-full bg-brand" />
             Now Booking Q4 2026 / Q1 2027
           </div>
 
           <h2 className="font-display text-4xl sm:text-6xl lg:text-7xl text-white leading-[0.95] tracking-tight">
             Got a vision to build?
             <br />
-            <span className="italic text-white/60 font-light">Let&apos;s roll cameras.</span>
+            <span className="italic text-white font-bold">Let&apos;s roll cameras.</span>
           </h2>
 
-          <p className="mt-8 max-w-2xl mx-auto text-base text-white/40 font-light leading-relaxed">
+          <p className="mt-8 max-w-2xl mx-auto text-lg sm:text-xl text-white font-medium leading-relaxed drop-shadow-sm">
             Whether you are a luxury brand launching a flagship campaign or an
             international artist dropping a narrative video — we assemble the
             master crew, lock the locations, and deliver the frames.
@@ -1007,17 +1000,17 @@ function ContactCta() {
             <MagneticButton strength={20}>
               <Link
                 href="/contact"
-                className="group inline-flex items-center gap-3 rounded-full bg-brand px-10 py-4 text-sm font-semibold tracking-wide text-[var(--primary-foreground)] hover:shadow-glow transition-all duration-300"
+                className="group inline-flex items-center gap-3 rounded-full bg-brand px-10 py-4 text-base sm:text-lg font-bold tracking-wide text-white hover:bg-white hover:text-black transition-all duration-300 shadow-glow"
               >
                 <span>Commission Studio</span>
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
               </Link>
             </MagneticButton>
 
             <MagneticButton strength={20}>
               <Link
                 href="/join/talent"
-                className="inline-flex items-center gap-3 rounded-full border border-white/20 px-10 py-4 text-sm font-medium tracking-wide text-white hover:bg-white/[0.05] transition-all"
+                className="inline-flex items-center gap-3 rounded-full border border-white/30 bg-white/20 hover:bg-white/35 px-10 py-4 text-base sm:text-lg font-bold tracking-wide text-white backdrop-blur-md transition-all shadow-md"
               >
                 Apply as Talent
               </Link>

@@ -117,16 +117,16 @@ function MinimalProductCard({ product }: { product: ProductScrollItem }) {
 
       {/* Typography Section */}
       <div className="flex flex-col items-center justify-center text-center p-3 sm:p-6 md:p-8 bg-transparent relative z-20">
-        <span className="text-[8px] sm:text-[9px] text-muted-foreground uppercase tracking-[0.4em] mb-1 sm:mb-3 font-light">
+        <span className="text-xs sm:text-sm text-white uppercase tracking-[0.3em] mb-2 font-bold drop-shadow-sm">
           {product.collection?.title ?? "MP PRODUCTIONS"}
         </span>
 
-        <h4 className="text-xs sm:text-sm md:text-base uppercase font-normal text-foreground mb-2 sm:mb-4 w-full line-clamp-2 transition-colors duration-500 tracking-widest">
+        <h4 className="text-sm sm:text-lg md:text-xl uppercase font-bold text-white mb-2 w-full line-clamp-2 transition-colors duration-500 tracking-widest drop-shadow-sm">
           {product.title}
         </h4>
 
         <div className="flex items-center justify-center">
-          <span className="text-[10px] sm:text-xs font-light tracking-[0.15em] text-foreground/80 group-hover:text-foreground transition-colors duration-500">
+          <span className="text-xs sm:text-base font-semibold tracking-[0.15em] text-white transition-colors duration-500 drop-shadow-sm">
             {product.price}
           </span>
         </div>
@@ -304,11 +304,11 @@ function ProductHero({ product, reversed = false }: { product: ProductScrollItem
                 className="reveal-step transition-all duration-1000 ease-out opacity-0 translate-y-12 [&.active]:opacity-100 [&.active]:translate-y-0"
                 data-progress="0.2"
               >
-                <h2 className="text-lg sm:text-xl md:text-4xl font-semibold tracking-tight text-foreground mb-3">
+                <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold tracking-tight text-white mb-3 drop-shadow-sm">
                   {product.title}
                 </h2>
                 <div className="flex items-center gap-3">
-                  <span className="text-base sm:text-xl font-medium text-foreground">
+                  <span className="text-lg sm:text-2xl font-bold text-white drop-shadow-sm">
                     {product.price}
                   </span>
                 </div>
@@ -319,7 +319,7 @@ function ProductHero({ product, reversed = false }: { product: ProductScrollItem
                 className="reveal-step transition-all duration-1000 ease-out opacity-0 translate-y-12 [&.active]:opacity-100 [&.active]:translate-y-0"
                 data-progress="0.4"
               >
-                <p className="text-sm md:text-base leading-relaxed text-muted-foreground font-light text-justify pt-6 border-t border-border/50">
+                <p className="text-base md:text-xl leading-relaxed text-white font-medium text-justify pt-6 border-t border-white/20 drop-shadow-sm">
                   {product.description}
                 </p>
               </div>
@@ -332,7 +332,7 @@ function ProductHero({ product, reversed = false }: { product: ProductScrollItem
                 >
                   {product.colors.length > 0 && (
                     <div>
-                      <span className="block text-[10px] text-muted-foreground uppercase mb-3 tracking-widest">
+                      <span className="block text-xs sm:text-sm text-white font-bold uppercase mb-3 tracking-widest">
                         TAG
                       </span>
                       <div className="flex gap-2.5 flex-wrap">
@@ -349,10 +349,10 @@ function ProductHero({ product, reversed = false }: { product: ProductScrollItem
 
                   {product.sizes.length > 0 && (
                     <div>
-                      <span className="block text-[10px] text-muted-foreground uppercase mb-3 tracking-widest">
+                      <span className="block text-xs sm:text-sm text-white font-bold uppercase mb-3 tracking-widest">
                         TYPE
                       </span>
-                      <div className="flex gap-4 text-xs font-medium text-foreground">
+                      <div className="flex gap-4 text-sm sm:text-base font-bold text-white">
                         {product.sizes.map((size: string, i: number) => (
                           <span key={i} className="cursor-default">
                             {size}
