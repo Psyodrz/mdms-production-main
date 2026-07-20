@@ -384,20 +384,24 @@ function ScrollyTelling() {
             <Image src="/images/careers-meeting.jpg" alt="Visual setup 3" fill sizes="100vw" className="object-cover object-[center_20%]" />
           </motion.div>
 
-          <div className="absolute inset-0 z-20 flex items-center justify-center px-6 pointer-events-none">
+          {/* Dark Contrast Overlays so text is crystal clear over any background image */}
+          <div className="absolute inset-0 bg-black/60 z-10 pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/70 z-10 pointer-events-none" />
+
+          <div className="absolute inset-0 z-20 flex items-center justify-center px-4 pointer-events-none">
             {acts.map((act, i) => (
               <motion.div
                 key={i}
                 style={{ opacity: act.opacity, y: act.y }}
-                className="absolute text-center max-w-xl transform-gpu will-change-[transform,opacity] pointer-events-auto"
+                className="absolute text-center max-w-2xl transform-gpu will-change-[transform,opacity] pointer-events-auto bg-black/70 backdrop-blur-xl border border-white/20 p-8 sm:p-12 rounded-3xl shadow-[0_0_60px_rgba(0,0,0,0.9)] mx-4"
               >
-                <span className="inline-block text-xs font-bold tracking-[0.3em] uppercase text-brand mb-4 drop-shadow-xl">
-                  {act.label}
-                </span>
-                <h2 className="font-display text-4xl sm:text-5xl lg:text-6xl text-white drop-shadow-xl leading-tight">
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand/20 border border-brand/50 text-brand text-xs sm:text-sm font-bold tracking-[0.3em] uppercase mb-5 shadow-lg">
+                  <span>{act.label}</span>
+                </div>
+                <h2 className="font-display text-4xl sm:text-5xl lg:text-6xl text-white font-bold drop-shadow-[0_4px_16px_rgba(0,0,0,1)] leading-tight mb-4">
                   {act.heading}
                 </h2>
-                <p className="mt-5 text-base sm:text-lg text-white/90 font-medium leading-relaxed max-w-md mx-auto drop-shadow-lg">
+                <p className="mt-4 text-base sm:text-xl text-white font-medium leading-relaxed max-w-lg mx-auto drop-shadow-[0_2px_10px_rgba(0,0,0,1)]">
                   {act.body}
                 </p>
               </motion.div>
