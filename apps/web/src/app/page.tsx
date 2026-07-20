@@ -478,21 +478,30 @@ function Intro({ intro }: { intro?: any }) {
    SERVICES — Bento grid (asymmetric)
    ═══════════════════════════════════════════════════════════ */
 function Services({ services = [], loading }: { services?: any[]; loading?: boolean }) {
-  const displayServices = services;
+  const displayServices = services.slice(0, 4);
 
   return (
     <section className="pt-8 pb-16 lg:pb-24 bg-background">
       <div className="mx-auto max-w-7xl px-6 sm:px-10">
         {/* Header */}
-        <Reveal direction="up" className="max-w-xl mb-16">
-          <div className="flex items-center gap-3 mb-4">
-            <span className="h-[2px] w-12 bg-brand" />
-            <span className="text-xs sm:text-sm font-bold tracking-[0.25em] uppercase text-brand">Capabilities</span>
+        <Reveal direction="up" className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-6 mb-16">
+          <div>
+            <div className="flex items-center gap-3 mb-4">
+              <span className="h-[2px] w-12 bg-brand" />
+              <span className="text-xs sm:text-sm font-bold tracking-[0.25em] uppercase text-brand">Capabilities</span>
+            </div>
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-display text-foreground font-bold leading-tight">
+              <DecryptedText text="Our Creative" animateOn="view" speed={50} sequential={true} revealDirection="start" /><br />
+              <DecryptedText text="Disciplines" animateOn="view" speed={50} sequential={true} revealDirection="start" />
+            </h2>
           </div>
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-display text-foreground font-bold leading-tight">
-            <DecryptedText text="Our Creative" animateOn="view" speed={50} sequential={true} revealDirection="start" /><br />
-            <DecryptedText text="Disciplines" animateOn="view" speed={50} sequential={true} revealDirection="start" />
-          </h2>
+          <Link
+            href="/services"
+            className="group inline-flex items-center gap-2 px-6 py-3 rounded-full border border-border bg-card hover:bg-brand hover:text-white hover:border-brand text-foreground font-bold text-sm tracking-wide transition-all duration-300 shadow-md cursor-pointer shrink-0"
+          >
+            <span>View All Services</span>
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+          </Link>
         </Reveal>
 
         {/* Boxed Layout */}
@@ -561,6 +570,19 @@ function Services({ services = [], loading }: { services?: any[]; loading?: bool
             })
           )}
         </div>
+
+        {/* Bottom View All CTA */}
+        {services.length > 3 && (
+          <Reveal direction="up" className="mt-12 text-center">
+            <Link
+              href="/services"
+              className="inline-flex items-center gap-3 px-10 py-4 rounded-full bg-brand text-white hover:bg-foreground hover:text-background font-bold text-base sm:text-lg tracking-wide transition-all duration-300 shadow-glow group cursor-pointer"
+            >
+              <span>View All Services & Disciplines</span>
+              <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+            </Link>
+          </Reveal>
+        )}
       </div>
     </section>
   );
