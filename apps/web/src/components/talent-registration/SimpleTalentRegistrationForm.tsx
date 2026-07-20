@@ -105,22 +105,22 @@ function SearchableDropdown({
 
   return (
     <div className="relative" ref={dropdownRef}>
-      <label className="block text-xs font-bold text-white/90 uppercase tracking-wider mb-2">
-        {label} {required && <span className="text-[#E50914]">*</span>}
+      <label className="block text-xs font-bold text-foreground uppercase tracking-wider mb-2">
+        {label} {required && <span className="text-brand">*</span>}
       </label>
       <div
         onClick={() => {
           setIsOpen(!isOpen);
           if (!isOpen) setSearch('');
         }}
-        className={`input-premium bg-black/60 border text-white font-medium w-full py-3.5 px-4 cursor-pointer flex justify-between items-center transition-all ${
-          error ? 'border-[#E50914]' : isOpen ? 'border-[#F59E0B] shadow-[0_0_15px_rgba(245,158,11,0.2)] bg-black/90' : 'border-white/25 hover:border-white/40'
+        className={`input-premium bg-surface border text-foreground font-medium w-full py-3.5 px-4 cursor-pointer flex justify-between items-center transition-all ${
+          error ? 'border-destructive' : isOpen ? 'border-brand shadow-sm bg-background' : 'border-border hover:border-foreground/30'
         } rounded-xl`}
       >
-        <span className={value ? 'text-white font-medium truncate pr-2' : 'text-gray-500 truncate pr-2'}>
+        <span className={value ? 'text-foreground font-medium truncate pr-2' : 'text-muted-foreground truncate pr-2'}>
           {value || placeholder}
         </span>
-        <ChevronDown className={`w-4 h-4 text-gray-400 shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180 text-[#F59E0B]' : ''}`} />
+        <ChevronDown className={`w-4 h-4 text-muted-foreground shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180 text-brand' : ''}`} />
       </div>
 
       <AnimatePresence>
@@ -130,21 +130,21 @@ function SearchableDropdown({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -4, scale: 0.98 }}
             transition={{ duration: 0.15 }}
-            className="absolute z-50 left-0 right-0 mt-2 bg-[#0A0A0C] border border-white/20 rounded-xl shadow-[0_15px_50px_rgba(0,0,0,0.95)] overflow-hidden"
+            className="absolute z-50 left-0 right-0 mt-2 bg-popover border border-border text-popover-foreground rounded-xl shadow-2xl overflow-hidden"
           >
-            <div className="p-2.5 border-b border-white/10 bg-black/80 relative flex items-center">
-              <Search className="w-4 h-4 text-[#F59E0B] absolute left-4.5" />
+            <div className="p-2.5 border-b border-border bg-surface relative flex items-center">
+              <Search className="w-4 h-4 text-brand absolute left-4.5" />
               <input
                 type="text"
                 placeholder="Search..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 onClick={(e) => e.stopPropagation()}
-                className="w-full bg-white/5 border border-white/20 rounded-lg py-2 pl-9 pr-3 text-xs text-white placeholder-white/50 focus:outline-none focus:border-[#F59E0B] focus:bg-black/80"
+                className="w-full bg-background border border-border rounded-lg py-2 pl-9 pr-3 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-brand"
                 autoFocus
               />
             </div>
-            <div className="max-h-56 overflow-y-auto divide-y divide-white/5 py-1">
+            <div className="max-h-56 overflow-y-auto divide-y divide-border/40 py-1">
               {filteredOptions.length > 0 ? (
                 filteredOptions.map((opt) => (
                   <button
@@ -156,12 +156,12 @@ function SearchableDropdown({
                     }}
                     className={`w-full text-left px-4 py-2.5 text-xs transition-colors flex items-center justify-between ${
                       value === opt
-                        ? 'bg-[#E50914]/20 text-[#E50914] font-bold'
-                        : 'text-gray-200 hover:bg-white/10 hover:text-white'
+                        ? 'bg-brand/15 text-brand font-bold'
+                        : 'text-foreground hover:bg-muted'
                     }`}
                   >
                     <span className="truncate pr-2">{opt}</span>
-                    {value === opt && <Check className="w-3.5 h-3.5 text-[#E50914] shrink-0" />}
+                    {value === opt && <Check className="w-3.5 h-3.5 text-brand shrink-0" />}
                   </button>
                 ))
               ) : (
@@ -173,7 +173,7 @@ function SearchableDropdown({
                       setIsOpen(false);
                     }
                   }}
-                  className="w-full text-left px-4 py-3 text-xs text-[#F59E0B] hover:bg-white/10 flex items-center gap-2 font-semibold"
+                  className="w-full text-left px-4 py-3 text-xs text-brand hover:bg-muted flex items-center gap-2 font-semibold"
                 >
                   <Search className="w-3.5 h-3.5 shrink-0" />
                   <span className="truncate">Use custom: "{search}"</span>
@@ -183,7 +183,7 @@ function SearchableDropdown({
           </motion.div>
         )}
       </AnimatePresence>
-      {error && <p className="text-[#E50914] text-xs mt-1.5 font-medium">{error}</p>}
+      {error && <p className="text-destructive text-xs mt-1.5 font-medium">{error}</p>}
     </div>
   );
 }
@@ -294,12 +294,12 @@ export function SimpleTalentRegistrationForm() {
   };
 
   return (
-    <div className="min-h-screen bg-[#060608] text-white relative overflow-x-hidden grain selection:bg-[#E50914] selection:text-white">
+    <div className="min-h-screen bg-background text-foreground relative overflow-x-hidden grain selection:bg-brand selection:text-white transition-colors duration-300">
       <PortalNavbar title="PREMIUM TALENT ONBOARDING" />
 
       {/* Background Multi-Color Glows */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] bg-gradient-to-r from-[#E50914]/20 via-[#F59E0B]/10 to-[#38BDF8]/15 blur-[140px] pointer-events-none rounded-full" />
-      <div className="absolute top-3/4 right-10 w-[500px] h-[500px] bg-[#E50914]/10 blur-[160px] pointer-events-none rounded-full" />
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] bg-gradient-to-r from-brand/20 via-brand-gold/10 to-brand-cyan/15 blur-[140px] pointer-events-none rounded-full" />
+      <div className="absolute top-3/4 right-10 w-[500px] h-[500px] bg-brand/10 blur-[160px] pointer-events-none rounded-full" />
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 relative z-10">
         
@@ -310,17 +310,17 @@ export function SimpleTalentRegistrationForm() {
           transition={{ duration: 0.6 }}
           className="text-center mb-10 md:mb-14 space-y-4"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#F59E0B]/10 border border-[#F59E0B]/30 text-[#F59E0B] text-xs font-bold tracking-widest uppercase shadow-[0_0_20px_rgba(245,158,11,0.15)]">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-gold/10 border border-brand-gold/30 text-brand-gold text-xs font-bold tracking-widest uppercase shadow-sm">
             <Sparkles className="w-3.5 h-3.5 animate-pulse" /> Streamlined Quick Onboarding
           </div>
           
           <h1 className="text-3xl sm:text-5xl md:text-6xl font-display font-extrabold tracking-tight flex flex-col items-center gap-4">
-            <img src="/logo.png" alt="MP Productions" className="h-16 sm:h-20 md:h-24 w-auto object-contain drop-shadow-[0_0_25px_rgba(235,61,38,0.3)]" />
+            <img src="/logo.png" alt="MP Productions" className="h-16 sm:h-20 md:h-24 w-auto object-contain drop-shadow-[0_0_25px_rgba(235,61,38,0.25)]" />
             <span>Join the <span className="text-gradient-brand">Roster</span></span>
           </h1>
           
-          <p className="max-w-2xl mx-auto text-sm sm:text-base text-gray-400 leading-relaxed">
-            Register below with your essential contact details. Once registered, you will unlock immediate access to your <span className="text-white font-semibold">Personal Talent Dashboard</span> where you can upload photos, showreels, social links, and multiple talents at your own pace.
+          <p className="max-w-2xl mx-auto text-sm sm:text-base text-muted-foreground leading-relaxed">
+            Register below with your essential contact details. Once registered, you will unlock immediate access to your <span className="text-foreground font-semibold">Personal Talent Dashboard</span> where you can upload photos, showreels, social links, and multiple talents at your own pace.
           </p>
         </motion.div>
 
@@ -329,121 +329,121 @@ export function SimpleTalentRegistrationForm() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.15 }}
-          className="bg-[#0e0e14]/95 backdrop-blur-2xl shadow-[0_20px_70px_rgba(0,0,0,0.9)] rounded-3xl p-6 sm:p-10 md:p-12 relative overflow-hidden border border-white/20 text-white"
+          className="bg-card text-card-foreground backdrop-blur-2xl shadow-xl dark:shadow-[0_20px_70px_rgba(0,0,0,0.8)] rounded-3xl p-6 sm:p-10 md:p-12 relative overflow-hidden border border-border transition-colors duration-300"
         >
           {/* Subtle Top Gradient Bar */}
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#E50914] via-[#F59E0B] to-[#38BDF8]" />
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-brand" />
 
           <form onSubmit={handleSubmit} className="space-y-8">
             
             {/* Section 1: Basic Identity */}
             <div className="space-y-6">
-              <div className="flex items-center gap-2 pb-3 border-b border-white/15 text-xs font-extrabold tracking-widest uppercase text-[#38BDF8]">
+              <div className="flex items-center gap-2 pb-3 border-b border-border text-xs font-extrabold tracking-widest uppercase text-brand">
                 <User className="w-4 h-4" /> 01. Personal Identification
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div>
-                  <label className="block text-xs font-bold text-white/90 uppercase tracking-wider mb-2">
-                    First Name <span className="text-[#E50914]">*</span>
+                  <label className="block text-xs font-bold text-foreground uppercase tracking-wider mb-2">
+                    First Name <span className="text-brand">*</span>
                   </label>
                   <input
                     type="text"
                     placeholder="e.g. Aditya"
                     value={formData.firstName}
                     onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                    className="input-premium bg-black/60 border border-white/25 focus:border-[#E50914] rounded-xl text-white font-medium placeholder-white/40 focus:bg-black/90 w-full py-3.5 px-4"
+                    className="input-premium bg-surface border border-border focus:border-brand rounded-xl text-foreground font-medium placeholder:text-muted-foreground/60 focus:bg-background w-full py-3.5 px-4 transition-colors"
                   />
-                  {errors.firstName && <p className="text-[#E50914] text-xs mt-1.5 font-medium">{errors.firstName}</p>}
+                  {errors.firstName && <p className="text-destructive text-xs mt-1.5 font-medium">{errors.firstName}</p>}
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-white/90 uppercase tracking-wider mb-2">
-                    Last Name <span className="text-[#E50914]">*</span>
+                  <label className="block text-xs font-bold text-foreground uppercase tracking-wider mb-2">
+                    Last Name <span className="text-brand">*</span>
                   </label>
                   <input
                     type="text"
                     placeholder="e.g. Sharma"
                     value={formData.lastName}
                     onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                    className="input-premium bg-black/60 border border-white/25 focus:border-[#E50914] rounded-xl text-white font-medium placeholder-white/40 focus:bg-black/90 w-full py-3.5 px-4"
+                    className="input-premium bg-surface border border-border focus:border-brand rounded-xl text-foreground font-medium placeholder:text-muted-foreground/60 focus:bg-background w-full py-3.5 px-4 transition-colors"
                   />
-                  {errors.lastName && <p className="text-[#E50914] text-xs mt-1.5 font-medium">{errors.lastName}</p>}
+                  {errors.lastName && <p className="text-destructive text-xs mt-1.5 font-medium">{errors.lastName}</p>}
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div>
-                  <label className="block text-xs font-bold text-white/90 uppercase tracking-wider mb-2">
-                    Mobile Number <span className="text-[#E50914]">*</span>
+                  <label className="block text-xs font-bold text-foreground uppercase tracking-wider mb-2">
+                    Mobile Number <span className="text-brand">*</span>
                   </label>
                   <div className="relative">
-                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <input
                       type="text"
                       placeholder="+91 9876543210"
                       value={formData.mobile}
                       onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
-                      className="input-premium bg-black/60 border border-white/25 focus:border-[#E50914] rounded-xl text-white font-medium placeholder-white/40 focus:bg-black/90 w-full py-3.5 pl-11 pr-4"
+                      className="input-premium bg-surface border border-border focus:border-brand rounded-xl text-foreground font-medium placeholder:text-muted-foreground/60 focus:bg-background w-full py-3.5 pl-11 pr-4 transition-colors"
                     />
                   </div>
-                  {errors.mobile && <p className="text-[#E50914] text-xs mt-1.5 font-medium">{errors.mobile}</p>}
+                  {errors.mobile && <p className="text-destructive text-xs mt-1.5 font-medium">{errors.mobile}</p>}
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-white/90 uppercase tracking-wider mb-2">
-                    Email Address <span className="text-[#E50914]">*</span>
+                  <label className="block text-xs font-bold text-foreground uppercase tracking-wider mb-2">
+                    Email Address <span className="text-brand">*</span>
                   </label>
                   <div className="relative">
-                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <input
                       type="email"
                       placeholder="talent@mpproductions.com"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="input-premium bg-black/60 border border-white/25 focus:border-[#E50914] rounded-xl text-white font-medium placeholder-white/40 focus:bg-black/90 w-full py-3.5 pl-11 pr-4"
+                      className="input-premium bg-surface border border-border focus:border-brand rounded-xl text-foreground font-medium placeholder:text-muted-foreground/60 focus:bg-background w-full py-3.5 pl-11 pr-4 transition-colors"
                     />
                   </div>
-                  {errors.email && <p className="text-[#E50914] text-xs mt-1.5 font-medium">{errors.email}</p>}
+                  {errors.email && <p className="text-destructive text-xs mt-1.5 font-medium">{errors.email}</p>}
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-white/90 uppercase tracking-wider mb-2">
-                  Create Account Password <span className="text-[#E50914]">*</span>
+                <label className="block text-xs font-bold text-foreground uppercase tracking-wider mb-2">
+                  Create Account Password <span className="text-brand">*</span>
                 </label>
                 <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <input
                     type="password"
                     placeholder="Min. 6 characters for login"
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    className="input-premium bg-black/60 border border-white/25 focus:border-[#E50914] rounded-xl text-white font-medium placeholder-white/40 focus:bg-black/90 w-full py-3.5 pl-11 pr-4"
+                    className="input-premium bg-surface border border-border focus:border-brand rounded-xl text-foreground font-medium placeholder:text-muted-foreground/60 focus:bg-background w-full py-3.5 pl-11 pr-4 transition-colors"
                   />
                 </div>
-                {errors.password && <p className="text-[#E50914] text-xs mt-1.5 font-medium">{errors.password}</p>}
+                {errors.password && <p className="text-destructive text-xs mt-1.5 font-medium">{errors.password}</p>}
               </div>
             </div>
 
             {/* Section 2: Professional Profile */}
             <div className="space-y-6 pt-4">
-              <div className="flex items-center gap-2 pb-3 border-b border-white/15 text-xs font-extrabold tracking-widest uppercase text-[#F59E0B]">
+              <div className="flex items-center gap-2 pb-3 border-b border-border text-xs font-extrabold tracking-widest uppercase text-brand-gold">
                 <Film className="w-4 h-4" /> 02. Professional Specialization
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div>
-                  <label className="block text-xs font-bold text-white/90 uppercase tracking-wider mb-2">
-                    Primary Talent Category <span className="text-[#E50914]">*</span>
+                  <label className="block text-xs font-bold text-foreground uppercase tracking-wider mb-2">
+                    Primary Talent Category <span className="text-brand">*</span>
                   </label>
                   <select
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    className="input-premium bg-black/60 border border-white/25 focus:border-[#F59E0B] rounded-xl text-white font-medium w-full py-3.5 px-4 cursor-pointer"
+                    className="input-premium bg-surface border border-border focus:border-brand-gold rounded-xl text-foreground font-medium w-full py-3.5 px-4 cursor-pointer transition-colors"
                   >
                     {TALENT_CATEGORIES.map((cat) => (
-                      <option key={cat.id} value={cat.id} className="bg-[#0A0A0C] text-white py-2">
+                      <option key={cat.id} value={cat.id} className="bg-card text-card-foreground py-2">
                         {cat.label}
                       </option>
                     ))}
@@ -451,16 +451,16 @@ export function SimpleTalentRegistrationForm() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-white/90 uppercase tracking-wider mb-2">
-                    Experience Level <span className="text-[#E50914]">*</span>
+                  <label className="block text-xs font-bold text-foreground uppercase tracking-wider mb-2">
+                    Experience Level <span className="text-brand">*</span>
                   </label>
                   <select
                     value={formData.experience}
                     onChange={(e) => setFormData({ ...formData, experience: e.target.value })}
-                    className="input-premium bg-black/60 border border-white/25 focus:border-[#F59E0B] rounded-xl text-white font-medium w-full py-3.5 px-4 cursor-pointer"
+                    className="input-premium bg-surface border border-border focus:border-brand-gold rounded-xl text-foreground font-medium w-full py-3.5 px-4 cursor-pointer transition-colors"
                   >
                     {EXPERIENCE_LEVELS.map((level) => (
-                      <option key={level.id} value={level.id} className="bg-[#0A0A0C] text-white py-2">
+                      <option key={level.id} value={level.id} className="bg-card text-card-foreground py-2">
                         {level.label}
                       </option>
                     ))}
@@ -496,8 +496,8 @@ export function SimpleTalentRegistrationForm() {
                 />
 
                 <div>
-                  <label className="block text-xs font-bold text-white/90 uppercase tracking-wider mb-2">
-                    Pincode <span className="text-[#E50914]">*</span>
+                  <label className="block text-xs font-bold text-foreground uppercase tracking-wider mb-2">
+                    Pincode <span className="text-brand">*</span>
                   </label>
                   <input
                     type="text"
@@ -505,46 +505,46 @@ export function SimpleTalentRegistrationForm() {
                     placeholder="e.g. 400001"
                     value={formData.pincode}
                     onChange={(e) => setFormData({ ...formData, pincode: e.target.value.replace(/\D/g, '') })}
-                    className="input-premium bg-black/60 border border-white/25 focus:border-[#F59E0B] rounded-xl text-white font-medium placeholder-white/40 focus:bg-black/90 w-full py-3.5 px-4 tracking-wider"
+                    className="input-premium bg-surface border border-border focus:border-brand-gold rounded-xl text-foreground font-medium placeholder:text-muted-foreground/60 focus:bg-background w-full py-3.5 px-4 tracking-wider transition-colors"
                   />
-                  {errors.pincode && <p className="text-[#E50914] text-xs mt-1.5 font-medium">{errors.pincode}</p>}
+                  {errors.pincode && <p className="text-destructive text-xs mt-1.5 font-medium">{errors.pincode}</p>}
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-white/90 uppercase tracking-wider mb-2 flex justify-between items-center">
+                <label className="block text-xs font-bold text-foreground uppercase tracking-wider mb-2 flex justify-between items-center">
                   <span>About You / Quick Summary</span>
-                  <span className="text-white/60 text-[11px] font-normal">Can be edited anytime later</span>
+                  <span className="text-muted-foreground text-[11px] font-normal">Can be edited anytime later</span>
                 </label>
                 <textarea
                   rows={3}
                   placeholder="Tell our casting directors a bit about your passions, past projects, or training..."
                   value={formData.bio}
                   onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-                  className="input-premium bg-black/60 border border-white/25 focus:border-[#E50914] rounded-xl text-white font-medium placeholder-white/40 focus:bg-black/90 w-full p-4 resize-y"
+                  className="input-premium bg-surface border border-border focus:border-brand rounded-xl text-foreground font-medium placeholder:text-muted-foreground/60 focus:bg-background w-full p-4 resize-y transition-colors"
                 />
               </div>
             </div>
 
             {/* Terms & Submit Section */}
-            <div className="pt-6 border-t border-white/10 space-y-6">
+            <div className="pt-6 border-t border-border space-y-6">
               <label className="flex items-start gap-3 cursor-pointer group">
                 <input
                   type="checkbox"
                   checked={formData.acceptTerms}
                   onChange={(e) => setFormData({ ...formData, acceptTerms: e.target.checked })}
-                  className="mt-1 w-4 h-4 rounded border-white/20 bg-black/60 text-[#E50914] focus:ring-[#E50914] cursor-pointer"
+                  className="mt-1 w-4 h-4 rounded border-border bg-surface text-brand focus:ring-brand cursor-pointer"
                 />
-                <span className="text-xs sm:text-sm text-gray-400 group-hover:text-gray-200 transition-colors">
-                  I agree to the <Link href="/terms" className="text-[#E50914] underline hover:text-[#F59E0B]">Terms of Service</Link> & <Link href="/privacy" className="text-[#E50914] underline hover:text-[#F59E0B]">Privacy Policy</Link> of MP Productions and confirm all provided details are accurate.
+                <span className="text-xs sm:text-sm text-muted-foreground group-hover:text-foreground transition-colors">
+                  I agree to the <Link href="/terms" className="text-brand underline hover:text-brand-glow">Terms of Service</Link> & <Link href="/privacy" className="text-brand underline hover:text-brand-glow">Privacy Policy</Link> of MP Productions and confirm all provided details are accurate.
                 </span>
               </label>
-              {errors.acceptTerms && <p className="text-[#E50914] text-xs font-medium">{errors.acceptTerms}</p>}
+              {errors.acceptTerms && <p className="text-destructive text-xs font-medium">{errors.acceptTerms}</p>}
 
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-[#E50914] via-[#D40812] to-[#B0070F] hover:from-[#FF1E27] hover:to-[#E50914] text-white font-extrabold text-sm sm:text-base tracking-widest uppercase shadow-[0_0_35px_rgba(229,9,20,0.45)] hover:shadow-[0_0_50px_rgba(229,9,20,0.65)] hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 flex items-center justify-center gap-3 disabled:opacity-50 cursor-pointer"
+                className="w-full py-4 px-6 rounded-2xl bg-gradient-brand hover:opacity-95 text-white font-extrabold text-sm sm:text-base tracking-widest uppercase shadow-md hover:shadow-lg hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 flex items-center justify-center gap-3 disabled:opacity-50 cursor-pointer"
               >
                 {isSubmitting ? (
                   <>
@@ -560,9 +560,9 @@ export function SimpleTalentRegistrationForm() {
               </button>
 
               <div className="text-center pt-2">
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-muted-foreground">
                   Already have an active talent account?{' '}
-                  <Link href="/login" className="text-white font-semibold hover:text-[#F59E0B] transition-colors underline">
+                  <Link href="/login" className="text-foreground font-semibold hover:text-brand transition-colors underline">
                     Sign In Here
                   </Link>
                 </p>
