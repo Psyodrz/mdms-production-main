@@ -481,8 +481,40 @@ function Intro({ intro }: { intro?: any }) {
 /* ═══════════════════════════════════════════════════════════
    SERVICES — Bento grid (asymmetric)
    ═══════════════════════════════════════════════════════════ */
+const DEFAULT_SERVICES = [
+  {
+    id: "pre-production",
+    title: "Pre-Production & Creative Direction",
+    description: "Scriptwriting, visual storyboarding, moodboarding, location scouting, and comprehensive casting for luxury lookbooks and commercial cinema.",
+    tags: ["Storyboarding", "Scouting", "Casting"],
+    imageUrl: "/images/services-lighting.jpg"
+  },
+  {
+    id: "cinematography",
+    title: "High-Fashion Cinematography",
+    description: "ARRI & RED 8K camera packages with anamorphic glass, master Gaffer lighting, and elite camera operators for high-fashion campaigns.",
+    tags: ["ARRI Alexa 35", "Anamorphic", "Lighting"],
+    imageUrl: "/images/portfolio-equipment.jpg"
+  },
+  {
+    id: "post-production",
+    title: "Post-Production & Color Grading",
+    description: "Theatrical editing, Kodak film emulation, Dolby Vision HDR color grading, motion graphics, and immersive sound design.",
+    tags: ["Dolby Vision", "Kodak 2383", "Sound Design"],
+    imageUrl: "/images/about-bts.jpg"
+  },
+  {
+    id: "talent-management",
+    title: "Talent Roster & Representation",
+    description: "Exclusive access to international cover models, actors, dancers, and visual directors with secure escrow contract protections.",
+    tags: ["Global Roster", "Escrow Contract", "Agency Access"],
+    imageUrl: "/images/projects-outdoor.jpg"
+  }
+];
+
 function Services({ services = [], loading }: { services?: any[]; loading?: boolean }) {
-  const displayServices = services.slice(0, 4);
+  const sourceServices = services && services.length > 0 ? services : DEFAULT_SERVICES;
+  const displayServices = sourceServices.slice(0, 4);
 
   return (
     <section className="pt-8 pb-16 lg:pb-24 bg-background">
@@ -516,8 +548,11 @@ function Services({ services = [], loading }: { services?: any[]; loading?: bool
             displayServices.map((s, idx) => {
               const serviceName = s.title || s.name || `Service 0${idx + 1}`;
               const desc = s.description || s.desc || "High-end production discipline designed for maximum brand impact.";
-              const tags = s.tags || s.features || ["Cinematic", "Global", "Luxury"];
-              const imageSrc = s.imageUrl || s.coverImage || `/images/services-${(idx % 3) + 1}.jpg`;
+              const rawTags = s.tags || s.features || ["Cinematic", "Global", "Luxury"];
+              const tags = Array.isArray(rawTags)
+                ? rawTags
+                : (typeof rawTags === 'string' ? (() => { try { return JSON.parse(rawTags); } catch { return ["Cinematic", "Global"]; } })() : ["Cinematic"]);
+              const imageSrc = s.imageUrl || s.coverImage || s.img || `/images/services-${(idx % 3) + 1}.jpg`;
 
               return (
                 <Reveal key={s.id || idx} direction="up" delay={idx * 0.05}>
@@ -576,17 +611,15 @@ function Services({ services = [], loading }: { services?: any[]; loading?: bool
         </div>
 
         {/* Bottom View All CTA */}
-        {services.length > 3 && (
-          <Reveal direction="up" className="mt-12 text-center">
-            <Link
-              href="/services"
-              className="inline-flex items-center gap-3 px-10 py-4 rounded-full bg-brand text-white hover:bg-foreground hover:text-background font-bold text-base sm:text-lg tracking-wide transition-all duration-300 shadow-glow group cursor-pointer"
-            >
-              <span>View All Services & Disciplines</span>
-              <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
-            </Link>
-          </Reveal>
-        )}
+        <Reveal direction="up" className="mt-12 text-center">
+          <Link
+            href="/services"
+            className="inline-flex items-center gap-3 px-10 py-4 rounded-full bg-brand text-white hover:bg-foreground hover:text-background font-bold text-base sm:text-lg tracking-wide transition-all duration-300 shadow-glow group cursor-pointer"
+          >
+            <span>View All Services & Disciplines</span>
+            <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+          </Link>
+        </Reveal>
       </div>
     </section>
   );
