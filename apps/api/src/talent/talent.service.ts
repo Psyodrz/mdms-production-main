@@ -15,16 +15,18 @@ export class TalentService {
   async findAllPublic(query: { search?: string; type?: string; location?: string }) {
     return this.prisma.talentProfile.findMany({
       where: {
-        status: TalentProfileStatus.ACTIVE,
-        // ...(query.type && { talentTypes: { has: query.type as any } }),
+        status: { in: [TalentProfileStatus.ACTIVE, TalentProfileStatus.PENDING_REVIEW] },
         ...(query.search && {
           OR: [
             { bio: { contains: query.search, mode: 'insensitive' } },
+            { stageName: { contains: query.search, mode: 'insensitive' } },
             { user: { firstName: { contains: query.search, mode: 'insensitive' } } },
             { user: { lastName: { contains: query.search, mode: 'insensitive' } } },
           ],
         }),
-        ...(query.location && { city: { contains: query.location, mode: 'insensitive' } }),
+        ...(query.location && {
+          user: { city: { contains: query.location, mode: 'insensitive' } },
+        }),
       },
       include: {
         user: {
@@ -32,9 +34,17 @@ export class TalentService {
             firstName: true,
             lastName: true,
             avatarUrl: true,
+            city: true,
+            state: true,
+          },
+        },
+        userTalents: {
+          include: {
+            category: true,
           },
         },
       },
+      orderBy: { createdAt: 'desc' },
     });
   }
 
