@@ -130,91 +130,115 @@ export default function SuperAdminDashboard() {
       let connected = false;
 
       // ── KPIs (real: counts + payment-sum revenue) ──
-      const kpi = kpiRes?.data ?? kpiRes;
-      if (kpi && typeof kpi === 'object') {
-        connected = true;
-        setKpis({
-          activeProjects: String(kpi.activeProjects ?? 0),
-          pendingBookings: String(kpi.pendingBookings ?? 0),
-          totalRevenue: String(kpi.totalRevenue ?? '₹0'),
-          totalTalent: String(kpi.totalTalent ?? 0),
-        });
+      if (kpiRes && kpiRes.ok !== false) {
+        const kpi = kpiRes.data ?? kpiRes;
+        if (kpi && typeof kpi === 'object' && ('activeProjects' in kpi || 'totalRevenue' in kpi)) {
+          connected = true;
+          setKpis({
+            activeProjects: String(kpi.activeProjects ?? 0),
+            pendingBookings: String(kpi.pendingBookings ?? 0),
+            totalRevenue: String(kpi.totalRevenue ?? '₹0'),
+            totalTalent: String(kpi.totalTalent ?? 0),
+          });
+        }
       }
 
       // ── CMS master list (real via BFF; now returns arrays) ──
       const liveCmsItems: CMSItem[] = [];
-      if (portfolioRes.ok && Array.isArray(portfolioRes.data)) {
-        connected = true;
-        liveCmsItems.push(...portfolioRes.data.map((item: any) => ({
-          id: String(item.id || item.slug),
-          title: String(item.title || 'Untitled Project'),
-          category: String(item.category || 'Portfolio'),
-          clientOrAuthor: String(item.client || item.brand || 'MP Productions'),
-          status: (item.isPublished === false ? 'Draft' : 'Published') as CMSItem['status'],
-          type: 'portfolio' as const,
-        })));
+      if (portfolioRes && portfolioRes.ok !== false) {
+        const list = Array.isArray(portfolioRes.data) ? portfolioRes.data : Array.isArray(portfolioRes) ? (portfolioRes as any[]) : [];
+        if (list.length > 0) {
+          connected = true;
+          liveCmsItems.push(...list.map((item: any) => ({
+            id: String(item.id || item.slug),
+            title: String(item.title || 'Untitled Project'),
+            category: String(item.category || 'Portfolio'),
+            clientOrAuthor: String(item.client || item.brand || 'MP Productions'),
+            status: (item.isPublished === false ? 'Draft' : 'Published') as CMSItem['status'],
+            type: 'portfolio' as const,
+          })));
+        }
       }
-      if (blogRes.ok && Array.isArray(blogRes.data)) {
-        connected = true;
-        liveCmsItems.push(...blogRes.data.map((item: any) => ({
-          id: String(item.id || item.slug),
-          title: String(item.title || 'Untitled Post'),
-          category: String(item.category || 'Blog'),
-          clientOrAuthor: String(item.authorName || 'MP Editorial'),
-          status: (item.status === 'PUBLISHED' ? 'Published' : 'Draft') as CMSItem['status'],
-          type: 'blog' as const,
-        })));
+      if (blogRes && blogRes.ok !== false) {
+        const list = Array.isArray(blogRes.data) ? blogRes.data : Array.isArray(blogRes) ? (blogRes as any[]) : [];
+        if (list.length > 0) {
+          connected = true;
+          liveCmsItems.push(...list.map((item: any) => ({
+            id: String(item.id || item.slug),
+            title: String(item.title || 'Untitled Post'),
+            category: String(item.category || 'Blog'),
+            clientOrAuthor: String(item.authorName || 'MP Editorial'),
+            status: (item.status === 'PUBLISHED' ? 'Published' : 'Draft') as CMSItem['status'],
+            type: 'blog' as const,
+          })));
+        }
       }
-      if (testimonialRes.ok && Array.isArray(testimonialRes.data)) {
-        connected = true;
-        liveCmsItems.push(...testimonialRes.data.map((item: any) => ({
-          id: String(item.id),
-          title: `"${String(item.content || 'Great service').slice(0, 60)}..."`,
-          category: 'Review',
-          clientOrAuthor: String(item.clientName || 'Client'),
-          status: (item.isPublished === false ? 'Draft' : 'Published') as CMSItem['status'],
-          type: 'testimonial' as const,
-        })));
+      if (testimonialRes && testimonialRes.ok !== false) {
+        const list = Array.isArray(testimonialRes.data) ? testimonialRes.data : Array.isArray(testimonialRes) ? (testimonialRes as any[]) : [];
+        if (list.length > 0) {
+          connected = true;
+          liveCmsItems.push(...list.map((item: any) => ({
+            id: String(item.id),
+            title: `"${String(item.content || 'Great service').slice(0, 60)}..."`,
+            category: 'Review',
+            clientOrAuthor: String(item.clientName || 'Client'),
+            status: (item.isPublished === false ? 'Draft' : 'Published') as CMSItem['status'],
+            type: 'testimonial' as const,
+          })));
+        }
       }
       setCmsItems(liveCmsItems);
 
       // ── Recent bookings & HireInquiries (real) ──
-      const recentBookings = recentBookingsRes?.data ?? recentBookingsRes;
-      if (Array.isArray(recentBookings)) {
-        connected = true;
-        setBookings(recentBookings.map((b: any) => {
-          const u = b.client?.user;
-          const clientName = u ? `${u.firstName ?? ''} ${u.lastName ?? ''}`.trim() || 'Client' : 'Client';
-          const talentName = b.talentName || (b.talent?.user ? `${b.talent.user.firstName || ''} ${b.talent.user.lastName || ''}`.trim() : 'Assigned Talent');
-          const bookingDate = b.dateNeeded || b.date;
-          return {
-            id: String(b.id),
-            client: clientName,
-            project: String(b.service?.name || b.projectBrief || 'Production Booking'),
-            talent: talentName,
-            dates: bookingDate ? new Date(bookingDate).toLocaleDateString() : new Date(b.createdAt).toLocaleDateString(),
-            budget: b.budget && b.budget !== '—' ? b.budget : (b.service?.basePrice ? `₹${Math.round(b.service.basePrice / 100).toLocaleString('en-IN')}` : '—'),
-            status: mapBookingStatus(b.status),
-          };
-        }));
+      if (recentBookingsRes && recentBookingsRes.ok !== false) {
+        const recentBookings = recentBookingsRes.data ?? recentBookingsRes;
+        if (Array.isArray(recentBookings)) {
+          connected = true;
+          setBookings(recentBookings.map((b: any) => {
+            const u = b.client?.user;
+            const clientName = u ? `${u.firstName ?? ''} ${u.lastName ?? ''}`.trim() || 'Client' : 'Client';
+            const talentName = b.talentName || (b.talent?.user ? `${b.talent.user.firstName || ''} ${b.talent.user.lastName || ''}`.trim() : 'Assigned Talent');
+            const bookingDate = b.dateNeeded || b.date;
+            return {
+              id: String(b.id),
+              client: clientName,
+              project: String(b.service?.name || b.projectBrief || 'Production Booking'),
+              talent: talentName,
+              dates: bookingDate ? new Date(bookingDate).toLocaleDateString() : new Date(b.createdAt).toLocaleDateString(),
+              budget: b.budget && b.budget !== '—' ? b.budget : (b.service?.basePrice ? `₹${Math.round(b.service.basePrice / 100).toLocaleString('en-IN')}` : '—'),
+              status: mapBookingStatus(b.status),
+            };
+          }));
+        }
       }
 
       // ── Talent moderation queue (real: PENDING_REVIEW profiles) ──
-      const pendingTalent = talentRes?.data ?? talentRes;
-      if (Array.isArray(pendingTalent)) {
-        connected = true;
-        setTalentReviews(pendingTalent.map((t: any) => ({
-          id: String(t.id),
-          name: t.user ? `${t.user.firstName ?? ''} ${t.user.lastName ?? ''}`.trim() || t.stageName || 'Talent Applicant' : t.stageName || 'Talent Applicant',
-          category: String(t.talentTypes?.[0] || t.experienceLevel || 'Talent'),
-          experience: String(t.experienceLevel || '—'),
-          status: 'pending' as const,
-          email: t.user?.email || '—',
-          phone: t.user?.phone || '—',
-          location: t.user?.city ? `${t.user.city}${t.user.state ? ', ' + t.user.state : ''}` : '—',
-          bio: t.bio || '—',
-          createdAt: t.createdAt ? new Date(t.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—',
-        })));
+      if (talentRes && talentRes.ok !== false) {
+        const pendingTalent = talentRes.data ?? talentRes;
+        if (Array.isArray(pendingTalent)) {
+          connected = true;
+          setTalentReviews(pendingTalent.map((t: any) => ({
+            id: String(t.id),
+            name: t.user ? `${t.user.firstName ?? ''} ${t.user.lastName ?? ''}`.trim() || t.stageName || 'Talent Applicant' : t.stageName || 'Talent Applicant',
+            category: String(t.talentTypes?.[0] || t.experienceLevel || 'Talent'),
+            experience: String(t.experienceLevel || '—'),
+            status: 'pending' as const,
+            email: t.user?.email || '—',
+            phone: t.user?.phone || '—',
+            location: t.user?.city ? `${t.user.city}${t.user.state ? ', ' + t.user.state : ''}` : '—',
+            bio: t.bio || '—',
+            createdAt: t.createdAt ? new Date(t.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—',
+          })));
+        }
+      }
+
+      setIsLiveDb(connected);
+
+      // If backend returned 502 / disconnected, schedule an auto-retry in 3 seconds while server boots up
+      if (!connected) {
+        setTimeout(() => {
+          loadLiveData();
+        }, 3000);
       }
 
       setIsLiveDb(connected);
