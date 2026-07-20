@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { fetchAPI } from '@/lib/api-client';
+import { useRealtimeRefresh } from '@/lib/realtime/useRealtimeRefresh';
 import Link from 'next/link';
 import { PortalNavbar } from '@/components/ui/PortalNavbar';
 import { Container } from '@/components/ui/Container';
@@ -105,10 +106,11 @@ export default function SuperAdminDashboard() {
   const loadLiveData = useCallback(async () => {
     setIsLoadingLive(true);
     try {
+      const bff = (path: string) => fetch(path, { cache: 'no-store' }).then((r) => r.json()).catch(() => null);
       const [kpiRes, recentBookingsRes, talentRes, portfolioRes, blogRes, testimonialRes] = await Promise.all([
-        fetchAPI('/admin/dashboard/kpis').catch(() => null),
-        fetchAPI('/admin/dashboard/recent-bookings').catch(() => null),
-        fetchAPI('/talent/pending').catch(() => null),
+        bff('/api/admin/dashboard/kpis'),
+        bff('/api/admin/dashboard/recent-bookings'),
+        bff('/api/talent/pending'),
         cms.list<any[]>('portfolio'),
         cms.list<any[]>('blog'),
         cms.list<any[]>('testimonials'),
@@ -208,6 +210,14 @@ export default function SuperAdminDashboard() {
     loadLiveData();
   }, [loadLiveData]);
 
+  // Realtime: refresh dashboard data when bookings / testimonials / portfolio
+  // change in Postgres. Realtime is only a signal — the reload still runs
+  // through the secure BFF loaders in loadLiveData.
+  const { connected: realtimeConnected } = useRealtimeRefresh(
+    ['Booking', 'Testimonial', 'PortfolioItem'],
+    loadLiveData,
+  );
+
   // Editing Modal State
   const [editingItem, setEditingItem] = useState<CMSItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -221,10 +231,12 @@ export default function SuperAdminDashboard() {
     if (!confirm('Mark this booking as ' + status + '?')) return;
 
     try {
-      await fetchAPI(`/booking/${id}/status`, {
+      const res = await fetch(`/api/booking/${id}/status`, {
         method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: toBookingStatus(status) }),
       });
+      if (!res.ok) throw new Error('Failed to update booking status');
       setBookings(prev => prev.map(b => (b.id === id ? { ...b, status } : b)));
       toast.success(`Booking status updated to ${status}`);
     } catch (err: any) {
@@ -238,10 +250,12 @@ export default function SuperAdminDashboard() {
     // Backend expects a TalentProfileStatus enum value on the `status` field.
     const newStatus = status === 'approved' ? 'ACTIVE' : 'SUSPENDED';
     try {
-      await fetchAPI(`/talent/${id}/moderate`, {
+      const res = await fetch(`/api/talent/${id}/moderate`, {
         method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),
       });
+      if (!res.ok) throw new Error('Failed to update talent status');
       setTalentReviews(prev => prev.filter(t => t.id !== id));
       toast.success(`Talent application ${status}`);
     } catch (err: any) {
@@ -367,6 +381,17 @@ export default function SuperAdminDashboard() {
                   <RefreshCw className={`w-3.5 h-3.5 ${isLoadingLive ? 'animate-spin text-primary' : ''}`} />
                   Refresh
                 </button>
+                <span
+                  className={`text-[11px] font-bold px-2 py-1 rounded-full flex items-center gap-1.5 border ${
+                    realtimeConnected
+                      ? 'bg-green-500/15 text-green-400 border-green-500/30'
+                      : 'bg-surface text-foreground/60 border-border'
+                  }`}
+                  title={realtimeConnected ? 'Realtime updates active' : 'Realtime offline'}
+                >
+                  <span className={`w-1.5 h-1.5 rounded-full ${realtimeConnected ? 'bg-green-500 animate-pulse' : 'bg-foreground/40'}`} />
+                  {realtimeConnected ? 'Realtime' : 'Offline'}
+                </span>
               </div>
             </div>
             

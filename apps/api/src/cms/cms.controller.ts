@@ -290,7 +290,7 @@ export class CmsController {
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @Post('admin/config/:key')
   async setAdminConfig(@Req() req: any, @Param('key') key: string, @Body() body: SetConfigDto) {
-    const data = await this.cmsService.setConfig(key, body.value, 'json', req.user?.id);
+    const data = await this.cmsService.setConfig(key, body.value, body.type ?? 'json', req.user?.id);
     return { success: true, data };
   }
 

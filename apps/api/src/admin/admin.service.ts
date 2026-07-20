@@ -4,12 +4,14 @@ import { AuditService } from '../audit/audit.service';
 import { Role } from '@mdms/types';
 import { PaginateUsersDto } from './dto/paginate-users.dto';
 import { Prisma } from '@prisma/client';
+import { SupabaseAdminService } from '../common/supabase/supabase-admin.service';
 
 @Injectable()
 export class AdminService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly auditService: AuditService,
+    private readonly supabaseAdmin: SupabaseAdminService,
   ) {}
 
   async listUsers(dto: PaginateUsersDto) {
@@ -63,6 +65,9 @@ export class AdminService {
       select: { id: true, email: true, firstName: true, lastName: true, role: true, isActive: true, createdAt: true },
     });
 
+    // Mirror role into Supabase app_metadata so Realtime RLS recognizes admins.
+    await this.supabaseAdmin.syncUserRole(user.id, user.role);
+
     await this.auditService.log({
       actorId: actor.id,
       action: 'CREATE_USER',
@@ -88,6 +93,10 @@ export class AdminService {
       where: { id: userId },
       data: { role: newRole },
     });
+
+    // Mirror the new role into Supabase app_metadata so Realtime RLS (and any
+    // future app_metadata-based checks) see the change on the next token refresh.
+    await this.supabaseAdmin.syncUserRole(userId, newRole);
 
     await this.auditService.log({
       actorId: actor.id,

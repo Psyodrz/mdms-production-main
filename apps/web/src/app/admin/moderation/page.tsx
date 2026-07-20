@@ -19,11 +19,7 @@ export default function ContentModeration() {
     else setLoading(true);
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') || localStorage.getItem('mdms_auth_token') : null;
-      const res = await fetch(`${apiUrl}/talent/pending`, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {}
-      });
+      const res = await fetch(`/api/talent/pending`, { cache: 'no-store' });
 
       if (res.ok) {
         const json = await res.json();
@@ -53,14 +49,9 @@ export default function ContentModeration() {
 
     setActionLoading(prev => ({ ...prev, [profile.id]: true }));
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') || localStorage.getItem('mdms_auth_token') : null;
-      const res = await fetch(`${apiUrl}/talent/${profile.id}/moderate`, {
+      const res = await fetch(`/api/talent/${profile.id}/moderate`, {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {})
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status })
       });
 

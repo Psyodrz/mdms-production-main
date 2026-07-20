@@ -9,6 +9,8 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { toast } from 'sonner';
 import { fetchAPI } from '@/lib/api-client';
+import { cms } from '@/lib/cms/client';
+import { useRealtimeRefresh } from '@/lib/realtime/useRealtimeRefresh';
 import { 
   Film, 
   FileText, 
@@ -101,12 +103,13 @@ export default function AdminDashboard() {
     else setLoading(true);
 
     try {
+      const bff = (path: string) => fetch(path, { cache: 'no-store' }).then((r) => r.json()).catch(() => null);
       const [kpiRes, bookingsRes, portfolioRes, blogRes, testimonialsRes] = await Promise.all([
-        fetchAPI('/admin/dashboard/kpis').catch(() => null),
-        fetchAPI('/admin/dashboard/recent-bookings').catch(() => null),
-        fetchAPI('/cms/admin/portfolio').catch(() => null),
-        fetchAPI('/cms/admin/blog').catch(() => null),
-        fetchAPI('/cms/admin/testimonials').catch(() => null),
+        bff('/api/admin/dashboard/kpis'),
+        bff('/api/admin/dashboard/recent-bookings'),
+        cms.list<any[]>('portfolio'),
+        cms.list<any[]>('blog'),
+        cms.list<any[]>('testimonials'),
       ]);
 
       // 1. Process KPIs
@@ -200,6 +203,10 @@ export default function AdminDashboard() {
     fetchDashboardData();
   }, []);
 
+  // Realtime: refresh when bookings / testimonials / portfolio change. The
+  // reload runs through the secure BFF loaders; Realtime is only the trigger.
+  useRealtimeRefresh(['Booking', 'Testimonial', 'PortfolioItem'], () => fetchDashboardData(true));
+
   const handleStatusChange = async (id: string, newStatus: Booking['status']) => {
     // Optimistic UI update
     const previous = [...bookings];
@@ -214,10 +221,12 @@ export default function AdminDashboard() {
       : 'INQUIRY';
 
     try {
-      await fetchAPI(`/booking/${id}/status`, {
+      const res = await fetch(`/api/booking/${id}/status`, {
         method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: toBookingStatus(newStatus) })
       });
+      if (!res.ok) throw new Error('Failed to update booking status');
 
       toast.success(`Booking marked as ${newStatus}`);
     } catch (err) {
