@@ -975,13 +975,33 @@ function Process({ process = [] }: { process?: any[] }) {
 /* ═══════════════════════════════════════════════════════════
    FAQ — Clean accordion (no card wrapper)
    ═══════════════════════════════════════════════════════════ */
+const DEFAULT_FAQS = [
+  {
+    question: "What is your typical project timeline?",
+    answer: "Production timelines vary based on scope. Commercial spots typically take 2-4 weeks from pre-production to final grade, while full campaign packages take 4-8 weeks."
+  },
+  {
+    question: "How do you handle talent bookings and contracts?",
+    answer: "Our client portal allows seamless browsing and booking of talent with automated NDA generation and escrow payment protections."
+  },
+  {
+    question: "What camera packages and equipment do you use?",
+    answer: "We shoot primarily on ARRI Alexa 35 and RED V-Raptor 8K systems paired with Cooke and Leica anamorphic prime lenses."
+  },
+  {
+    question: "Can we hire your team for international shoots?",
+    answer: "Yes, our team holds active carnet permits and international passports for rapid deployment anywhere across Europe, Asia, and North America."
+  }
+];
+
 function Faq({ faqs = [], loading }: { faqs?: any[]; loading?: boolean }) {
   const [open, setOpen] = useState<number | null>(0);
 
-  const displayFaqs = faqs;
+  const sourceFaqs = faqs && faqs.length > 0 ? faqs : DEFAULT_FAQS;
+  const displayFaqs = sourceFaqs;
 
   return (
-    <section className="py-32">
+    <section className="py-32 bg-background">
       <div className="mx-auto max-w-3xl px-6 sm:px-10">
         <Reveal direction="up" className="text-center mb-16">
           <h2 className="font-display text-4xl sm:text-5xl text-foreground font-bold leading-tight">
@@ -992,7 +1012,7 @@ function Faq({ faqs = [], loading }: { faqs?: any[]; loading?: boolean }) {
         {loading && faqs.length === 0 ? (
           <div className="space-y-4">
             {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="h-16 rounded-xl bg-white/[0.03] animate-pulse" />
+              <div key={i} className="h-16 rounded-xl bg-muted/20 animate-pulse" />
             ))}
           </div>
         ) : (
@@ -1000,27 +1020,30 @@ function Faq({ faqs = [], loading }: { faqs?: any[]; loading?: boolean }) {
             <div className="space-y-4">
               {displayFaqs.map((f, i) => {
                 const isOpen = open === i;
+                const questionText = f.q || f.question || f.title;
+                const answerText = f.a || f.answer || f.desc || f.description;
+
                 return (
-                  <div key={f.id || f.q || f.question} className="border border-white/20 rounded-2xl p-6 md:p-8 bg-card shadow-2xl transition-all duration-300 hover:border-brand/60">
+                  <div key={f.id || questionText || i} className="border border-border rounded-2xl p-6 md:p-8 bg-card shadow-xl transition-all duration-300 hover:border-brand/60">
                     <button
                       className="group flex w-full items-center justify-between gap-6 text-left transition"
                       onClick={() => setOpen(isOpen ? null : i)}
                     >
-                      <span className="font-display text-xl md:text-2xl text-white font-bold group-hover:text-brand transition-colors">{f.q || f.question}</span>
+                      <span className="font-display text-xl md:text-2xl text-foreground font-bold group-hover:text-brand transition-colors">{questionText}</span>
                       <span
                         className={`grid h-7 w-7 shrink-0 place-items-center rounded-full border transition-all duration-300 ${
-                          isOpen ? "border-brand bg-brand text-white rotate-0" : "border-white/30 text-white"
+                          isOpen ? "border-brand bg-brand text-white rotate-0" : "border-border text-foreground"
                         }`}
                       >
                         {isOpen ? <Minus className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}
                       </span>
                     </button>
                     <div
-                      className="grid overflow-hidden text-base md:text-lg text-white font-medium transition-all duration-300"
+                      className="grid overflow-hidden text-base md:text-lg transition-all duration-300"
                       style={{ gridTemplateRows: isOpen ? "1fr" : "0fr" }}
                     >
                       <div className="min-h-0">
-                        <p className="pt-6 pb-2 leading-relaxed text-white/95">{f.a || f.answer}</p>
+                        <p className="pt-6 pb-2 leading-relaxed text-muted-foreground font-medium">{answerText}</p>
                       </div>
                     </div>
                   </div>
