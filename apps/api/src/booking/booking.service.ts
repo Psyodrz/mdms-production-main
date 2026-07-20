@@ -73,14 +73,26 @@ export class BookingService {
       }
     });
     
-    if (!booking) throw new NotFoundException('Booking not found');
+    if (!booking) {
+      const hireRequest = await this.prisma.hireRequest.findUnique({
+        where: { id: bookingId },
+      });
+      if (hireRequest) {
+        const updatedHr = await this.prisma.hireRequest.update({
+          where: { id: bookingId },
+          data: { status: status as any },
+        });
+        return updatedHr;
+      }
+      throw new NotFoundException('Booking or Hire Inquiry not found');
+    }
 
     const updated = await this.prisma.booking.update({
       where: { id: bookingId },
       data: { status },
     });
 
-    if (booking.client.user.phone) {
+    if (booking.client?.user?.phone) {
       this.whatsappService.sendMessage(
         booking.client.user.phone,
         `Update from MP Production: Your booking inquiry status has been changed to ${status.replace('_', ' ')}.`
