@@ -93,39 +93,39 @@ export default function TalentPage() {
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[120vw] h-[80vh] bg-linear-to-b from-brand/5 via-brand/1 to-transparent blur-[140px] pointer-events-none z-0" />
         
         {/* Hero Section */}
-        <section className="relative w-full h-[60vh] flex items-center justify-center overflow-hidden mb-20 text-center">
+        <section className="relative w-full min-h-[75vh] py-24 flex items-center justify-center overflow-hidden mb-16 text-center">
           <Image 
             src="/images/projects-outdoor.jpg" 
             alt="Talent Roster" 
             fill 
             className="object-cover" 
             priority sizes="100vw" />
-          <div className="absolute inset-0 dark:bg-black/60 bg-black/40" />
-          <div className="absolute bottom-0 left-0 right-0 h-32 dark:bg-gradient-to-t dark:from-background bg-gradient-to-t from-background to-transparent" />
+          <div className="absolute inset-0 dark:bg-black/60 bg-black/50" />
+          <div className="absolute bottom-0 left-0 right-0 h-32 dark:bg-gradient-to-t dark:from-background bg-gradient-to-t from-background to-transparent pointer-events-none z-5" />
           
-          <Container className="relative z-10 w-full max-w-5xl mx-auto px-4">
+          <Container className="relative z-10 w-full max-w-5xl mx-auto px-4 py-8">
             <Reveal direction="up">
-              <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-[10px] font-mono tracking-[0.25em] text-white uppercase font-bold mb-8 backdrop-blur-md">
+              <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-[10px] font-mono tracking-[0.25em] text-white uppercase font-bold mb-6 backdrop-blur-md">
                 <Sparkles className="w-3.5 h-3.5 animate-pulse text-brand" />
                 <span>Global Roster · Selected Talents Only</span>
               </div>
 
-              <h1 className="text-6xl sm:text-8xl lg:text-9xl font-display text-white tracking-editorial leading-[0.9] mb-10 font-light drop-shadow-lg">
+              <h1 className="text-5xl sm:text-7xl lg:text-8xl font-display text-white tracking-editorial leading-[0.95] mb-6 font-light drop-shadow-lg">
                 THE ICONIC <br />
-                <span className="italic font-extralight text-white/80">REPRESENTATION.</span>
+                <span className="italic font-extralight text-white/90">REPRESENTATION.</span>
               </h1>
 
-              <p className="text-base sm:text-lg text-white/80 max-w-2xl mx-auto mb-16 font-light leading-relaxed drop-shadow">
+              <p className="text-base sm:text-lg text-white/90 max-w-2xl mx-auto mb-10 font-light leading-relaxed drop-shadow">
                 We represent a highly vetted ecosystem of cover models, actors, choreographers, and visual directors who transcend normal standards to define the cultural vanguard.
               </p>
 
               {/* Editorial Grid Actions */}
-              <div className="flex flex-col sm:flex-row gap-5 justify-center items-center">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center z-20 relative">
                 <Link
                   href="/talent/directory"
                   data-cursor="hover"
                   data-cursor-label="ENTER"
-                  className="w-full sm:w-auto px-10 py-4 rounded-full bg-brand hover:bg-white hover:text-black text-white font-mono font-bold text-xs uppercase tracking-[0.25em] transition-all duration-300 shadow-glow flex items-center justify-center gap-2"
+                  className="w-full sm:w-auto px-9 py-3.5 rounded-full bg-brand hover:bg-white hover:text-black text-white font-mono font-bold text-xs uppercase tracking-[0.25em] transition-all duration-300 shadow-glow flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <span>Explore Directory</span>
                   <Compass className="w-4 h-4" />
@@ -135,7 +135,7 @@ export default function TalentPage() {
                   href="/join/talent"
                   data-cursor="hover"
                   data-cursor-label="APPLY"
-                  className="w-full sm:w-auto px-10 py-4 rounded-full bg-white/10 hover:bg-white/20 text-white backdrop-blur-md border border-white/20 font-mono font-bold text-xs uppercase tracking-[0.25em] transition-all duration-300 flex items-center justify-center gap-2"
+                  className="w-full sm:w-auto px-9 py-3.5 rounded-full bg-white/10 hover:bg-white/20 text-white backdrop-blur-md border border-white/20 font-mono font-bold text-xs uppercase tracking-[0.25em] transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <span>Apply for Roster</span>
                   <ArrowUpRight className="w-4 h-4" />
