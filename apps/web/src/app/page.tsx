@@ -431,23 +431,23 @@ function Intro({ intro }: { intro?: any }) {
           {/* Left — Pull quote */}
           <div>
             <span className="h-[2px] w-16 bg-brand block mb-8" />
-            <h2 className="font-display text-4xl sm:text-5xl lg:text-[3.5rem] text-white leading-[1.1] tracking-tight drop-shadow-sm">
+            <h2 className="font-display text-4xl sm:text-5xl lg:text-[3.5rem] text-foreground font-bold leading-[1.1] tracking-tight">
               {heading}{" "}
-              <span className="italic text-white/90">{italic}</span>
+              <span className="italic text-muted-foreground font-medium">{italic}</span>
             </h2>
           </div>
 
           {/* Right — Body */}
           <div className="lg:pt-4">
-            <p className="text-lg sm:text-xl text-white leading-relaxed font-medium whitespace-pre-wrap drop-shadow-sm">
+            <p className="text-lg sm:text-xl text-foreground leading-relaxed font-medium whitespace-pre-wrap">
               {body}
             </p>
             {extraContent && (
-              <p className="mt-6 text-base text-white/90 leading-relaxed font-medium whitespace-pre-wrap">
+              <p className="mt-6 text-base text-muted-foreground leading-relaxed font-medium whitespace-pre-wrap">
                 {extraContent}
               </p>
             )}
-            <div className="mt-8 flex items-center flex-wrap gap-6 text-xs sm:text-sm tracking-[0.2em] uppercase font-bold text-white">
+            <div className="mt-8 flex items-center flex-wrap gap-6 text-xs sm:text-sm tracking-[0.2em] uppercase font-bold text-foreground">
               {locations.map((loc: string, idx: number) => (
                 <div key={idx} className="flex items-center gap-6">
                   <span>{loc}</span>
@@ -489,7 +489,7 @@ function Services({ services = [], loading }: { services?: any[]; loading?: bool
             <span className="h-[2px] w-12 bg-brand" />
             <span className="text-xs sm:text-sm font-bold tracking-[0.25em] uppercase text-brand">Capabilities</span>
           </div>
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-display text-white leading-tight">
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-display text-foreground font-bold leading-tight">
             <DecryptedText text="Our Creative" animateOn="view" speed={50} sequential={true} revealDirection="start" /><br />
             <DecryptedText text="Disciplines" animateOn="view" speed={50} sequential={true} revealDirection="start" />
           </h2>
@@ -498,7 +498,7 @@ function Services({ services = [], loading }: { services?: any[]; loading?: bool
         {/* Boxed Layout */}
         <div className="flex flex-col gap-6">
           {loading && services.length === 0 ? (
-            <div className="h-64 rounded-3xl bg-white/[0.03] animate-pulse" />
+            <div className="h-64 rounded-3xl bg-muted/20 animate-pulse" />
           ) : (
             displayServices.map((s, idx) => {
               const serviceName = s.title || s.name || `Service 0${idx + 1}`;
@@ -508,7 +508,7 @@ function Services({ services = [], loading }: { services?: any[]; loading?: bool
 
               return (
                 <Reveal key={s.id || idx} direction="up" delay={idx * 0.05}>
-                  <div className="group relative rounded-[2rem] border border-white/20 bg-card hover:border-brand/60 transition-all duration-500 overflow-hidden shadow-2xl p-8 sm:p-12">
+                  <div className="group relative rounded-[2rem] border border-border bg-card hover:border-brand/60 transition-all duration-500 overflow-hidden shadow-xl p-8 sm:p-12">
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
                       
                       {/* Left: Metadata & Titles */}
@@ -516,25 +516,25 @@ function Services({ services = [], loading }: { services?: any[]; loading?: bool
                         <div>
                           <div className="flex items-center gap-4 mb-6">
                             <span className="text-sm sm:text-base font-bold text-brand tracking-widest font-mono">/ 0{idx + 1}</span>
-                            <span className="h-1 w-1 rounded-full bg-white/40" />
-                            <span className="text-xs sm:text-sm font-bold text-white tracking-widest uppercase">Verified Discipline</span>
+                            <span className="h-1 w-1 rounded-full bg-border" />
+                            <span className="text-xs sm:text-sm font-bold text-muted-foreground tracking-widest uppercase">Verified Discipline</span>
                           </div>
 
-                          <h3 className="font-display text-3xl sm:text-4xl lg:text-5xl text-white group-hover:text-brand transition-colors leading-tight mb-6">
+                          <h3 className="font-display text-3xl sm:text-4xl lg:text-5xl text-foreground font-bold group-hover:text-brand transition-colors leading-tight mb-6">
                             {serviceName}
                           </h3>
 
-                          <p className="text-base sm:text-lg text-white leading-relaxed font-medium mb-8 max-w-xl">
+                          <p className="text-base sm:text-lg text-muted-foreground leading-relaxed font-medium mb-8 max-w-xl">
                             {desc}
                           </p>
                         </div>
 
                         {/* Tags */}
-                        <div className="flex flex-wrap gap-2.5 pt-6 border-t border-white/20">
+                        <div className="flex flex-wrap gap-2.5 pt-6 border-t border-border">
                           {tags.map((tag: string, tIdx: number) => (
                             <span
                               key={tIdx}
-                              className="px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-xs sm:text-sm font-bold uppercase tracking-wider text-white"
+                              className="px-4 py-1.5 rounded-full bg-muted text-xs sm:text-sm font-bold uppercase tracking-wider text-foreground border border-border"
                             >
                               {tag}
                             </span>
@@ -543,15 +543,15 @@ function Services({ services = [], loading }: { services?: any[]; loading?: bool
                       </div>
 
                       {/* Right: Cinematic Image */}
-                      <div className="lg:col-span-5 relative min-h-[220px] lg:min-h-full rounded-[1.5rem] overflow-hidden border border-border/50 group-hover:border-white/20 transition-colors duration-500">
+                      <div className="lg:col-span-5 relative min-h-[220px] lg:min-h-full rounded-[1.5rem] overflow-hidden border border-border group-hover:border-brand/40 transition-colors duration-500">
                         <Image
                           src={imageSrc}
                           alt={serviceName}
                           fill
                           sizes="(max-width: 1024px) 100vw, 40vw"
-                          className="object-cover scale-105 group-hover:scale-100 transition-transform duration-[1.5s] ease-out brightness-[0.7] group-hover:brightness-100"
+                          className="object-cover scale-105 group-hover:scale-100 transition-transform duration-[1.5s] ease-out brightness-[0.8] group-hover:brightness-100"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60 group-hover:opacity-20 transition-opacity duration-500" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-60 group-hover:opacity-20 transition-opacity duration-500" />
                       </div>
 
                     </div>
@@ -604,11 +604,11 @@ function FeaturedProjects({
             <span className="h-[2px] w-12 bg-brand" />
             <span className="text-xs sm:text-sm font-bold tracking-[0.25em] uppercase text-brand">Selected Work</span>
           </div>
-          <h2 className="font-display text-4xl sm:text-5xl text-white leading-tight">Featured Productions</h2>
+          <h2 className="font-display text-4xl sm:text-5xl text-foreground font-bold leading-tight">Featured Productions</h2>
         </div>
         <Link
           href="/portfolio"
-          className="text-base font-bold text-white hover:text-brand transition-colors flex items-center gap-2"
+          className="text-base font-bold text-muted-foreground hover:text-brand transition-colors flex items-center gap-2"
         >
           <span>View All</span>
           <ArrowRight className="h-4 w-4" />
@@ -617,9 +617,9 @@ function FeaturedProjects({
 
       {loading && portfolio.length === 0 ? (
         <div className="grid gap-4 md:grid-cols-12">
-          <div className="md:col-span-12 h-[420px] rounded-2xl bg-white/[0.03] animate-pulse" />
+          <div className="md:col-span-12 h-[420px] rounded-2xl bg-muted/20 animate-pulse" />
           {[1, 2, 3].map((i) => (
-            <div key={i} className="md:col-span-4 h-[320px] rounded-2xl bg-white/[0.03] animate-pulse" />
+            <div key={i} className="md:col-span-4 h-[320px] rounded-2xl bg-muted/20 animate-pulse" />
           ))}
         </div>
       ) : (
@@ -730,16 +730,16 @@ function FeaturedTalent({ talent = [], loading }: { talent?: any[]; loading?: bo
               <span className="h-[2px] w-12 bg-brand" />
               <span className="text-xs sm:text-sm font-bold tracking-[0.25em] uppercase text-brand">Exclusive Roster</span>
             </div>
-            <h2 className="font-display text-4xl sm:text-5xl text-white leading-tight">Featured Talent</h2>
+            <h2 className="font-display text-4xl sm:text-5xl text-foreground font-bold leading-tight">Featured Talent</h2>
           </div>
           <div className="flex items-center gap-3">
-            <button onClick={() => scroll("left")} className="h-10 w-10 rounded-full border border-white/20 grid place-items-center text-white hover:text-brand hover:border-brand transition-colors">
+            <button onClick={() => scroll("left")} className="h-10 w-10 rounded-full border border-border grid place-items-center text-foreground hover:text-brand hover:border-brand transition-colors">
               <ChevronLeft className="w-4 h-4" />
             </button>
-            <button onClick={() => scroll("right")} className="h-10 w-10 rounded-full border border-white/20 grid place-items-center text-white hover:text-brand hover:border-brand transition-colors">
+            <button onClick={() => scroll("right")} className="h-10 w-10 rounded-full border border-border grid place-items-center text-foreground hover:text-brand hover:border-brand transition-colors">
               <ChevronRight className="w-4 h-4" />
             </button>
-            <Link href="/talent" className="hidden sm:flex items-center gap-2 text-base font-bold text-white hover:text-brand transition-colors ml-2">
+            <Link href="/talent" className="hidden sm:flex items-center gap-2 text-base font-bold text-muted-foreground hover:text-brand transition-colors ml-2">
               <span>View All</span>
               <ArrowRight className="h-4 w-4" />
             </Link>
@@ -772,7 +772,7 @@ function FeaturedTalent({ talent = [], loading }: { talent?: any[]; loading?: bo
                   {t.user?.avatarUrl ? (
                     <Image src={t.user.avatarUrl} alt={`${t.user.firstName ?? ''} ${t.user.lastName ?? ''}`.trim() || 'Talent'} fill className="object-cover" sizes="(max-width: 640px) 192px, 224px" />
                   ) : (
-                    <div className="text-4xl font-display text-white/40 group-hover:text-brand transition-colors duration-500">
+                    <div className="text-4xl font-display text-muted-foreground group-hover:text-brand transition-colors duration-500">
                       {t.user?.firstName?.[0] || "T"}
                       {t.user?.lastName?.[0] || "M"}
                     </div>
@@ -785,18 +785,18 @@ function FeaturedTalent({ talent = [], loading }: { talent?: any[]; loading?: bo
               {/* Info below avatar */}
               <div className="flex flex-col items-center">
                 <div className="flex items-center justify-center gap-2 mb-3">
-                  <CheckCircle2 className="h-3 w-3 text-brand" />
-                  <span className="text-[10px] tracking-[0.2em] uppercase text-brand font-medium">Exclusive</span>
+                  <CheckCircle2 className="h-3.5 w-3.5 text-brand" />
+                  <span className="text-xs font-bold tracking-[0.2em] uppercase text-brand">Exclusive</span>
                 </div>
-                <h3 className="font-display text-2xl text-foreground group-hover:text-brand transition-colors leading-tight mb-2">
+                <h3 className="font-display text-2xl sm:text-3xl text-foreground font-bold group-hover:text-brand transition-colors leading-tight mb-2">
                   {t.user?.firstName || "Talent"} {t.user?.lastName || ""}
                 </h3>
-                <p className="text-[11px] text-muted-foreground tracking-widest uppercase mb-4">
+                <p className="text-xs sm:text-sm text-muted-foreground font-bold tracking-widest uppercase mb-4">
                   {t.talentTypes?.[0]?.replace(/_/g, " ") || "Artist"}
                 </p>
-                <div className="flex items-center gap-2 text-[11px] font-medium text-foreground/20 group-hover:text-muted-foreground transition-colors">
-                  <span>{t.instagramFollowers ? `${(t.instagramFollowers / 1000).toFixed(0)}K Followers` : "Verified"}</span>
-                  <ArrowRight className="h-3 w-3 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all duration-300" />
+                <div className="flex items-center gap-2 text-xs sm:text-sm font-bold text-muted-foreground group-hover:text-brand transition-colors">
+                  <span>{t.instagramFollowers ? `${(t.instagramFollowers / 1000).toFixed(0)}K Followers` : "Verified Roster"}</span>
+                  <ArrowRight className="h-3.5 w-3.5 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all duration-300" />
                 </div>
               </div>
             </Link>
@@ -819,7 +819,7 @@ function Stats({ stats }: { stats?: any }) {
   ];
 
   return (
-    <section className="border-y border-white/20 bg-white/[0.02]">
+    <section className="border-y border-border bg-muted/10">
       <div className="mx-auto max-w-7xl px-6 sm:px-10 py-20">
         <Reveal direction="up">
           <div className="flex flex-wrap justify-between items-center gap-y-10">
@@ -828,14 +828,14 @@ function Stats({ stats }: { stats?: any }) {
                 <div className="text-center">
                   <div className="flex items-center justify-center gap-3 mb-2">
                     <Icon className="h-6 w-6 text-brand" />
-                    <span className="font-display text-4xl sm:text-5xl font-bold text-white drop-shadow-sm">
+                    <span className="font-display text-4xl sm:text-5xl font-bold text-foreground">
                       <Counter n={n} suffix={s} />
                     </span>
                   </div>
-                  <span className="text-xs sm:text-sm font-bold tracking-[0.2em] uppercase text-white block drop-shadow-sm">{label}</span>
+                  <span className="text-xs sm:text-sm font-bold tracking-[0.2em] uppercase text-muted-foreground block">{label}</span>
                 </div>
                 {i < items.length - 1 && (
-                  <div className="hidden md:block h-12 w-[1px] bg-white/20" />
+                  <div className="hidden md:block h-12 w-[1px] bg-border" />
                 )}
               </div>
             ))}
@@ -863,10 +863,10 @@ function Process({ process = [] }: { process?: any[] }) {
                 <span className="h-[2px] w-12 bg-brand" />
                 <span className="text-xs sm:text-sm font-bold tracking-[0.25em] uppercase text-brand">Methodology</span>
               </div>
-              <h2 className="font-display text-4xl sm:text-5xl text-white leading-tight">
+              <h2 className="font-display text-4xl sm:text-5xl text-foreground font-bold leading-tight">
                 Production Process
               </h2>
-              <p className="mt-6 text-base sm:text-lg text-white font-medium leading-relaxed drop-shadow-sm">
+              <p className="mt-6 text-base sm:text-lg text-muted-foreground font-medium leading-relaxed">
                 A rigorous four-phase pipeline that eliminates friction between
                 creative ambition and technical execution.
               </p>
@@ -878,7 +878,7 @@ function Process({ process = [] }: { process?: any[] }) {
             <div className="space-y-16">
               {displayProcess.map((p, i) => (
                 <Reveal key={p.step || i} direction="up" delay={0.05 * i}>
-                  <div className="group flex flex-col md:flex-row md:items-start gap-6 md:gap-12 border border-white/20 rounded-3xl p-6 sm:p-8 md:p-10 bg-card shadow-2xl transition-all duration-500 hover:border-brand/60 min-h-[280px] md:min-h-[220px]">
+                  <div className="group flex flex-col md:flex-row md:items-start gap-6 md:gap-12 border border-border bg-card shadow-xl transition-all duration-500 hover:border-brand/60 min-h-[280px] md:min-h-[220px]">
                     {/* Number */}
                     <div className="text-brand font-mono text-xl md:text-2xl font-bold tracking-widest pt-2 opacity-80 group-hover:opacity-100 transition-opacity">
                       {p.step || `0${i + 1}`}
@@ -886,10 +886,10 @@ function Process({ process = [] }: { process?: any[] }) {
 
                     {/* Content */}
                     <div>
-                      <h3 className="font-display text-3xl md:text-4xl text-white font-bold group-hover:text-brand transition-colors leading-tight mb-4 h-[90px] md:h-[100px] flex items-center">
+                      <h3 className="font-display text-3xl md:text-4xl text-foreground font-bold group-hover:text-brand transition-colors leading-tight mb-4 h-[90px] md:h-[100px] flex items-center">
                         <DecryptedText text={p.title} animateOn="hover" speed={40} sequential={true} revealDirection="start" useOriginalCharsOnly={true} />
                       </h3>
-                      <p className="text-base md:text-xl text-white font-medium leading-relaxed max-w-xl">
+                      <p className="text-base md:text-xl text-muted-foreground font-medium leading-relaxed max-w-xl">
                         {p.desc || p.description}
                       </p>
                     </div>
@@ -916,7 +916,7 @@ function Faq({ faqs = [], loading }: { faqs?: any[]; loading?: boolean }) {
     <section className="py-32">
       <div className="mx-auto max-w-3xl px-6 sm:px-10">
         <Reveal direction="up" className="text-center mb-16">
-          <h2 className="font-display text-4xl sm:text-5xl text-white leading-tight">
+          <h2 className="font-display text-4xl sm:text-5xl text-foreground font-bold leading-tight">
             Frequently Asked Questions
           </h2>
         </Reveal>
