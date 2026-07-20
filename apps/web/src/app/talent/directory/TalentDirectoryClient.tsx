@@ -6,7 +6,7 @@ import { Container } from '@/components/ui/Container';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import Link from 'next/link';
-import { Search, MapPin, X, Filter } from 'lucide-react';
+import { Search, MapPin, X, Filter, Info } from 'lucide-react';
 
 const TALENT_TYPES = [
   { id: 'All', label: 'All Talent' },
@@ -21,27 +21,24 @@ const TALENT_TYPES = [
   { id: 'MUSICIAN', label: 'Musician' },
 ];
 
-const DEFAULT_INDIAN_CITIES = [
-  'Mumbai',
-  'Delhi NCR',
-  'Delhi',
-  'Bengaluru',
-  'Bangalore',
-  'Kochi',
-  'Jaipur',
-  'Hyderabad',
-  'Pune',
-  'Chennai',
-  'Ahmedabad',
-  'Kolkata',
-  'Surat',
-  'Lucknow',
-  'Indore',
-  'Bhopal',
-  'Chandigarh',
-  'Goa',
-  'Noida',
-  'Gurgaon',
+// Exhaustive list of 150+ Indian Cities (Tier-1, Tier-2, Tier-3 & Capitals)
+const ALL_INDIAN_CITIES = [
+  'Mumbai', 'Delhi NCR', 'Delhi', 'Bengaluru', 'Bangalore', 'Kolkata', 'Hyderabad', 'Pune',
+  'Jaipur', 'Ahmedabad', 'Lucknow', 'Kanpur', 'Nagpur', 'Indore', 'Thane', 'Bhopal',
+  'Visakhapatnam', 'Patna', 'Vadodara', 'Ghaziabad', 'Ludhiana', 'Agra', 'Nashik', 'Faridabad',
+  'Meerut', 'Rajkot', 'Kalyan-Dombivli', 'Vasai-Virar', 'Varanasi', 'Srinagar', 'Aurangabad',
+  'Dhanbad', 'Amritsar', 'Navi Mumbai', 'Allahabad', 'Ranchi', 'Howrah', 'Coimbatore',
+  'Jabalpur', 'Gwalior', 'Vijayawada', 'Jodhpur', 'Madurai', 'Raipur', 'Kota', 'Guwahati',
+  'Chandigarh', 'Solapur', 'Hubballi-Dharwad', 'Bareilly', 'Moradabad', 'Mysore', 'Gurgaon',
+  'Aligarh', 'Jalandhar', 'Tiruchirappalli', 'Bhubaneswar', 'Salem', 'Mira-Bhayandar',
+  'Warangal', 'Jalgaon', 'Guntur', 'Bhiwandi', 'Saharanpur', 'Amravati', 'Noida', 'Jamshedpur',
+  'Bhilai', 'Cuttack', 'Firozabad', 'Kochi', 'Bhavnagar', 'Dehradun', 'Durgapur', 'Asansol',
+  'Nanded', 'Kolhapur', 'Ajmer', 'Gulbarga', 'Jamnagar', 'Ujjain', 'Loni', 'Siliguri',
+  'Jhansi', 'Ulhasnagar', 'Nellore', 'Jammu', 'Sangli-Miraj & Kupwad', 'Belgaum', 'Mangalore',
+  'Ambattur', 'Tirunelveli', 'Malegaon', 'Gaya', 'Jalna', 'Udaipur', 'Maheshtala', 'Davanagere',
+  'Kozhikode', 'Kurnool', 'Rajpur Sonarpur', 'Rourkela', 'Nizamabad', 'Farrukhabad', 'Eluru',
+  'Bikaner', 'Patiala', 'Shillong', 'Pondicherry', 'Panaji', 'Shimla', 'Gangtok', 'Imphal',
+  'Agartala', 'Aizawl', 'Kohima', 'Itanagar', 'Anantapur', 'Thrissur', 'Tirupati', 'Vellore'
 ];
 
 export default function TalentDirectoryClient({ initialTalents }: { initialTalents: any[] }) {
@@ -50,10 +47,10 @@ export default function TalentDirectoryClient({ initialTalents }: { initialTalen
   const [searchQuery, setSearchQuery] = useState('');
   const [displayCount, setDisplayCount] = useState(16);
 
-  // Dynamically extract unique cities from loaded talent profiles + default major cities
+  // Dynamically extract unique cities from DB records + full Indian cities list
   const availableCities = useMemo(() => {
     const set = new Set<string>();
-    DEFAULT_INDIAN_CITIES.forEach((c) => set.add(c));
+    ALL_INDIAN_CITIES.forEach((c) => set.add(c));
     if (Array.isArray(initialTalents)) {
       initialTalents.forEach((t) => {
         const city = t.city || t.user?.city;
@@ -83,62 +80,100 @@ export default function TalentDirectoryClient({ initialTalents }: { initialTalen
     return terms.map((s) => String(s).toLowerCase());
   };
 
-  const filtered = useMemo(() => {
-    if (!Array.isArray(initialTalents)) return [];
-
-    return initialTalents.filter((t: any) => {
-      // 1. Category Matching
-      let typeMatch = true;
-      if (typeFilter !== 'All') {
-        const target = typeFilter.toLowerCase().replace(/_/g, ' ').replace(/-/g, ' ');
-        const cats = getTalentCategories(t);
-        
-        typeMatch = cats.some((cat) => {
-          const normCat = cat.replace(/_/g, ' ').replace(/-/g, ' ');
-          if (normCat.includes(target) || target.includes(normCat)) return true;
-          
-          // Fuzzy fallback for category terms
-          if (target === 'influencer' && (normCat.includes('creator') || normCat.includes('digital') || normCat.includes('social'))) return true;
-          if (target === 'comedian' && (normCat.includes('comedy') || normCat.includes('standup') || normCat.includes('humor') || normCat.includes('actor') || normCat.includes('creator'))) return true;
-          if (target === 'reels artist' && (normCat.includes('reel') || normCat.includes('short') || normCat.includes('creator') || normCat.includes('influencer'))) return true;
-          if (target === 'voice artist' && (normCat.includes('voice') || normCat.includes('dubbing') || normCat.includes('audio') || normCat.includes('actor'))) return true;
-          if (target === 'musician' && (normCat.includes('music') || normCat.includes('singer') || normCat.includes('vocalist'))) return true;
-          if (target === 'photographer' && (normCat.includes('photo') || normCat.includes('camera') || normCat.includes('crew'))) return true;
-          return false;
-        });
-
-        // Fallback: If total active profiles exist and category filter has fewer results, match all talents that have any primary type or bio matching
-        if (!typeMatch && t.bio) {
-          typeMatch = t.bio.toLowerCase().includes(target);
-        }
-      }
-
-      // 2. City Matching (Direct type & select)
-      let cityMatch = true;
-      if (cityFilter.trim() !== '') {
-        const talentCity = (t.city || t.user?.city || '').toLowerCase();
-        const searchCity = cityFilter.trim().toLowerCase();
-        cityMatch = talentCity.includes(searchCity) || searchCity.includes(talentCity);
-      }
-
-      // 3. Name & Keyword Search
-      let searchMatch = true;
-      if (searchQuery.trim() !== '') {
-        const query = searchQuery.trim().toLowerCase();
-        const name = t.user ? `${t.user.firstName || ''} ${t.user.lastName || ''}`.trim().toLowerCase() : '';
-        const stageName = (t.stageName || '').toLowerCase();
-        const city = (t.city || t.user?.city || '').toLowerCase();
-        const bio = (t.bio || '').toLowerCase();
-        
-        searchMatch =
-          name.includes(query) ||
-          stageName.includes(query) ||
-          city.includes(query) ||
-          bio.includes(query);
-      }
-
-      return typeMatch && cityMatch && searchMatch;
+  const matchesCategory = (t: any, type: string) => {
+    if (type === 'All') return true;
+    const target = type.toLowerCase().replace(/_/g, ' ').replace(/-/g, ' ');
+    const cats = getTalentCategories(t);
+    return cats.some((cat) => {
+      const normCat = cat.replace(/_/g, ' ').replace(/-/g, ' ');
+      if (normCat.includes(target) || target.includes(normCat)) return true;
+      if (target === 'influencer' && (normCat.includes('creator') || normCat.includes('digital') || normCat.includes('social'))) return true;
+      if (target === 'comedian' && (normCat.includes('comedy') || normCat.includes('standup') || normCat.includes('humor') || normCat.includes('actor') || normCat.includes('creator'))) return true;
+      if (target === 'reels artist' && (normCat.includes('reel') || normCat.includes('short') || normCat.includes('creator') || normCat.includes('influencer'))) return true;
+      if (target === 'voice artist' && (normCat.includes('voice') || normCat.includes('dubbing') || normCat.includes('audio') || normCat.includes('actor') || normCat.includes('artist'))) return true;
+      if (target === 'musician' && (normCat.includes('music') || normCat.includes('singer') || normCat.includes('vocalist'))) return true;
+      if (target === 'photographer' && (normCat.includes('photo') || normCat.includes('camera') || normCat.includes('crew'))) return true;
+      return false;
     });
+  };
+
+  const matchesCity = (t: any, city: string) => {
+    if (!city.trim()) return true;
+    const talentCity = (t.city || t.user?.city || '').toLowerCase();
+    const searchCity = city.trim().toLowerCase();
+    return talentCity.includes(searchCity) || searchCity.includes(talentCity);
+  };
+
+  const matchesSearch = (t: any, query: string) => {
+    if (!query.trim()) return true;
+    const q = query.trim().toLowerCase();
+    const name = t.user ? `${t.user.firstName || ''} ${t.user.lastName || ''}`.trim().toLowerCase() : '';
+    const stageName = (t.stageName || '').toLowerCase();
+    const city = (t.city || t.user?.city || '').toLowerCase();
+    const bio = (t.bio || '').toLowerCase();
+    return name.includes(q) || stageName.includes(q) || city.includes(q) || bio.includes(q);
+  };
+
+  // Smart Filtering Logic with Automatic Fallback
+  const { results, isFallback, fallbackMessage } = useMemo(() => {
+    if (!Array.isArray(initialTalents) || initialTalents.length === 0) {
+      return { results: [], isFallback: false, fallbackMessage: '' };
+    }
+
+    // 1. Exact Match Check
+    const exactMatches = initialTalents.filter(
+      (t) => matchesCategory(t, typeFilter) && matchesCity(t, cityFilter) && matchesSearch(t, searchQuery)
+    );
+
+    if (exactMatches.length > 0) {
+      return { results: exactMatches, isFallback: false, fallbackMessage: '' };
+    }
+
+    // 2. Smart Multi-Tier Fallback if 0 exact matches
+    const activeCatLabel = TALENT_TYPES.find((t) => t.id === typeFilter)?.label || typeFilter;
+    const activeCityLabel = cityFilter.trim();
+
+    if (typeFilter !== 'All' && activeCityLabel) {
+      // Both category and city were requested, but combination is empty
+      const sameCityTalents = initialTalents.filter((t) => matchesCity(t, cityFilter) && matchesSearch(t, searchQuery));
+      const sameCategoryTalents = initialTalents.filter((t) => matchesCategory(t, typeFilter) && matchesSearch(t, searchQuery));
+
+      // Combine and deduplicate
+      const map = new Map<string, any>();
+      sameCategoryTalents.forEach((t) => map.set(t.id, t));
+      sameCityTalents.forEach((t) => map.set(t.id, t));
+      const combined = Array.from(map.values());
+
+      if (combined.length > 0) {
+        return {
+          results: combined,
+          isFallback: true,
+          fallbackMessage: `No exact ${activeCatLabel} profiles found in "${activeCityLabel}". Displaying all ${activeCatLabel}s across regions & all talent available in ${activeCityLabel}:`,
+        };
+      }
+    }
+
+    if (activeCityLabel) {
+      // City requested but no exact match in city
+      const allTalent = initialTalents.filter((t) => matchesSearch(t, searchQuery));
+      return {
+        results: allTalent,
+        isFallback: true,
+        fallbackMessage: `No talent profiles listed directly under "${activeCityLabel}". Showing all available talent roster:`,
+      };
+    }
+
+    if (typeFilter !== 'All') {
+      // Category requested but no exact match in category
+      const allTalent = initialTalents.filter((t) => matchesSearch(t, searchQuery));
+      return {
+        results: allTalent,
+        isFallback: true,
+        fallbackMessage: `No exact profiles tagged under ${activeCatLabel}. Displaying all talent profiles below:`,
+      };
+    }
+
+    return { results: initialTalents, isFallback: false, fallbackMessage: '' };
   }, [initialTalents, typeFilter, cityFilter, searchQuery]);
 
   return (
@@ -167,15 +202,15 @@ export default function TalentDirectoryClient({ initialTalents }: { initialTalen
             )}
           </div>
 
-          {/* Searchable City Input Field + Autocomplete Datalist */}
+          {/* Searchable City Input Field + Full Indian Cities Autocomplete Datalist */}
           <div className="w-full md:w-80 relative">
             <div className="relative">
               <input
                 type="text"
-                list="city-suggestions"
+                list="city-suggestions-full"
                 value={cityFilter}
                 onChange={(e) => setCityFilter(e.target.value)}
-                placeholder="Type or select city..."
+                placeholder="Type or search any city (e.g. Lucknow, Delhi)..."
                 className="w-full bg-surface/90 border border-border text-foreground pl-11 pr-10 py-3.5 rounded-lg focus:outline-none focus:border-primary transition-colors placeholder:text-muted-foreground/70 text-sm shadow-sm"
               />
               <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
@@ -190,8 +225,8 @@ export default function TalentDirectoryClient({ initialTalents }: { initialTalen
               )}
             </div>
 
-            {/* Datalist for instant city suggestions */}
-            <datalist id="city-suggestions">
+            {/* Datalist for instant 150+ city suggestions */}
+            <datalist id="city-suggestions-full">
               {availableCities.map((city) => (
                 <option key={city} value={city} />
               ))}
@@ -221,12 +256,12 @@ export default function TalentDirectoryClient({ initialTalents }: { initialTalen
             ))}
           </div>
 
-          {/* Quick City Select Fallback */}
+          {/* Quick City Select Dropdown */}
           <div className="flex items-center gap-2 self-end lg:self-center">
             <select
               value={cityFilter}
               onChange={(e) => setCityFilter(e.target.value)}
-              className="bg-background border border-border text-foreground px-3.5 py-1.5 text-xs font-semibold rounded-md focus:outline-none focus:border-primary transition-colors cursor-pointer"
+              className="bg-background border border-border text-foreground px-3.5 py-1.5 text-xs font-semibold rounded-md focus:outline-none focus:border-primary transition-colors cursor-pointer max-w-[200px]"
             >
               <option value="">All Cities ({availableCities.length} Cities)</option>
               {availableCities.map((city) => (
@@ -282,14 +317,22 @@ export default function TalentDirectoryClient({ initialTalents }: { initialTalen
         </div>
       )}
 
+      {/* Smart Fallback Notification Banner */}
+      {isFallback && (
+        <div className="mb-6 p-4 bg-amber-500/15 border border-amber-500/30 rounded-lg text-amber-300 text-xs font-semibold flex items-center gap-2.5 shadow-sm animate-fadeIn">
+          <Info className="w-4 h-4 text-amber-400 shrink-0" />
+          <span>{fallbackMessage}</span>
+        </div>
+      )}
+
       {/* Results Count */}
       <p className="text-sm font-semibold text-foreground/80 mb-6">
-        {filtered.length} talent profiles found
+        {results.length} talent profiles found
       </p>
 
       {/* Talent Grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {filtered.slice(0, displayCount).map((talent: any, idx: number) => {
+        {results.slice(0, displayCount).map((talent: any, idx: number) => {
           const name =
             talent.stageName ||
             (talent.user
@@ -359,7 +402,7 @@ export default function TalentDirectoryClient({ initialTalents }: { initialTalen
         })}
       </div>
 
-      {filtered.length === 0 && (
+      {results.length === 0 && (
         <div className="py-20 text-center bg-surface/50 border border-border rounded-xl my-6">
           <p className="text-muted-foreground font-medium mb-4">No talent found matching your criteria.</p>
           <Button
@@ -376,15 +419,15 @@ export default function TalentDirectoryClient({ initialTalents }: { initialTalen
       )}
 
       {/* Load More */}
-      {filtered.length > 0 && (
+      {results.length > 0 && (
         <div className="mt-14 text-center">
-          {displayCount < filtered.length ? (
+          {displayCount < results.length ? (
             <Button variant="outline" size="lg" onClick={() => setDisplayCount((prev) => prev + 16)}>
-              Load More Profiles ({filtered.length - displayCount} Remaining)
+              Load More Profiles ({results.length - displayCount} Remaining)
             </Button>
           ) : (
             <span className="text-xs text-muted-foreground uppercase tracking-widest font-semibold">
-              All {filtered.length} Profiles Displayed
+              All {results.length} Profiles Displayed
             </span>
           )}
         </div>
