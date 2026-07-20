@@ -32,7 +32,12 @@ import {
   Trash2, 
   Briefcase,
   RefreshCw,
-  Database
+  Database,
+  Eye,
+  Phone,
+  Mail,
+  MapPin,
+  X
 } from 'lucide-react';
 
 interface Booking {
@@ -60,6 +65,11 @@ interface TalentReview {
   category: string;
   experience: string;
   status: 'pending' | 'approved' | 'rejected';
+  email?: string;
+  phone?: string;
+  location?: string;
+  bio?: string;
+  createdAt?: string;
 }
 
 // Map backend BookingStatus enum → UI status label.
@@ -102,6 +112,7 @@ export default function SuperAdminDashboard() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [cmsItems, setCmsItems] = useState<CMSItem[]>([]);
   const [talentReviews, setTalentReviews] = useState<TalentReview[]>([]);
+  const [selectedTalentModal, setSelectedTalentModal] = useState<TalentReview | null>(null);
 
   const loadLiveData = useCallback(async () => {
     setIsLoadingLive(true);
@@ -198,6 +209,11 @@ export default function SuperAdminDashboard() {
           category: String(t.talentTypes?.[0] || t.experienceLevel || 'Talent'),
           experience: String(t.experienceLevel || '—'),
           status: 'pending' as const,
+          email: t.user?.email || '—',
+          phone: t.user?.phone || '—',
+          location: t.user?.city ? `${t.user.city}${t.user.state ? ', ' + t.user.state : ''}` : '—',
+          bio: t.bio || '—',
+          createdAt: t.createdAt ? new Date(t.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—',
         })));
       }
 
@@ -545,16 +561,26 @@ export default function SuperAdminDashboard() {
                             {talent.status}
                           </span>
                         </div>
-                        {talent.status === 'pending' && (
-                          <div className="flex gap-2 pt-1">
-                            <Button size="sm" variant="primary" className="flex-1! py-1.5! text-xs bg-primary! hover:bg-primary/90! text-white! font-bold flex justify-center items-center gap-1.5 shadow-sm" onClick={() => handleTalentReview(talent.id, 'approved')}>
-                              <CheckCircle2 className="w-3.5 h-3.5" /> Approve
-                            </Button>
-                            <Button size="sm" variant="outline" className="flex-1! py-1.5! text-xs text-red-400 border-red-500/60 hover:bg-red-600 hover:text-white font-bold flex justify-center items-center gap-1.5" onClick={() => handleTalentReview(talent.id, 'rejected')}>
-                              <XCircle className="w-3.5 h-3.5" /> Reject
-                            </Button>
-                          </div>
-                        )}
+                        <div className="flex flex-wrap gap-2 pt-1">
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            className="py-1.5! px-3! text-xs border-blue-500/40 text-blue-400 hover:bg-blue-600 hover:text-white font-bold flex items-center gap-1"
+                            onClick={() => setSelectedTalentModal(talent)}
+                          >
+                            <Eye className="w-3.5 h-3.5" /> View Details
+                          </Button>
+                          {talent.status === 'pending' && (
+                            <>
+                              <Button size="sm" variant="primary" className="flex-1! py-1.5! text-xs bg-primary! hover:bg-primary/90! text-white! font-bold flex justify-center items-center gap-1.5 shadow-sm" onClick={() => handleTalentReview(talent.id, 'approved')}>
+                                <CheckCircle2 className="w-3.5 h-3.5" /> Approve
+                              </Button>
+                              <Button size="sm" variant="outline" className="flex-1! py-1.5! text-xs text-red-400 border-red-500/60 hover:bg-red-600 hover:text-white font-bold flex justify-center items-center gap-1.5" onClick={() => handleTalentReview(talent.id, 'rejected')}>
+                                <XCircle className="w-3.5 h-3.5" /> Reject
+                              </Button>
+                            </>
+                          )}
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -883,9 +909,129 @@ export default function SuperAdminDashboard() {
             </div>
           )}
 
+          {/* TALENT REGISTRATION INSPECTION MODAL */}
+          {selectedTalentModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in">
+              <div className="bg-[#0e0e14] border border-white/20 rounded-2xl max-w-lg w-full p-6 sm:p-8 space-y-6 text-white shadow-2xl relative">
+                <button 
+                  onClick={() => setSelectedTalentModal(null)}
+                  className="absolute top-4 right-4 p-2 text-gray-400 hover:text-white rounded-full bg-white/5 hover:bg-white/10 transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+
+                <div className="flex items-center gap-4 border-b border-white/10 pb-4">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#E50914] to-[#F59E0B] flex items-center justify-center font-black text-2xl text-white shadow-lg shrink-0">
+                    {selectedTalentModal.name.charAt(0)}
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className="text-xl font-extrabold text-white">{selectedTalentModal.name}</h3>
+                      <span className={`text-[10px] font-extrabold uppercase px-2 py-0.5 rounded border ${
+                        selectedTalentModal.status === 'approved' ? 'bg-green-500/20 text-green-400 border-green-500/40' :
+                        selectedTalentModal.status === 'rejected' ? 'bg-red-500/20 text-red-400 border-red-500/40' :
+                        'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                      }`}>
+                        {selectedTalentModal.status}
+                      </span>
+                    </div>
+                    <p className="text-xs text-[#38BDF8] font-bold mt-0.5">
+                      {selectedTalentModal.category} • {selectedTalentModal.experience}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Registration Details Grid */}
+                <div className="space-y-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="bg-white/5 p-3.5 rounded-xl border border-white/10">
+                      <p className="text-[11px] text-gray-400 font-bold uppercase tracking-wider flex items-center gap-1.5 mb-1">
+                        <Mail className="w-3.5 h-3.5 text-[#38BDF8]" /> Email Address
+                      </p>
+                      <p className="text-xs font-semibold text-white truncate">{selectedTalentModal.email || '—'}</p>
+                    </div>
+
+                    <div className="bg-white/5 p-3.5 rounded-xl border border-white/10">
+                      <p className="text-[11px] text-gray-400 font-bold uppercase tracking-wider flex items-center gap-1.5 mb-1">
+                        <Phone className="w-3.5 h-3.5 text-emerald-400" /> Phone / Mobile
+                      </p>
+                      <p className="text-xs font-semibold text-white">{selectedTalentModal.phone || '—'}</p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="bg-white/5 p-3.5 rounded-xl border border-white/10">
+                      <p className="text-[11px] text-gray-400 font-bold uppercase tracking-wider flex items-center gap-1.5 mb-1">
+                        <MapPin className="w-3.5 h-3.5 text-[#F59E0B]" /> Location Hub
+                      </p>
+                      <p className="text-xs font-semibold text-white">{selectedTalentModal.location || '—'}</p>
+                    </div>
+
+                    <div className="bg-white/5 p-3.5 rounded-xl border border-white/10">
+                      <p className="text-[11px] text-gray-400 font-bold uppercase tracking-wider flex items-center gap-1.5 mb-1">
+                        <Calendar className="w-3.5 h-3.5 text-purple-400" /> Registration Date
+                      </p>
+                      <p className="text-xs font-semibold text-white">{selectedTalentModal.createdAt || '—'}</p>
+                    </div>
+                  </div>
+
+                  <div className="bg-white/5 p-4 rounded-xl border border-white/10">
+                    <p className="text-[11px] text-gray-400 font-bold uppercase tracking-wider mb-1.5">
+                      About / Pitch Summary
+                    </p>
+                    <p className="text-xs text-gray-200 leading-relaxed italic bg-black/40 p-3 rounded-lg border border-white/5 max-h-32 overflow-y-auto">
+                      "{selectedTalentModal.bio || 'No custom bio submitted.'}"
+                    </p>
+                  </div>
+                </div>
+
+                {/* Action Bar */}
+                <div className="flex flex-wrap gap-2 pt-2 border-t border-white/10">
+                  {selectedTalentModal.status === 'pending' && (
+                    <>
+                      <Button
+                        size="sm"
+                        variant="primary"
+                        className="flex-1 py-2.5 text-xs bg-[#E50914] hover:bg-[#FF1E27] text-white font-extrabold flex justify-center items-center gap-2 rounded-xl shadow-lg cursor-pointer"
+                        onClick={() => {
+                          handleTalentReview(selectedTalentModal.id, 'approved');
+                          setSelectedTalentModal(null);
+                        }}
+                      >
+                        <CheckCircle2 className="w-4 h-4" /> Approve Talent
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="py-2.5 px-4 text-xs text-red-400 border-red-500/40 hover:bg-red-600 hover:text-white font-bold flex justify-center items-center gap-2 rounded-xl cursor-pointer"
+                        onClick={() => {
+                          handleTalentReview(selectedTalentModal.id, 'rejected');
+                          setSelectedTalentModal(null);
+                        }}
+                      >
+                        <XCircle className="w-4 h-4" /> Reject
+                      </Button>
+                    </>
+                  )}
+
+                  {selectedTalentModal.phone && selectedTalentModal.phone !== '—' && (
+                    <a
+                      href={`https://wa.me/${selectedTalentModal.phone.replace(/[^0-9]/g, '')}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="py-2.5 px-4 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-2 rounded-xl transition-all cursor-pointer"
+                    >
+                      <MessageSquare className="w-4 h-4" /> WhatsApp
+                    </a>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
         </Container>
       </main>
-          </>
+    </>
   );
 }
 
