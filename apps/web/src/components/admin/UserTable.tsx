@@ -53,13 +53,6 @@ export function UserTable({ currentUserRole }: UserTableProps) {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
-      const { createClient } = await import('@/utils/supabase/client');
-      const supabase = createClient();
-      const { data: { session } } = await supabase.auth.getSession();
-      const token = session?.access_token;
-      const headers: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
-
       const queryParams = new URLSearchParams({
         page: String(page),
         limit: String(limit),
@@ -67,7 +60,7 @@ export function UserTable({ currentUserRole }: UserTableProps) {
         ...(roleFilter && { role: roleFilter }),
       });
 
-      const res = await fetch(`${apiUrl}/admin/users?${queryParams.toString()}`, { headers });
+      const res = await fetch(`/api/admin/users?${queryParams.toString()}`);
       if (!res.ok) {
         throw new Error('Failed to fetch users');
       }
@@ -94,14 +87,8 @@ export function UserTable({ currentUserRole }: UserTableProps) {
     setActionLoading(true);
 
     const { type, userId, payload } = confirmAction;
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
-    const { createClient } = await import('@/utils/supabase/client');
-    const supabase = createClient();
-    const { data: { session } } = await supabase.auth.getSession();
-    const token = session?.access_token;
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
     };
 
     try {
@@ -110,21 +97,21 @@ export function UserTable({ currentUserRole }: UserTableProps) {
       let body: string | undefined = undefined;
 
       if (type === 'role') {
-        endpoint = `/admin/users/${userId}/role`;
+        endpoint = `/api/admin/users/${userId}/role`;
         body = JSON.stringify({ role: payload.newRole });
       } else if (type === 'deactivate') {
-        endpoint = `/admin/users/${userId}/deactivate`;
+        endpoint = `/api/admin/users/${userId}/deactivate`;
       } else if (type === 'reactivate') {
-        endpoint = `/admin/users/${userId}/reactivate`;
+        endpoint = `/api/admin/users/${userId}/reactivate`;
       } else if (type === 'reset-mfa') {
-        endpoint = `/admin/users/${userId}/reset-mfa`;
+        endpoint = `/api/admin/users/${userId}/reset-mfa`;
         method = 'POST';
       }
 
-      const res = await fetch(`${apiUrl}${endpoint}`, { method, headers, body });
+      const res = await fetch(endpoint, { method, headers, body });
       if (!res.ok) {
         const errJson = await res.json().catch(() => ({}));
-        throw new Error(errJson.message || 'Operation failed');
+        throw new Error(errJson.error || errJson.message || 'Operation failed');
       }
 
       toast.success(
