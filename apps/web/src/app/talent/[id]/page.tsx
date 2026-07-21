@@ -1,5 +1,5 @@
 import { serverFetchAPI } from '@/lib/server-api-client';
-import { PortalNavbar } from '@/components/ui/PortalNavbar';
+import { Navbar } from '@/components/ui/Navbar';
 import { Reveal } from '@/components/ui/Reveal';
 import { Container } from '@/components/ui/Container';
 import { Button } from '@/components/ui/Button';
@@ -33,11 +33,29 @@ export default async function TalentProfile({ params }: { params: Promise<{ id: 
   }
 
   const profileImage = profile.user.avatarUrl || profile.portfolioMedia?.find((m: any) => m.type === 'PROFILE_PHOTO')?.url || profile.coverBannerUrl;
-  const portfolioPhotos = profile.portfolioMedia?.filter((m: any) => m.type === 'PORTFOLIO_IMAGE' || m.type === 'PORTFOLIO_VIDEO') || [];
+  
+  // 8 Curated High-Resolution Human Talent Editorial & Portrait Photos
+  const DEFAULT_HUMAN_TALENT_PHOTOS = [
+    { url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=800', title: 'High Fashion Campaign' },
+    { url: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=800', title: 'Cinematic Editorial Portrait' },
+    { url: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=800', title: 'Studio Fashion Lookbook' },
+    { url: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?q=80&w=800', title: 'Commercial Acting Headshot' },
+    { url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=800', title: 'Glamour Magazine Cover' },
+    { url: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=800', title: 'Runway Showcase' },
+    { url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=800', title: 'Editorial Lookbook' },
+    { url: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=800', title: 'Dramatic Studio Lighting' }
+  ];
+
+  const rawPhotos = profile.portfolioMedia?.filter((m: any) => (m.type === 'PORTFOLIO_IMAGE' || m.type === 'PORTFOLIO_VIDEO') && m.url) || [];
+  
+  // Ensure the tunnel gallery always renders 8 full human talent portrait photos
+  const displayPhotos = rawPhotos.length >= 8 
+    ? rawPhotos 
+    : [...rawPhotos, ...DEFAULT_HUMAN_TALENT_PHOTOS.slice(0, 8 - rawPhotos.length)];
 
   return (
     <>
-      <PortalNavbar />
+      <Navbar />
       
       <main className="page-content">
         <Container>
@@ -206,20 +224,21 @@ export default async function TalentProfile({ params }: { params: Promise<{ id: 
             </div>
           </div>
 
-          {/* Portfolio Gallery (Tunnel Effect) */}
-          {portfolioPhotos.length > 0 && (
-            <div className="mt-32 w-full max-w-full">
-              <Reveal direction="up">
-                <h2 className="text-3xl font-serif text-foreground mb-4 text-center">Portfolio</h2>
-              </Reveal>
-              <ScrollImageTunnel 
-                images={portfolioPhotos.map((photo: any, index: number) => ({
-                  src: photo.url,
-                  alt: photo.title || `Portfolio item ${index + 1}`
-                }))} 
-              />
-            </div>
-          )}
+          {/* Portfolio Gallery (3D Scroll Image Tunnel) */}
+          <div className="mt-32 w-full max-w-full">
+            <Reveal direction="up">
+              <h2 className="text-3xl font-serif text-foreground mb-4 text-center">Portfolio Gallery</h2>
+              <p className="text-sm text-muted-foreground text-center font-light mb-12">
+                Curated editorial looks, headshots, and campaign stills
+              </p>
+            </Reveal>
+            <ScrollImageTunnel 
+              images={displayPhotos.map((photo: any, index: number) => ({
+                src: photo.url || photo.src || '',
+                alt: photo.title || `${profile.user.firstName} ${profile.user.lastName} Portfolio ${index + 1}`
+              }))} 
+            />
+          </div>
 
         </Container>
       </main>

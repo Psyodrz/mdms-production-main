@@ -33,7 +33,7 @@ export function StepProfilePreview({ data, categories }: StepProfilePreviewProps
         {/* Cover Banner */}
         <div className="w-full h-[200px] sm:h-[300px] relative bg-gradient-to-tr from-neutral-800 to-neutral-900">
           {coverUrl && (
-            <img src={coverUrl} alt="Cover" className="w-full h-full object-cover" />
+            <img src={coverUrl} alt="Cover" className="w-full h-full object-cover object-top" />
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-[var(--surface)] to-transparent" />
         </div>
@@ -44,7 +44,7 @@ export function StepProfilePreview({ data, categories }: StepProfilePreviewProps
             {/* Profile Photo */}
             <div className="w-32 h-32 sm:w-48 sm:h-48 rounded-2xl sm:rounded-[2rem] border-4 border-[var(--surface)] overflow-hidden shadow-2xl flex-shrink-0 bg-[var(--card)] flex items-center justify-center">
               {profileUrl ? (
-                <img src={profileUrl} alt={data.fullName} className="w-full h-full object-cover" />
+                <img src={profileUrl} alt={data.fullName} className="w-full h-full object-cover object-top" />
               ) : (
                 <span className="text-4xl font-serif text-muted-foreground">{data.fullName?.[0] || 'T'}</span>
               )}

@@ -35,6 +35,8 @@ const EXPERIENCE_LEVELS = ['Fresher', '1-3 Years', '3-5 Years', '5+ Years'];
 const CITIES = [
   { city: 'Mumbai', state: 'Maharashtra' },
   { city: 'Delhi NCR', state: 'Delhi' },
+  { city: 'Gurgaon', state: 'Haryana' },
+  { city: 'Noida', state: 'Uttar Pradesh' },
   { city: 'Bengaluru', state: 'Karnataka' },
   { city: 'Kochi', state: 'Kerala' },
   { city: 'Jaipur', state: 'Rajasthan' },
@@ -42,7 +44,10 @@ const CITIES = [
   { city: 'Pune', state: 'Maharashtra' },
   { city: 'Chennai', state: 'Tamil Nadu' },
   { city: 'Ahmedabad', state: 'Gujarat' },
-  { city: 'Kolkata', state: 'West Bengal' }
+  { city: 'Kolkata', state: 'West Bengal' },
+  { city: 'Chandigarh', state: 'Punjab' },
+  { city: 'Lucknow', state: 'Uttar Pradesh' },
+  { city: 'Indore', state: 'Madhya Pradesh' }
 ];
 
 const PORTRAITS = [
@@ -82,7 +87,7 @@ async function main() {
 
   // Clear existing seeded talent users to avoid unique constraint collisions
   await prisma.user.deleteMany({
-    where: { email: { endsWith: '@mpproduction.com' } }
+    where: { email: { startsWith: 'talent.' } }
   });
 
   // Password for all seeded accounts

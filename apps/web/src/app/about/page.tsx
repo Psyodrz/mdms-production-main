@@ -32,20 +32,23 @@ export default function About() {
   return (
     <>
       <Navbar />
-      <main className="min-h-screen bg-background text-foreground pt-24 pb-32 relative overflow-hidden">
+      <main className="min-h-screen bg-background text-foreground pb-32 relative overflow-hidden">
         {/* Subtle Ambient Radial Lighting */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[110vw] h-[70vh] bg-linear-to-b from-brand/5 via-transparent to-transparent blur-[150px] pointer-events-none z-0" />
 
-        {/* Brand Story Hero */}
-        <section className="relative w-full h-[60vh] flex items-center justify-center overflow-hidden mb-20">
+        {/* Brand Story Hero — Full Bleed Merged With Navbar */}
+        <section className="relative w-full h-[75vh] sm:h-[85vh] flex items-center justify-center overflow-hidden mb-20 pt-28 sm:pt-36">
           <Image 
             src="/images/about-hero.jpg" 
             alt="About MP Production" 
             fill 
-            className="object-cover" 
+            className="object-cover object-center" 
             priority sizes="100vw" />
-          <div className="absolute inset-0 dark:bg-black/55 bg-black/25" />
-          <div className="absolute bottom-0 left-0 right-0 h-32 dark:bg-gradient-to-t dark:from-background bg-gradient-to-t from-background to-transparent" />
+          
+          {/* Top Vignette Overlay for Navbar Integration */}
+          <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-black/80 via-black/40 to-transparent z-1 pointer-events-none" />
+          <div className="absolute inset-0 dark:bg-black/55 bg-black/35 z-1" />
+          <div className="absolute bottom-0 left-0 right-0 h-40 dark:bg-gradient-to-t dark:from-background bg-gradient-to-t from-background to-transparent z-2" />
           
           <div className="relative z-10 text-center px-4 w-full max-w-5xl mx-auto">
             {loading && !hero ? (

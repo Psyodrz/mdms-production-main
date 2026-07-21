@@ -83,7 +83,7 @@ export function CinematicTestimonial() {
                 loop
                 playsInline
                 poster="/images/portfolio-hero.jpg"
-                className="w-full h-full object-cover scale-105 group-hover:scale-100 transition-transform duration-1000"
+                className="w-full h-full object-cover object-top scale-105 group-hover:scale-100 transition-transform duration-1000"
               >
                 <source src="https://zmpeiobdilrgtuzggzuj.supabase.co/storage/v1/object/public/mdms/videos/reel_1.mp4" type="video/mp4" />
               </video>

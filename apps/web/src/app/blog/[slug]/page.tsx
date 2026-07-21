@@ -99,19 +99,23 @@ export default function BlogPostPage() {
                 </div>
 
                 {(post.img || post.coverImage || post.coverImageUrl) && (
-                  <div className="aspect-video rounded-2xl overflow-hidden border border-border shadow-xl">
-                    <img src={post.img || post.coverImage || post.coverImageUrl} alt={post.title} className="w-full h-full object-cover" />
+                  <div className="w-full max-h-[80vh] min-h-[380px] rounded-2xl overflow-hidden border border-border shadow-2xl bg-black/60 flex items-center justify-center relative my-6">
+                    <img 
+                      src={post.img || post.coverImage || post.coverImageUrl} 
+                      alt={post.title} 
+                      className="w-full h-auto max-h-[80vh] object-contain md:object-cover object-top rounded-2xl" 
+                    />
                   </div>
                 )}
 
-                <div className="prose prose-invert max-w-none pt-6 space-y-6 text-muted-foreground font-light leading-relaxed">
+                <div className="prose dark:prose-invert max-w-none pt-6 space-y-6 text-foreground font-light leading-relaxed">
                   {post.content ? (
                     <div 
-                      className="text-base md:text-lg space-y-6"
+                      className="text-base md:text-lg space-y-6 [&_h2]:text-2xl [&_h2]:md:text-3xl [&_h2]:font-serif [&_h2]:text-foreground [&_h2]:font-normal [&_h2]:mt-10 [&_h2]:mb-4 [&_h3]:text-xl [&_h3]:font-serif [&_h3]:text-foreground [&_p]:text-muted-foreground [&_p]:leading-relaxed [&_p]:font-light [&_blockquote]:border-l-2 [&_blockquote]:border-brand [&_blockquote]:pl-6 [&_blockquote]:py-2 [&_blockquote]:my-8 [&_blockquote]:italic [&_blockquote]:text-foreground/90 [&_blockquote]:bg-surface/50 [&_blockquote]:rounded-r-lg [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:space-y-2 [&_li]:text-muted-foreground"
                       dangerouslySetInnerHTML={{ __html: post.content }}
                     />
                   ) : (
-                    <p className="text-lg">{post.excerpt || "Article content loading..."}</p>
+                    <p className="text-lg text-muted-foreground font-light">{post.excerpt || "Article content loading..."}</p>
                   )}
                 </div>
 

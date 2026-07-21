@@ -65,27 +65,30 @@ export default function Contact() {
   return (
     <>
       <Navbar />
-      <main className="min-h-screen bg-background text-foreground pt-24 pb-32">
-        {/* Header Section — no photo, clean themed backdrop */}
-        <section className="relative w-full h-[48vh] flex items-center justify-center overflow-hidden mb-20 text-center">
-          <div className="absolute inset-0 bg-background" />
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                'radial-gradient(125% 125% at 50% 0%, transparent 40%, color-mix(in oklab, var(--brand) 12%, transparent) 100%)',
-            }}
-          />
+      <main className="min-h-screen bg-background text-foreground pb-32 relative overflow-hidden">
+        {/* Header Section — Full Bleed Merged With Navbar */}
+        <section className="relative w-full h-[70vh] sm:h-[80vh] flex items-center justify-center overflow-hidden mb-20 text-center pt-28 sm:pt-36">
+          <Image 
+            src="/images/contact-studio.jpg" 
+            alt="Contact MP Production" 
+            fill 
+            className="object-cover object-center" 
+            priority sizes="100vw" />
+          
+          {/* Top Vignette Gradient for Navbar Contrast */}
+          <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-black/80 via-black/40 to-transparent z-1 pointer-events-none" />
+          <div className="absolute inset-0 dark:bg-black/60 bg-black/40 z-1" />
+          <div className="absolute bottom-0 left-0 right-0 h-40 dark:bg-gradient-to-t dark:from-background bg-gradient-to-t from-background to-transparent z-2" />
 
           <Container className="relative z-10 w-full max-w-5xl mx-auto px-4">
             <Reveal direction="up">
-              <span className="text-brand tracking-[0.2em] text-sm uppercase font-semibold mb-4 block">
+              <span className="text-brand tracking-[0.2em] text-sm uppercase font-semibold mb-4 block drop-shadow-md">
                 Get in Touch
               </span>
-              <h1 className="text-6xl sm:text-8xl font-display text-foreground tracking-editorial leading-[0.92] mb-8 font-light whitespace-pre-line">
+              <h1 className="text-6xl sm:text-8xl font-display text-white tracking-editorial leading-[0.92] mb-8 font-light whitespace-pre-line drop-shadow-lg">
                 START A CONVERSATION.
               </h1>
-              <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto font-light leading-relaxed mb-12">
+              <p className="text-base sm:text-lg text-white/80 max-w-2xl mx-auto font-light leading-relaxed mb-12 drop-shadow">
                 Whether you're a brand seeking cinematic production, or an elite talent looking for representation, we'd love to hear from you.
               </p>
             </Reveal>

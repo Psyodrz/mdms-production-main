@@ -18,7 +18,7 @@ export default function UserDirectory() {
                 User Directory
               </h1>
             </div>
-            <Button href="/studio-8f2k/users/invite" variant="outline" size="sm">
+            <Button href="/super-admin/users/invite" variant="outline" size="sm">
               Invite User
             </Button>
           </div>

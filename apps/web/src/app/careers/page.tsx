@@ -58,16 +58,19 @@ export default function Careers() {
   return (
     <>
       <Navbar />
-      <main className="min-h-screen bg-background text-foreground pt-24 pb-32">
-        {/* Header Section */}
-        <section className="relative w-full h-[60vh] flex items-center justify-center overflow-hidden mb-20 text-center">
+      <main className="min-h-screen bg-background text-foreground pb-32 relative overflow-hidden">
+        {/* Header Section — Full Bleed Merged With Navbar */}
+        <section className="relative w-full h-[70vh] sm:h-[80vh] flex items-center justify-center overflow-hidden mb-20 text-center pt-28 sm:pt-36">
           <img 
             src="/images/careers-meeting.jpg" 
             alt="Careers at MP Productions" 
-            className="absolute inset-0 w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-cover object-center"
           />
-          <div className="absolute inset-0 dark:bg-black/60 bg-black/40" />
-          <div className="absolute bottom-0 left-0 right-0 h-32 dark:bg-gradient-to-t dark:from-background bg-gradient-to-t from-background to-transparent" />
+          
+          {/* Top Vignette Gradient for Navbar Contrast */}
+          <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-black/80 via-black/40 to-transparent z-1 pointer-events-none" />
+          <div className="absolute inset-0 dark:bg-black/60 bg-black/40 z-1" />
+          <div className="absolute bottom-0 left-0 right-0 h-40 dark:bg-gradient-to-t dark:from-background bg-gradient-to-t from-background to-transparent z-2" />
           
           <Container className="relative z-10 w-full max-w-5xl mx-auto px-4">
             <Reveal direction="up">

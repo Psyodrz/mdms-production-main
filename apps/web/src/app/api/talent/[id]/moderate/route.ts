@@ -15,9 +15,17 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
   }
   const { id } = await ctx.params;
   const body = await req.json().catch(() => ({}));
+  
+  // Normalize frontend status values to valid Prisma TalentProfileStatus enum (ACTIVE, SUSPENDED, DEACTIVATED, DRAFT, PENDING_REVIEW)
+  let status = body.status;
+  if (status === 'APPROVED') status = 'ACTIVE';
+  if (status === 'REJECTED') status = 'SUSPENDED';
+
+  const payload = { ...body, status };
+
   const result = await backendFetch(`/talent/${encodeURIComponent(id)}/moderate`, {
     method: 'PATCH',
-    body: JSON.stringify(body),
+    body: JSON.stringify(payload),
   });
   return NextResponse.json(result, { status: result.ok ? 200 : result.status });
 }

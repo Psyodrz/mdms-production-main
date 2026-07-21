@@ -44,19 +44,20 @@ export default function Blog() {
   return (
     <>
       <Navbar />
-      <main className="page-content">
-        <Container>
-
-          {/* Header Section */}
-        <section className="relative w-full h-[60vh] flex items-center justify-center overflow-hidden mb-20 text-center -mx-4 sm:-mx-8 lg:-mx-12 px-4 sm:px-8 lg:px-12 w-[calc(100%+2rem)] sm:w-[calc(100%+4rem)] lg:w-[calc(100%+6rem)] rounded-none">
+      <main className="min-h-screen bg-background text-foreground pb-24 relative overflow-hidden">
+        {/* Header Section — Full Bleed Merged With Navbar */}
+        <section className="relative w-full h-[70vh] sm:h-[80vh] flex items-center justify-center overflow-hidden mb-20 text-center pt-28 sm:pt-36">
           <Image 
             src="/images/about-hero.jpg" 
             alt="The Journal" 
             fill 
-            className="object-cover" 
+            className="object-cover object-center" 
             priority sizes="100vw" />
-          <div className="absolute inset-0 dark:bg-black/60 bg-black/40" />
-          <div className="absolute bottom-0 left-0 right-0 h-32 dark:bg-gradient-to-t dark:from-background bg-gradient-to-t from-background to-transparent" />
+          
+          {/* Top Vignette Overlay for Navbar Integration */}
+          <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-black/80 via-black/40 to-transparent z-1 pointer-events-none" />
+          <div className="absolute inset-0 dark:bg-black/60 bg-black/40 z-1" />
+          <div className="absolute bottom-0 left-0 right-0 h-40 dark:bg-gradient-to-t dark:from-background bg-gradient-to-t from-background to-transparent z-2" />
           
           <Container className="relative z-10 w-full max-w-5xl mx-auto px-4">
             <Reveal direction="up">
@@ -73,6 +74,7 @@ export default function Blog() {
           </Container>
         </section>
 
+        <Container>
           {loading ? (
             <div className="mb-16 aspect-video lg:aspect-[2/1] rounded-2xl bg-muted/20 animate-pulse border border-border" />
           ) : featured ? (
@@ -82,7 +84,7 @@ export default function Blog() {
                   <Card padding="none" hover className="grid grid-cols-1 lg:grid-cols-2 gap-0 overflow-hidden border border-border">
                     <div className="relative aspect-video lg:aspect-auto overflow-hidden bg-neutral-900">
                       {featured.coverImageUrl ? (
-                        <img src={featured.coverImageUrl} alt={featured.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                        <img src={featured.coverImageUrl} alt={featured.title} className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700" />
                       ) : (
                         <div className="w-full h-full bg-gradient-to-tr from-neutral-800 to-neutral-900 flex items-center justify-center">
                           <span className="text-6xl font-serif text-muted-foreground">{featured.title?.[0]}</span>
@@ -128,7 +130,7 @@ export default function Blog() {
                     <Card padding="none" hover className="group cursor-pointer overflow-hidden flex flex-col h-full border border-border">
                       <div className="relative aspect-video overflow-hidden bg-neutral-900">
                         {post.coverImageUrl ? (
-                          <img src={post.coverImageUrl} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                          <img src={post.coverImageUrl} alt={post.title} className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700" />
                         ) : (
                           <div className="w-full h-full bg-gradient-to-tr from-neutral-800 to-neutral-900 flex items-center justify-center">
                             <span className="text-4xl font-serif text-muted-foreground">{post.title?.[0]}</span>

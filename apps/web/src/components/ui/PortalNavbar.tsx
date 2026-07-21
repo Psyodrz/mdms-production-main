@@ -89,6 +89,43 @@ export function PortalNavbar({ role, title, className, user, ...props }: PortalN
         <nav className="hidden md:flex items-center gap-6">
           {isPortal ? (
             <>
+              {pathname.startsWith('/super-admin') && (
+                <div className="flex items-center gap-4 text-xs font-semibold uppercase tracking-wider">
+                  <Link href="/super-admin" className={`transition-colors ${pathname === '/super-admin' ? 'text-brand font-bold' : 'text-muted-foreground hover:text-foreground'}`}>
+                    Dashboard
+                  </Link>
+                  <Link href="/super-admin/users" className={`transition-colors ${pathname.startsWith('/super-admin/users') ? 'text-brand font-bold' : 'text-muted-foreground hover:text-foreground'}`}>
+                    Users
+                  </Link>
+                  <Link href="/super-admin/cms" className={`transition-colors ${pathname.startsWith('/super-admin/cms') ? 'text-brand font-bold' : 'text-muted-foreground hover:text-foreground'}`}>
+                    CMS Engine
+                  </Link>
+                  <Link href="/super-admin/moderation" className={`transition-colors ${pathname.startsWith('/super-admin/moderation') ? 'text-brand font-bold' : 'text-muted-foreground hover:text-foreground'}`}>
+                    Moderation
+                  </Link>
+                  <Link href="/super-admin/audit-logs" className={`transition-colors ${pathname.startsWith('/super-admin/audit-logs') ? 'text-brand font-bold' : 'text-muted-foreground hover:text-foreground'}`}>
+                    Audit Logs
+                  </Link>
+                </div>
+              )}
+
+              {pathname.startsWith('/admin') && !pathname.startsWith('/super-admin') && (
+                <div className="flex items-center gap-4 text-xs font-semibold uppercase tracking-wider">
+                  <Link href="/admin" className={`transition-colors ${pathname === '/admin' ? 'text-brand font-bold' : 'text-muted-foreground hover:text-foreground'}`}>
+                    Dashboard
+                  </Link>
+                  <Link href="/admin/users" className={`transition-colors ${pathname.startsWith('/admin/users') ? 'text-brand font-bold' : 'text-muted-foreground hover:text-foreground'}`}>
+                    Users
+                  </Link>
+                  <Link href="/admin/cms/blog" className={`transition-colors ${pathname.startsWith('/admin/cms') ? 'text-brand font-bold' : 'text-muted-foreground hover:text-foreground'}`}>
+                    CMS Content
+                  </Link>
+                  <Link href="/admin/moderation" className={`transition-colors ${pathname.startsWith('/admin/moderation') ? 'text-brand font-bold' : 'text-muted-foreground hover:text-foreground'}`}>
+                    Moderation
+                  </Link>
+                </div>
+              )}
+
               <Link
                 href="/"
                 className="text-xs uppercase font-semibold tracking-widest text-muted-foreground hover:text-primary transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded hover:bg-surface/80 border border-transparent hover:border-border"
@@ -117,9 +154,15 @@ export function PortalNavbar({ role, title, className, user, ...props }: PortalN
               <div className="w-px h-6 bg-border/80" />
               <Link
                 href="/login"
-                className="px-5 py-2 border border-brand bg-brand/10 text-brand hover:bg-brand hover:text-primary-foreground text-xs font-semibold tracking-wider uppercase rounded transition-all shadow-sm"
+                className="px-4 py-2 text-xs font-semibold tracking-wider uppercase text-foreground/80 hover:text-brand transition-colors"
               >
                 SIGN IN
+              </Link>
+              <Link
+                href="/join/talent"
+                className="px-4 py-2 bg-brand text-white hover:bg-brand/90 text-xs font-bold tracking-wider uppercase rounded-full transition-all shadow-sm border border-brand/30"
+              >
+                TALENT REGISTER
               </Link>
             </>
           )}
@@ -178,13 +221,22 @@ export function PortalNavbar({ role, title, className, user, ...props }: PortalN
                   Talent
                 </Link>
                 <div className="w-16 h-px bg-border my-2" />
-                <Link
-                  href="/login"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="px-6 py-2.5 border border-brand bg-brand/10 text-brand text-sm font-semibold tracking-wider uppercase rounded transition-all"
-                >
-                  SIGN IN
-                </Link>
+                <div className="flex items-center gap-3 w-full max-w-xs px-4">
+                  <Link
+                    href="/login"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex-1 text-center py-2.5 border border-border text-foreground text-xs font-semibold tracking-wider uppercase rounded-lg"
+                  >
+                    SIGN IN
+                  </Link>
+                  <Link
+                    href="/join/talent"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex-1 text-center py-2.5 bg-brand text-white text-xs font-bold tracking-wider uppercase rounded-lg shadow-md"
+                  >
+                    TALENT REGISTER
+                  </Link>
+                </div>
               </>
             )}
           </motion.div>

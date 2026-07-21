@@ -211,9 +211,9 @@ function Hero({ hero, onOpenModal }: { hero?: any; onOpenModal?: (project: Proje
   const headingWords = headingText.split(/(\s+)/);
 
   return (
-    <section className="relative min-h-screen flex items-end overflow-hidden isolate pb-0 px-4 sm:px-6 lg:px-8">
-      {/* Background layer */}
-      <div className="absolute inset-x-4 sm:inset-x-6 lg:inset-x-8 top-4 bottom-4 -z-10 bg-[#060608] overflow-hidden select-none rounded-[2rem] sm:rounded-[3rem] border border-[var(--cinematic-border)]/50">
+    <section className="relative min-h-screen flex items-end overflow-hidden isolate pb-0 px-0 sm:px-4 lg:px-6">
+      {/* Background layer — Full Bleed Merged With Navbar */}
+      <div className="absolute inset-0 top-0 bottom-4 -z-10 bg-[#060608] overflow-hidden select-none rounded-none sm:rounded-b-[3rem] border-b border-[var(--cinematic-border)]/50">
         <div ref={bgRef} className="absolute inset-0 h-[120%] w-full -top-[10%]">
           <video
             className="absolute inset-0 h-full w-full object-cover object-center"
@@ -226,6 +226,8 @@ function Hero({ hero, onOpenModal }: { hero?: any; onOpenModal?: (project: Proje
             <source src="https://zmpeiobdilrgtuzggzuj.supabase.co/storage/v1/object/public/mdms/videos/hero.mp4" type="video/mp4" />
           </video>
         </div>
+        {/* Top Vignette Gradient for Navbar Contrast */}
+        <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-black/80 via-black/40 to-transparent z-1 pointer-events-none" />
         <div className="absolute inset-0 dark:bg-black/65 bg-black/45 pointer-events-none" />
         <div className="absolute bottom-0 left-0 right-0 h-40 pointer-events-none dark:bg-gradient-to-t dark:from-black bg-gradient-to-t from-white to-transparent" />
         <div className="absolute inset-0 bg-[var(--hero-gradient-left)] pointer-events-none" />

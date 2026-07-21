@@ -75,7 +75,7 @@ function MenuItem({ link, text, image, speed, textColor, marqueeBgColor, marquee
     }
   }, []);
 
-  const [repetitions, setRepetitions] = useState(4);
+  const [repetitions, setRepetitions] = useState(10);
 
   const animationDefaults = { duration: 0.6, ease: 'expo' };
 
@@ -101,17 +101,20 @@ function MenuItem({ link, text, image, speed, textColor, marqueeBgColor, marquee
 
       const contentWidth = marqueeContent.offsetWidth;
       if (contentWidth <= 0) return;
-      const viewportWidth = window.innerWidth;
+      const viewportWidth = typeof window !== 'undefined' ? window.innerWidth : 1920;
 
-      // Calculate how many copies we need to fill viewport + extra for seamless loop
-      // We need at least 2, but calculate based on content vs viewport
-      const needed = Math.ceil(viewportWidth / contentWidth) + 2;
-      setRepetitions(Math.max(4, needed));
+      // Calculate how many copies we need to fill viewport + extra for seamless loop across any monitor width
+      const needed = Math.ceil(viewportWidth / contentWidth) + 6;
+      setRepetitions(Math.max(10, needed));
     };
 
     calculateRepetitions();
+    const timer = setTimeout(calculateRepetitions, 100);
     window.addEventListener('resize', calculateRepetitions);
-    return () => window.removeEventListener('resize', calculateRepetitions);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('resize', calculateRepetitions);
+    };
   }, [text, image]);
 
   useEffect(() => {

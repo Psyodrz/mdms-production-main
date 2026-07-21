@@ -47,19 +47,28 @@ export default function TalentDirectoryClient({ initialTalents }: { initialTalen
   const [searchQuery, setSearchQuery] = useState('');
   const [displayCount, setDisplayCount] = useState(16);
 
-  // Dynamically extract unique cities from DB records + full Indian cities list
-  const availableCities = useMemo(() => {
-    const set = new Set<string>();
-    ALL_INDIAN_CITIES.forEach((c) => set.add(c));
+  // Dynamically extract unique cities from DB records + group active vs all cities
+  const { activeCities, sortedAllCities, cityCounts } = useMemo(() => {
+    const counts: Record<string, number> = {};
     if (Array.isArray(initialTalents)) {
       initialTalents.forEach((t) => {
-        const city = t.city || t.user?.city;
-        if (city && typeof city === 'string' && city.trim()) {
-          set.add(city.trim());
+        const city = (t.city || t.user?.city || '').trim();
+        if (city) {
+          counts[city] = (counts[city] || 0) + 1;
         }
       });
     }
-    return Array.from(set).sort();
+
+    const activeList = Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+    const set = new Set<string>();
+    activeList.forEach((c) => set.add(c));
+    ALL_INDIAN_CITIES.forEach((c) => set.add(c));
+
+    return {
+      activeCities: activeList,
+      sortedAllCities: Array.from(set),
+      cityCounts: counts,
+    };
   }, [initialTalents]);
 
   // Helper to extract category terms for a talent profile
@@ -99,9 +108,37 @@ export default function TalentDirectoryClient({ initialTalents }: { initialTalen
 
   const matchesCity = (t: any, city: string) => {
     if (!city.trim()) return true;
-    const talentCity = (t.city || t.user?.city || '').toLowerCase();
+    const talentCity = (t.city || t.user?.city || '').trim().toLowerCase();
     const searchCity = city.trim().toLowerCase();
-    return talentCity.includes(searchCity) || searchCity.includes(talentCity);
+
+    if (!talentCity) return false;
+
+    // 1. Direct exact or substring match
+    if (talentCity === searchCity || talentCity.includes(searchCity) || searchCity.includes(talentCity)) {
+      return true;
+    }
+
+    // 2. Gurugram / Gurgaon exact alias
+    if (
+      (searchCity === 'gurgaon' && talentCity === 'gurugram') ||
+      (searchCity === 'gurugram' && talentCity === 'gurgaon')
+    ) {
+      return true;
+    }
+
+    // 3. Delhi NCR regional mapping (Gurgaon, Noida, Ghaziabad, Faridabad, Delhi)
+    const ncrCities = ['delhi', 'delhi ncr', 'gurgaon', 'gurugram', 'noida', 'ghaziabad', 'faridabad', 'greater noida'];
+    if (ncrCities.includes(searchCity) && ncrCities.includes(talentCity)) {
+      return true;
+    }
+
+    // 4. Mumbai Metropolitan Region (MMR) regional mapping
+    const mmrCities = ['mumbai', 'navi mumbai', 'thane', 'kalyan', 'dombivli', 'vasai', 'virar'];
+    if (mmrCities.includes(searchCity) && mmrCities.includes(talentCity)) {
+      return true;
+    }
+
+    return false;
   };
 
   const matchesSearch = (t: any, query: string) => {
@@ -210,7 +247,7 @@ export default function TalentDirectoryClient({ initialTalents }: { initialTalen
                 list="city-suggestions-full"
                 value={cityFilter}
                 onChange={(e) => setCityFilter(e.target.value)}
-                placeholder="Type or search any city (e.g. Lucknow, Delhi)..."
+                placeholder="Type or search any city (e.g. Gurgaon, Delhi)..."
                 className="w-full bg-surface/90 border border-border text-foreground pl-11 pr-10 py-3.5 rounded-lg focus:outline-none focus:border-primary transition-colors placeholder:text-muted-foreground/70 text-sm shadow-sm"
               />
               <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
@@ -227,7 +264,7 @@ export default function TalentDirectoryClient({ initialTalents }: { initialTalen
 
             {/* Datalist for instant 150+ city suggestions */}
             <datalist id="city-suggestions-full">
-              {availableCities.map((city) => (
+              {sortedAllCities.map((city) => (
                 <option key={city} value={city} />
               ))}
             </datalist>
@@ -261,14 +298,27 @@ export default function TalentDirectoryClient({ initialTalents }: { initialTalen
             <select
               value={cityFilter}
               onChange={(e) => setCityFilter(e.target.value)}
-              className="bg-background border border-border text-foreground px-3.5 py-1.5 text-xs font-semibold rounded-md focus:outline-none focus:border-primary transition-colors cursor-pointer max-w-[200px]"
+              className="bg-background border border-border text-foreground px-3.5 py-1.5 text-xs font-semibold rounded-md focus:outline-none focus:border-primary transition-colors cursor-pointer max-w-[220px]"
             >
-              <option value="">All Cities ({availableCities.length} Cities)</option>
-              {availableCities.map((city) => (
-                <option key={city} value={city}>
-                  {city}
-                </option>
-              ))}
+              <option value="">All Cities ({initialTalents?.length || 0} Talents)</option>
+              {activeCities.length > 0 && (
+                <optgroup label="Cities with Active Talent">
+                  {activeCities.map((city) => (
+                    <option key={`active-${city}`} value={city}>
+                      {city} ({cityCounts[city]} {cityCounts[city] === 1 ? 'talent' : 'talents'})
+                    </option>
+                  ))}
+                </optgroup>
+              )}
+              <optgroup label="Other Major Indian Cities">
+                {sortedAllCities
+                  .filter((c) => !activeCities.includes(c))
+                  .map((city) => (
+                    <option key={`other-${city}`} value={city}>
+                      {city}
+                    </option>
+                  ))}
+              </optgroup>
             </select>
           </div>
         </Card>
@@ -361,7 +411,7 @@ export default function TalentDirectoryClient({ initialTalents }: { initialTalen
                     <img
                       src={imageUrl}
                       alt={name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700"
                     />
 
                     {/* Status Badge */}

@@ -95,7 +95,7 @@ export function CinematicViewerModal({
                     poster={project.coverImage}
                     controls
                     autoPlay
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover object-top"
                   />
                 )
               ) : (
@@ -105,7 +105,7 @@ export function CinematicViewerModal({
                     "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&w=1920&q=80"
                   }
                   alt={project.title}
-                  className="w-full h-full object-cover scale-105 group-hover:scale-100 transition-transform duration-1000"
+                  className="w-full h-full object-cover object-top scale-105 group-hover:scale-100 transition-transform duration-1000"
                 />
               )}
 

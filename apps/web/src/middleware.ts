@@ -21,12 +21,6 @@ const ROLE_ROUTES: Record<string, Role[]> = {
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // Block direct access to the real admin paths — they are only reachable via
-  // the secret /studio-8f2k base path (served through next.config rewrites).
-  if (pathname.startsWith('/admin') || pathname.startsWith('/super-admin')) {
-    return NextResponse.rewrite(new URL('/404', req.url));
-  }
-
   // Redirect /model/dashboard to /talent-dashboard
   if (pathname.startsWith('/model/dashboard')) {
     return NextResponse.redirect(new URL('/talent-dashboard', req.url));

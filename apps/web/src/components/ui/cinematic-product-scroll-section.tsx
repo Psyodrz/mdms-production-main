@@ -69,7 +69,7 @@ function MinimalProductCard({ product }: { product: ProductScrollItem }) {
             src={fullImageUrl}
             alt={product.title || 'Showcase'}
             fill
-            className="object-cover grayscale opacity-90 transition-all duration-1000 ease-out"
+            className="object-cover object-top grayscale opacity-90 transition-all duration-1000 ease-out"
             sizes="(max-width: 768px) 100vw, 33vw"
           />
         )}
@@ -89,7 +89,7 @@ function MinimalProductCard({ product }: { product: ProductScrollItem }) {
               src={fullImageUrl}
               alt={product.title || 'Showcase'}
               fill
-              className="object-cover"
+              className="object-cover object-top"
               sizes="(max-width: 768px) 100vw, 33vw"
             />
           </div>

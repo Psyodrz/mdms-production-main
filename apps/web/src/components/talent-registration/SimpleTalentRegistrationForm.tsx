@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { ArrowRight, Sparkles, CheckCircle2, Globe, Award, Briefcase, User, Mail, Phone, Lock, MapPin, Film, ChevronDown, Search, Check } from 'lucide-react';
 import Link from 'next/link';
-import { PortalNavbar } from '@/components/ui/PortalNavbar';
+import { Navbar } from '@/components/ui/Navbar';
 import { createClient } from '@/utils/supabase/client';
 import { fetchAPI } from '@/lib/api-client';
 
@@ -105,7 +105,7 @@ function SearchableDropdown({
 
   return (
     <div className="relative" ref={dropdownRef}>
-      <label className="block text-xs font-bold text-foreground uppercase tracking-wider mb-2">
+      <label className="block text-sm font-bold text-foreground uppercase tracking-wider mb-2">
         {label} {required && <span className="text-brand">*</span>}
       </label>
       <div
@@ -295,13 +295,13 @@ export function SimpleTalentRegistrationForm() {
 
   return (
     <div className="min-h-screen bg-background text-foreground relative overflow-x-hidden grain selection:bg-brand selection:text-white transition-colors duration-300">
-      <PortalNavbar title="PREMIUM TALENT ONBOARDING" />
+      <Navbar />
 
       {/* Background Multi-Color Glows */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] bg-gradient-to-r from-brand/20 via-brand-gold/10 to-brand-cyan/15 blur-[140px] pointer-events-none rounded-full" />
       <div className="absolute top-3/4 right-10 w-[500px] h-[500px] bg-brand/10 blur-[160px] pointer-events-none rounded-full" />
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 relative z-10">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 md:pt-36 pb-12 md:pb-16 relative z-10">
         
         {/* Header Section */}
         <motion.div 
@@ -319,8 +319,8 @@ export function SimpleTalentRegistrationForm() {
             <span>Join the <span className="text-gradient-brand">Roster</span></span>
           </h1>
           
-          <p className="max-w-2xl mx-auto text-sm sm:text-base text-muted-foreground leading-relaxed">
-            Register below with your essential contact details. Once registered, you will unlock immediate access to your <span className="text-foreground font-semibold">Personal Talent Dashboard</span> where you can upload photos, showreels, social links, and multiple talents at your own pace.
+          <p className="max-w-3xl mx-auto text-base sm:text-lg md:text-xl text-muted-foreground leading-relaxed font-medium">
+            Register below with your essential contact details. Once registered, you will unlock immediate access to your <span className="text-foreground font-bold">Personal Talent Dashboard</span> where you can upload photos, showreels, social links, and multiple talents at your own pace.
           </p>
         </motion.div>
 
@@ -344,7 +344,7 @@ export function SimpleTalentRegistrationForm() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div>
-                  <label className="block text-xs font-bold text-foreground uppercase tracking-wider mb-2">
+                  <label className="block text-sm font-bold text-foreground uppercase tracking-wider mb-2">
                     First Name <span className="text-brand">*</span>
                   </label>
                   <input
@@ -358,7 +358,7 @@ export function SimpleTalentRegistrationForm() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-foreground uppercase tracking-wider mb-2">
+                  <label className="block text-sm font-bold text-foreground uppercase tracking-wider mb-2">
                     Last Name <span className="text-brand">*</span>
                   </label>
                   <input
@@ -374,7 +374,7 @@ export function SimpleTalentRegistrationForm() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div>
-                  <label className="block text-xs font-bold text-foreground uppercase tracking-wider mb-2">
+                  <label className="block text-sm font-bold text-foreground uppercase tracking-wider mb-2">
                     Mobile Number <span className="text-brand">*</span>
                   </label>
                   <div className="relative">
@@ -391,7 +391,7 @@ export function SimpleTalentRegistrationForm() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-foreground uppercase tracking-wider mb-2">
+                  <label className="block text-sm font-bold text-foreground uppercase tracking-wider mb-2">
                     Email Address <span className="text-brand">*</span>
                   </label>
                   <div className="relative">
@@ -434,7 +434,7 @@ export function SimpleTalentRegistrationForm() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div>
-                  <label className="block text-xs font-bold text-foreground uppercase tracking-wider mb-2">
+                  <label className="block text-sm font-bold text-foreground uppercase tracking-wider mb-2">
                     Primary Talent Category <span className="text-brand">*</span>
                   </label>
                   <select
@@ -451,7 +451,7 @@ export function SimpleTalentRegistrationForm() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-foreground uppercase tracking-wider mb-2">
+                  <label className="block text-sm font-bold text-foreground uppercase tracking-wider mb-2">
                     Experience Level <span className="text-brand">*</span>
                   </label>
                   <select
@@ -496,7 +496,7 @@ export function SimpleTalentRegistrationForm() {
                 />
 
                 <div>
-                  <label className="block text-xs font-bold text-foreground uppercase tracking-wider mb-2">
+                  <label className="block text-sm font-bold text-foreground uppercase tracking-wider mb-2">
                     Pincode <span className="text-brand">*</span>
                   </label>
                   <input
@@ -533,18 +533,18 @@ export function SimpleTalentRegistrationForm() {
                   type="checkbox"
                   checked={formData.acceptTerms}
                   onChange={(e) => setFormData({ ...formData, acceptTerms: e.target.checked })}
-                  className="mt-1 w-4 h-4 rounded border-border bg-surface text-brand focus:ring-brand cursor-pointer"
+                  className="mt-1 w-5 h-5 rounded border-border bg-surface text-brand focus:ring-brand cursor-pointer"
                 />
-                <span className="text-xs sm:text-sm text-muted-foreground group-hover:text-foreground transition-colors">
-                  I agree to the <Link href="/terms" className="text-brand underline hover:text-brand-glow">Terms of Service</Link> & <Link href="/privacy" className="text-brand underline hover:text-brand-glow">Privacy Policy</Link> of MP Productions and confirm all provided details are accurate.
+                <span className="text-sm sm:text-base text-muted-foreground group-hover:text-foreground transition-colors font-medium">
+                  I agree to the <Link href="/terms" className="text-brand underline hover:text-brand-glow font-bold">Terms of Service</Link> & <Link href="/privacy" className="text-brand underline hover:text-brand-glow font-bold">Privacy Policy</Link> of MP Productions and confirm all provided details are accurate.
                 </span>
               </label>
-              {errors.acceptTerms && <p className="text-destructive text-xs font-medium">{errors.acceptTerms}</p>}
+              {errors.acceptTerms && <p className="text-destructive text-sm mt-1.5 font-bold">{errors.acceptTerms}</p>}
 
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-4 px-6 rounded-2xl bg-gradient-brand hover:opacity-95 text-white font-extrabold text-sm sm:text-base tracking-widest uppercase shadow-md hover:shadow-lg hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 flex items-center justify-center gap-3 disabled:opacity-50 cursor-pointer"
+                className="w-full py-4.5 px-6 rounded-2xl bg-gradient-brand hover:opacity-95 text-white font-extrabold text-base sm:text-lg tracking-wider uppercase shadow-lg hover:shadow-xl hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 flex items-center justify-center gap-3 disabled:opacity-50 cursor-pointer"
               >
                 {isSubmitting ? (
                   <>
@@ -560,9 +560,9 @@ export function SimpleTalentRegistrationForm() {
               </button>
 
               <div className="text-center pt-2">
-                <p className="text-xs text-muted-foreground">
+                <p className="text-sm sm:text-base text-muted-foreground font-medium">
                   Already have an active talent account?{' '}
-                  <Link href="/login" className="text-foreground font-semibold hover:text-brand transition-colors underline">
+                  <Link href="/login" className="text-foreground font-bold hover:text-brand transition-colors underline">
                     Sign In Here
                   </Link>
                 </p>
@@ -574,20 +574,20 @@ export function SimpleTalentRegistrationForm() {
 
         {/* Post-Registration Feature Preview */}
         <div className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
-          <div className="p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
-            <Award className="w-8 h-8 text-[#F59E0B] mx-auto mb-3" />
-            <h4 className="text-sm font-bold text-white mb-1">Instant Portfolio Hub</h4>
-            <p className="text-xs text-gray-400">Add unlimited showreels, high-res photos & vocal clips inside your dashboard.</p>
+          <div className="p-6 sm:p-8 rounded-2xl bg-card border border-border shadow-md hover:border-brand/40 transition-all duration-300">
+            <Award className="w-10 h-10 text-brand-gold mx-auto mb-4" />
+            <h4 className="text-base sm:text-lg font-bold text-foreground mb-2">Instant Portfolio Hub</h4>
+            <p className="text-sm text-muted-foreground leading-relaxed font-medium">Add unlimited showreels, high-res photos & vocal clips inside your dashboard.</p>
           </div>
-          <div className="p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
-            <Globe className="w-8 h-8 text-[#38BDF8] mx-auto mb-3" />
-            <h4 className="text-sm font-bold text-white mb-1">Casting Discovery</h4>
-            <p className="text-xs text-gray-400">Get discovered directly by verified directors, producers, and premium brands.</p>
+          <div className="p-6 sm:p-8 rounded-2xl bg-card border border-border shadow-md hover:border-brand/40 transition-all duration-300">
+            <Globe className="w-10 h-10 text-brand-cyan mx-auto mb-4" />
+            <h4 className="text-base sm:text-lg font-bold text-foreground mb-2">Casting Discovery</h4>
+            <p className="text-sm text-muted-foreground leading-relaxed font-medium">Get discovered directly by verified directors, producers, and premium brands.</p>
           </div>
-          <div className="p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
-            <Briefcase className="w-8 h-8 text-[#E50914] mx-auto mb-3" />
-            <h4 className="text-sm font-bold text-white mb-1">Add-On Anytime</h4>
-            <p className="text-xs text-gray-400">No pressure during registration. Expand languages, skills & rates whenever ready.</p>
+          <div className="p-6 sm:p-8 rounded-2xl bg-card border border-border shadow-md hover:border-brand/40 transition-all duration-300">
+            <Briefcase className="w-10 h-10 text-brand mx-auto mb-4" />
+            <h4 className="text-base sm:text-lg font-bold text-foreground mb-2">Add-On Anytime</h4>
+            <p className="text-sm text-muted-foreground leading-relaxed font-medium">No pressure during registration. Expand languages, skills & rates whenever ready.</p>
           </div>
         </div>
 

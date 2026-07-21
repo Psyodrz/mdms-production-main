@@ -1,4 +1,4 @@
-import { PortalNavbar } from '@/components/ui/PortalNavbar';
+import { Navbar } from '@/components/ui/Navbar';
 import { Reveal } from '@/components/ui/Reveal';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -27,7 +27,7 @@ export default async function BookTalentPage({ params }: { params: Promise<{ id:
 
   return (
     <>
-      <PortalNavbar />
+      <Navbar />
       
       <main className="page-content">
         <div className="max-w-4xl mx-auto">

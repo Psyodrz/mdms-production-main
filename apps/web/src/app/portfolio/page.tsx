@@ -95,21 +95,24 @@ export default function PortfolioPage() {
     <>
       <Navbar />
       
-      <main className="min-h-screen bg-background text-foreground pt-24 pb-32 relative overflow-hidden">
+      <main className="min-h-screen bg-background text-foreground pb-32 relative overflow-hidden">
         {/* Background Ambient Glows */}
         <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-brand/5 rounded-full blur-[180px] pointer-events-none" />
         <div className="absolute top-2/3 right-1/4 w-[500px] h-[500px] bg-amber-500/5 rounded-full blur-[200px] pointer-events-none" />
 
-        {/* Header Section */}
-        <section className="relative w-full h-[60vh] flex items-center justify-center overflow-hidden mb-20 text-center">
+        {/* Header Section — Full Bleed Merged With Navbar */}
+        <section className="relative w-full h-[75vh] sm:h-[85vh] flex items-center justify-center overflow-hidden mb-20 text-center pt-28 sm:pt-36">
           <Image 
             src="/images/portfolio-hero.jpg" 
             alt="Portfolio Showcase" 
             fill 
-            className="object-cover" 
+            className="object-cover object-center" 
             priority sizes="100vw" />
-          <div className="absolute inset-0 dark:bg-black/60 bg-black/40" />
-          <div className="absolute bottom-0 left-0 right-0 h-32 dark:bg-gradient-to-t dark:from-background bg-gradient-to-t from-background to-transparent" />
+          
+          {/* Top Vignette Overlay for Crisp Navbar Contrast */}
+          <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-black/80 via-black/40 to-transparent z-1 pointer-events-none" />
+          <div className="absolute inset-0 dark:bg-black/50 bg-black/35 z-1" />
+          <div className="absolute bottom-0 left-0 right-0 h-40 dark:bg-gradient-to-t dark:from-background bg-gradient-to-t from-background to-transparent z-2" />
           
           <Container className="relative z-10 w-full max-w-5xl mx-auto px-4">
             <Reveal direction="up">
@@ -123,7 +126,7 @@ export default function PortfolioPage() {
                 <span className="italic font-extralight text-white/80">SHOWCASE.</span>
               </h1>
               
-              <p className="text-base sm:text-lg text-white/80 max-w-2xl mx-auto font-light leading-relaxed mb-12 drop-shadow">
+              <p className="text-base sm:text-lg text-white/90 max-w-2xl mx-auto font-light leading-relaxed mb-12 drop-shadow">
                 Every frame is an engineering marvel. We fuse high-speed motion control, bespoke anamorphic optics, and editorial world-building to create campaigns that transcend advertising.
               </p>
             </Reveal>

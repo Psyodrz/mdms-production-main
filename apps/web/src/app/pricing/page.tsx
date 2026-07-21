@@ -80,19 +80,20 @@ export default function Pricing() {
   return (
     <>
       <Navbar />
-      <main className="page-content">
-        <Container>
-
-          {/* Header Section */}
-        <section className="relative w-full h-[60vh] flex items-center justify-center overflow-hidden mb-20 text-center -mx-4 sm:-mx-8 lg:-mx-12 px-4 sm:px-8 lg:px-12 w-[calc(100%+2rem)] sm:w-[calc(100%+4rem)] lg:w-[calc(100%+6rem)] rounded-none">
+      <main className="min-h-screen bg-background text-foreground pb-32 relative overflow-hidden">
+        {/* Header Section — Full Bleed Merged With Navbar */}
+        <section className="relative w-full h-[75vh] sm:h-[85vh] flex items-center justify-center overflow-hidden mb-20 text-center pt-28 sm:pt-36">
           <Image 
             src="/images/pricing-hero.jpg" 
             alt="Investment" 
             fill 
-            className="object-cover" 
+            className="object-cover object-center" 
             priority sizes="100vw" />
-          <div className="absolute inset-0 dark:bg-black/60 bg-black/40" />
-          <div className="absolute bottom-0 left-0 right-0 h-32 dark:bg-gradient-to-t dark:from-background bg-gradient-to-t from-background to-transparent" />
+          
+          {/* Top Vignette Overlay for Navbar Integration */}
+          <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-black/80 via-black/40 to-transparent z-1 pointer-events-none" />
+          <div className="absolute inset-0 dark:bg-black/60 bg-black/40 z-1" />
+          <div className="absolute bottom-0 left-0 right-0 h-40 dark:bg-gradient-to-t dark:from-background bg-gradient-to-t from-background to-transparent z-2" />
           
           <Container className="relative z-10 w-full max-w-5xl mx-auto px-4">
             <Reveal direction="up">
@@ -108,6 +109,8 @@ export default function Pricing() {
             </Reveal>
           </Container>
         </section>
+
+        <Container>
 
           {/* Pricing Cards */}
           {loading ? (

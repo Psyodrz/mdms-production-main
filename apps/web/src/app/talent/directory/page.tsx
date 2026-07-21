@@ -1,4 +1,4 @@
-import { PortalNavbar } from '@/components/ui/PortalNavbar';
+import { Navbar } from '@/components/ui/Navbar';
 import TalentDirectoryClient from './TalentDirectoryClient';
 import Image from 'next/image';
 import { Container } from '@/components/ui/Container';
@@ -26,17 +26,21 @@ export default async function TalentDirectory() {
   
   return (
     <>
-      <PortalNavbar />
-      <main className="min-h-screen bg-background text-foreground pt-24 pb-32">
-        <section className="relative w-full h-[60vh] flex items-center justify-center overflow-hidden mb-12 text-center">
+      <Navbar />
+      <main className="min-h-screen bg-background text-foreground pb-32 relative overflow-hidden">
+        {/* Header — Full Bleed Merged With Navbar */}
+        <section className="relative w-full h-[70vh] sm:h-[80vh] flex items-center justify-center overflow-hidden mb-12 text-center pt-28 sm:pt-36">
           <Image 
             src="/images/projects-outdoor.jpg" 
             alt="Talent Directory" 
             fill 
-            className="object-cover" 
+            className="object-cover object-center" 
             priority sizes="100vw" />
-          <div className="absolute inset-0 dark:bg-black/60 bg-black/40" />
-          <div className="absolute bottom-0 left-0 right-0 h-32 dark:bg-gradient-to-t dark:from-background bg-gradient-to-t from-background to-transparent" />
+          
+          {/* Top Vignette Gradient for Navbar Contrast */}
+          <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-black/80 via-black/40 to-transparent z-1 pointer-events-none" />
+          <div className="absolute inset-0 dark:bg-black/60 bg-black/40 z-1" />
+          <div className="absolute bottom-0 left-0 right-0 h-40 dark:bg-gradient-to-t dark:from-background bg-gradient-to-t from-background to-transparent z-2" />
           
           <Container className="relative z-10 w-full max-w-5xl mx-auto px-4">
             <span className="text-brand tracking-[0.2em] text-sm uppercase font-semibold mb-4 block drop-shadow-md">

@@ -112,19 +112,24 @@ export function Navbar() {
           </Link>
 
           {/* ── Right Side ── */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             <Link
               href="/login"
-              className="hidden sm:inline-flex items-center text-xs font-semibold tracking-widest uppercase transition-colors text-foreground/80 hover:text-foreground"
+              className={cn(
+                "inline-flex items-center text-xs font-bold tracking-widest uppercase transition-all px-3 py-1.5 rounded-full border shadow-sm backdrop-blur-md",
+                scrolled 
+                  ? "text-foreground hover:text-brand bg-surface/80 border-border" 
+                  : "text-white hover:text-brand bg-black/50 border-white/20 drop-shadow"
+              )}
             >
               Sign In
             </Link>
             <Link
-              href="/login"
-              className="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 text-xs font-semibold tracking-wider uppercase rounded-full transition-all duration-300 bg-foreground/10 text-foreground hover:bg-foreground hover:text-background border border-border/50"
+              href="/join/talent"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 sm:px-4 sm:py-2 text-[11px] sm:text-xs font-bold tracking-wider uppercase rounded-full transition-all duration-300 bg-brand text-white hover:bg-brand/90 hover:shadow-[0_0_15px_rgba(235,61,38,0.4)] shadow-md shrink-0 border border-brand/30"
               data-cursor="hover"
             >
-              Talent Sign In
+              Talent Register
             </Link>
 
             <ThemeToggle />
@@ -132,7 +137,12 @@ export function Navbar() {
             {/* ── Mobile Toggle ── */}
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
-              className="relative z-50 p-2 text-foreground"
+              className={cn(
+                "relative z-50 p-2.5 rounded-full transition-all backdrop-blur-md border shadow-sm",
+                scrolled 
+                  ? "text-foreground bg-surface/80 hover:bg-surface border-border" 
+                  : "text-white bg-black/50 border-white/20 hover:bg-black/70 drop-shadow"
+              )}
               aria-label="Toggle menu"
             >
               {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -149,9 +159,9 @@ export function Navbar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed inset-0 z-40 bg-[var(--cinematic-bg)]"
+            className="fixed inset-0 w-screen h-screen z-40 bg-[var(--cinematic-bg)] overflow-hidden flex flex-col justify-between"
           >
-            <div className="pt-24 h-screen w-full flex flex-col pb-6">
+            <div className="pt-24 flex-1 w-screen flex flex-col pb-4">
               <FlowingMenu 
                 items={flowingMenuData} 
                 onItemClick={() => setMobileOpen(false)}
@@ -161,6 +171,24 @@ export function Navbar() {
                 marqueeTextColor="var(--primary-foreground)"
                 borderColor="var(--cinematic-border)"
               />
+            </div>
+
+            {/* Mobile Footer Action Bar */}
+            <div className="w-full px-6 pb-8 pt-3 sm:hidden flex items-center justify-center gap-3 border-t border-border/40 bg-background/90 backdrop-blur-xl z-50">
+              <Link
+                href="/login"
+                onClick={() => setMobileOpen(false)}
+                className="flex-1 py-2.5 text-center text-xs font-semibold tracking-wider uppercase rounded-lg border border-border text-foreground hover:bg-surface"
+              >
+                Sign In
+              </Link>
+              <Link
+                href="/join/talent"
+                onClick={() => setMobileOpen(false)}
+                className="flex-1 py-2.5 text-center text-xs font-bold tracking-wider uppercase rounded-lg bg-brand text-white shadow-md hover:bg-brand/90"
+              >
+                Talent Register
+              </Link>
             </div>
           </motion.div>
         )}

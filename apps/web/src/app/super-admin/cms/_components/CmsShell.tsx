@@ -110,7 +110,7 @@ const NAV: { section: string; items: NavItem[] }[] = [
 
 function NavLinks({ pathname, onNavigate }: { pathname: string; onNavigate?: () => void }) {
   return (
-    <nav className="flex flex-col gap-8">
+    <nav className="flex flex-col gap-8 pb-16">
       {NAV.map((group) => (
         <div key={group.section} className="flex flex-col gap-2">
           <p className="px-3 text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground/85">
@@ -157,16 +157,18 @@ export function CmsShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-background">
-      {/* Desktop sidebar */}
-      <aside className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 border-r border-border bg-surface px-4 py-6 overflow-y-auto z-40 shadow-xl">
-        <div className="px-3 py-4 mb-4 border-b border-border/60">
+      {/* Desktop sidebar — smooth scrollable overflow */}
+      <aside className="hidden md:flex md:w-64 md:flex-col md:fixed md:top-0 md:bottom-0 h-screen max-h-screen border-r border-border bg-surface px-4 py-6 overflow-y-auto scrollbar-thin z-40 shadow-xl pb-24">
+        <div className="px-3 py-4 mb-4 border-b border-border/60 shrink-0">
           <div className="flex items-center gap-2.5 mb-1">
             <div className="w-2.5 h-2.5 rounded-full bg-[#eb3d26] animate-pulse" />
             <p className="text-base font-serif font-bold text-foreground tracking-wide">Command Center</p>
           </div>
           <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold">Super Admin & CMS Studio</p>
         </div>
-        <NavLinks pathname={pathname} />
+        <div className="flex-1 overflow-y-auto pr-1">
+          <NavLinks pathname={pathname} />
+        </div>
       </aside>
 
       {/* Mobile top bar */}
