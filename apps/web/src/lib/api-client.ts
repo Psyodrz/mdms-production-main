@@ -1,7 +1,7 @@
 import { createClient } from '@/utils/supabase/client';
 
 // Resolve the API URL for both client and server environments
-export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1';
+export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://mp-backend-api.onrender.com/api/v1';
 
 export function mapEndpointToEdgeFunction(endpoint: string, options: RequestInit = {}): { url: string; headers: Record<string, string>; useEdge: boolean } {
   const formattedEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
