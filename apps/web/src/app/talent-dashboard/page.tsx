@@ -74,7 +74,7 @@ export default async function TalentDashboard() {
     redirect('/login');
   }
 
-  if (result.status === 'not_found') {
+  if (result.status === 'not_found' || result.status === 'api_error') {
     const metadata = (session.user as any)?.user_metadata || {};
     const name = session.user.name || metadata.full_name || 'Talent Member';
     const email = session.user.email;
