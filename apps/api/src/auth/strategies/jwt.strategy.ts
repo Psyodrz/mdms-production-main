@@ -124,26 +124,36 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       const lastName = rest.join(' ') || userId.slice(0, 6);
 
       // Upsert: create if not exists, update role if it changed
-      await this.prisma.user.upsert({
-        where: { id: userId },
-        create: {
-          id: userId,
-          email: payload.email ?? `${userId}@unknown.com`,
-          firstName,
-          lastName,
-          role: role as any,
-          isActive: true,
-          phone: `+91000000${Math.floor(1000 + Math.random() * 9000)}`,
-        },
-        update: {
-          role: role as any,
-          // Keep other fields as they are — don't overwrite user-set data
-        },
-      });
+      try {
+        await this.prisma.user.upsert({
+          where: { id: userId },
+          create: {
+            id: userId,
+            email: payload.email ?? `${userId}@unknown.com`,
+            firstName,
+            lastName,
+            role: role as any,
+            isActive: true,
+            phone: null,
+          },
+          update: {
+            role: role as any,
+            // Keep other fields as they are — don't overwrite user-set data
+          },
+        });
+      } catch (upsertErr) {
+        // If email or ID collision occurs (e.g. mock user existing with same email), update role by email
+        if (payload.email) {
+          await this.prisma.user.updateMany({
+            where: { email: payload.email },
+            data: { role: role as any },
+          }).catch(() => {});
+        }
+      }
     }
 
     // Fetch the canonical user record from Prisma
-    const user = await this.prisma.user.findUnique({
+    let user = await this.prisma.user.findUnique({
       where: { id: userId },
       select: {
         id: true,
@@ -154,6 +164,20 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         isActive: true,
       },
     });
+
+    if (!user && payload.email) {
+      user = await this.prisma.user.findUnique({
+        where: { email: payload.email },
+        select: {
+          id: true,
+          email: true,
+          role: true,
+          firstName: true,
+          lastName: true,
+          isActive: true,
+        },
+      });
+    }
 
     if (!user || !user.isActive) {
       throw new UnauthorizedException('User not found or deactivated');

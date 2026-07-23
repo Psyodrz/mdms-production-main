@@ -18,7 +18,11 @@ export default async function SetupTalentProfilePage() {
     }
   } catch (error: any) {
     // Expected to fail with 404 if profile doesn't exist
-    if (!error.message || !error.message.includes('404')) {
+    if (
+      error.status !== 404 &&
+      error.statusCode !== 404 &&
+      (!error.message || (!error.message.includes('404') && !error.message.toLowerCase().includes('not found')))
+    ) {
       // Unhandled error
       console.error('Error checking profile existence:', error);
     }

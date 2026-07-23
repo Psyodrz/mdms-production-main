@@ -98,7 +98,7 @@ export class TalentService {
         firstName: 'Talent',
         lastName: 'User',
         role: 'TALENT',
-        phone: `+9199999${Math.floor(10000 + Math.random() * 90000)}`,
+        phone: null,
         isActive: true,
       },
     });
@@ -133,7 +133,7 @@ export class TalentService {
       profilePhotoPreview, coverBannerPreview, introductionVideoPreview,
       resumeName, compCardName, galleryImages,
       achievements, education, brandsWorkedWith,
-      instagram, youtube, linkedin, portfolio,
+      instagram, youtube, linkedin, portfolio, facebook, imdb, website, behance, pinterest, spotify, tiktok,
       ...rest 
     } = data;
 
@@ -214,7 +214,13 @@ export class TalentService {
     if (instagram) socialLinks.push({ talentProfileId: profile.id, platform: SocialPlatform.INSTAGRAM, url: instagram });
     if (youtube) socialLinks.push({ talentProfileId: profile.id, platform: SocialPlatform.YOUTUBE, url: youtube });
     if (linkedin) socialLinks.push({ talentProfileId: profile.id, platform: SocialPlatform.LINKEDIN, url: linkedin });
-    if (portfolio) socialLinks.push({ talentProfileId: profile.id, platform: SocialPlatform.WEBSITE, url: portfolio });
+    if (facebook) socialLinks.push({ talentProfileId: profile.id, platform: SocialPlatform.FACEBOOK, url: facebook });
+    if (imdb) socialLinks.push({ talentProfileId: profile.id, platform: SocialPlatform.IMDB, url: imdb });
+    if (website || portfolio) socialLinks.push({ talentProfileId: profile.id, platform: SocialPlatform.WEBSITE, url: website || portfolio });
+    if (behance) socialLinks.push({ talentProfileId: profile.id, platform: SocialPlatform.BEHANCE, url: behance });
+    if (pinterest) socialLinks.push({ talentProfileId: profile.id, platform: SocialPlatform.PINTEREST, url: pinterest });
+    if (spotify) socialLinks.push({ talentProfileId: profile.id, platform: SocialPlatform.SPOTIFY, url: spotify });
+    if (tiktok) socialLinks.push({ talentProfileId: profile.id, platform: SocialPlatform.TIKTOK, url: tiktok });
     
     if (socialLinks.length > 0) {
       await this.prisma.socialLink.createMany({ data: socialLinks });
@@ -227,7 +233,7 @@ export class TalentService {
     return this.prisma.talentProfile.findMany({
       where: { status: TalentProfileStatus.PENDING_REVIEW },
       include: { user: true },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
     });
   }
 
@@ -235,7 +241,7 @@ export class TalentService {
     const profile = await this.prisma.talentProfile.update({
       where: { id },
       data: { status, reviewNote, approvedAt: status === TalentProfileStatus.ACTIVE ? new Date() : null },
-      include: { user: true }
+      include: { user: true },
     });
 
     if (profile.user.phone) {
@@ -254,31 +260,42 @@ export class TalentService {
 
     return profile;
   }
+
   async getMe(userId: string) {
-    const profile = await this.prisma.talentProfile.findUnique({
-      where: { userId },
-      include: {
-        user: true,
-        userTalents: true,
-        userLanguages: { include: { language: true } },
-        userSkills: { include: { skill: true } },
-        socialLinks: true,
-        portfolioMedia: true,
-        pricing: true,
-        availability: true,
-        hireRequests: true,
-        castingApplications: { include: { castingCall: true } },
-      },
-    });
-    if (!profile) throw new NotFoundException('Talent profile not found');
-    return profile;
+    if (!userId) {
+      throw new NotFoundException('Talent profile not found');
+    }
+    try {
+      const profile = await this.prisma.talentProfile.findUnique({
+        where: { userId },
+        include: {
+          user: true,
+          userTalents: {
+            include: {
+              category: true,
+            },
+          },
+          userLanguages: { include: { language: true } },
+          userSkills: { include: { skill: true } },
+          socialLinks: true,
+          portfolioMedia: true,
+          pricing: true,
+          availability: true,
+          hireRequests: true,
+          castingApplications: { include: { castingCall: true } },
+        },
+      });
+      if (!profile) throw new NotFoundException('Talent profile not found');
+      return profile;
+    } catch (err) {
+      if (err instanceof NotFoundException) throw err;
+      console.error('Error in TalentService.getMe:', err);
+      throw new NotFoundException('Talent profile not found');
+    }
   }
 
   async updateMe(userId: string, data: any) {
-    return this.prisma.talentProfile.update({
-      where: { userId },
-      data,
-    });
+    return this.submitProfile(userId, data);
   }
 
   async getFeatured() {

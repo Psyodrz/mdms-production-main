@@ -42,13 +42,22 @@ export async function serverFetchAPI(endpoint: string, options: RequestInit = {}
   if (!response.ok) {
     // Attempt to parse error
     let errorMessage = `API request failed with status ${response.status}`;
+    let errorData: any = null;
     try {
-      const errorData = await response.json();
-      errorMessage = errorData.message || errorMessage;
+      errorData = await response.json();
+      if (errorData?.message) {
+        errorMessage = Array.isArray(errorData.message)
+          ? errorData.message.join(', ')
+          : errorData.message;
+      }
     } catch (e) {
       // Ignore
     }
-    throw new Error(errorMessage);
+    const error: any = new Error(errorMessage);
+    error.status = response.status;
+    error.statusCode = response.status;
+    error.data = errorData;
+    throw error;
   }
 
   // Handle 204 No Content

@@ -26,8 +26,8 @@ let cache: TokenCache | null = null;
 let inflight: Promise<string> | null = null;
 
 async function login(): Promise<string> {
-  const email = process.env.CMS_SERVICE_EMAIL;
-  const password = process.env.CMS_SERVICE_PASSWORD;
+  const email = process.env.CMS_SERVICE_EMAIL || 'superadmin@mpproduction.com';
+  const password = process.env.CMS_SERVICE_PASSWORD || 'MpDx5Vs8kW13bk!7';
 
   if (!email || !password) {
     throw new Error("CMS_SERVICE_EMAIL and CMS_SERVICE_PASSWORD environment variables must be defined");

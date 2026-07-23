@@ -1,26 +1,46 @@
-import { Injectable, OnModuleDestroy } from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Redis from 'ioredis';
 
 @Injectable()
 export class RedisService implements OnModuleDestroy {
+  private readonly logger = new Logger(RedisService.name);
   private readonly client: Redis;
+  private isConnected = false;
 
   constructor(private configService: ConfigService) {
     this.client = new Redis(
       this.configService.get<string>('REDIS_URL', 'redis://localhost:6379'),
       {
         maxRetriesPerRequest: 3,
+        enableOfflineQueue: false,
         retryStrategy(times: number) {
-          const delay = Math.min(times * 50, 2000);
+          if (times > 10) {
+            return null; // Stop retrying after 10 attempts
+          }
+          const delay = Math.min(times * 500, 5000);
           return delay;
         },
       },
     );
+
+    this.client.on('connect', () => {
+      this.isConnected = true;
+      this.logger.log('Redis connected successfully.');
+    });
+
+    this.client.on('error', (err) => {
+      this.isConnected = false;
+      this.logger.debug(`Redis error: ${err.message}`);
+    });
   }
 
   async onModuleDestroy() {
-    await this.client.quit();
+    try {
+      await this.client.quit();
+    } catch {
+      // Ignore disconnect errors
+    }
   }
 
   getClient(): Redis {
@@ -30,24 +50,41 @@ export class RedisService implements OnModuleDestroy {
   // ── Key-Value Operations ────────────────────
 
   async get(key: string): Promise<string | null> {
-    return this.client.get(key);
+    try {
+      return await this.client.get(key);
+    } catch (error) {
+      this.logger.debug(`Redis GET error for key ${key}: ${error}`);
+      return null;
+    }
   }
 
   async set(key: string, value: string, ttlSeconds?: number): Promise<void> {
-    if (ttlSeconds) {
-      await this.client.setex(key, ttlSeconds, value);
-    } else {
-      await this.client.set(key, value);
+    try {
+      if (ttlSeconds) {
+        await this.client.setex(key, ttlSeconds, value);
+      } else {
+        await this.client.set(key, value);
+      }
+    } catch (error) {
+      this.logger.debug(`Redis SET error for key ${key}: ${error}`);
     }
   }
 
   async del(key: string): Promise<void> {
-    await this.client.del(key);
+    try {
+      await this.client.del(key);
+    } catch (error) {
+      this.logger.debug(`Redis DEL error for key ${key}: ${error}`);
+    }
   }
 
   async exists(key: string): Promise<boolean> {
-    const result = await this.client.exists(key);
-    return result === 1;
+    try {
+      const result = await this.client.exists(key);
+      return result === 1;
+    } catch {
+      return false;
+    }
   }
 
   // ── JSON helpers ────────────────────────────
@@ -83,12 +120,17 @@ export class RedisService implements OnModuleDestroy {
   // ── Rate limiting helpers ───────────────────
 
   async incrementLoginAttempts(identifier: string, ttlSeconds = 900): Promise<number> {
-    const key = `login_attempts:${identifier}`;
-    const count = await this.client.incr(key);
-    if (count === 1) {
-      await this.client.expire(key, ttlSeconds);
+    try {
+      const key = `login_attempts:${identifier}`;
+      const count = await this.client.incr(key);
+      if (count === 1) {
+        await this.client.expire(key, ttlSeconds);
+      }
+      return count;
+    } catch (error) {
+      this.logger.debug(`Redis INCR error for ${identifier}: ${error}`);
+      return 1; // Fallback: allow attempt
     }
-    return count;
   }
 
   async resetLoginAttempts(identifier: string): Promise<void> {
@@ -98,9 +140,13 @@ export class RedisService implements OnModuleDestroy {
   // ── Pattern-based cleanup ───────────────────
 
   async deleteByPattern(pattern: string): Promise<void> {
-    const keys = await this.client.keys(pattern);
-    if (keys.length > 0) {
-      await this.client.del(...keys);
+    try {
+      const keys = await this.client.keys(pattern);
+      if (keys.length > 0) {
+        await this.client.del(...keys);
+      }
+    } catch (error) {
+      this.logger.debug(`Redis deleteByPattern error for pattern ${pattern}: ${error}`);
     }
   }
 }

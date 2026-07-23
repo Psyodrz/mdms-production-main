@@ -32,20 +32,22 @@ export class TalentController {
     };
   }
 
-  @Roles(Role.TALENT)
+  @Roles(Role.TALENT, Role.CLIENT, Role.ADMIN, Role.SUPER_ADMIN)
   @Get('me')
   async getMe(@Req() req: any) {
-    const profile = await this.talentService.getMe(req.user.id);
+    const userId = req.user?.id || req.user?.sub;
+    const profile = await this.talentService.getMe(userId);
     return {
       success: true,
       data: profile,
     };
   }
 
-  @Roles(Role.TALENT)
+  @Roles(Role.TALENT, Role.CLIENT, Role.ADMIN, Role.SUPER_ADMIN)
   @Patch('me')
   async updateMe(@Req() req: any, @Body() body: any) {
-    const profile = await this.talentService.updateMe(req.user.id, body);
+    const userId = req.user?.id || req.user?.sub;
+    const profile = await this.talentService.updateMe(userId, body);
     return {
       success: true,
       message: 'Profile updated successfully',
@@ -109,10 +111,11 @@ export class TalentController {
     };
   }
 
-  @Roles(Role.TALENT)
+  @Roles(Role.TALENT, Role.CLIENT, Role.ADMIN, Role.SUPER_ADMIN)
   @Post('draft')
   async saveDraft(@Req() req: any, @Body() body: any) {
-    const profile = await this.talentService.saveDraft(req.user.id, body);
+    const userId = req.user?.id || req.user?.sub;
+    const profile = await this.talentService.saveDraft(userId, body);
     return {
       success: true,
       message: 'Draft saved successfully',
@@ -120,10 +123,11 @@ export class TalentController {
     };
   }
 
-  @Roles(Role.TALENT)
+  @Roles(Role.TALENT, Role.CLIENT, Role.ADMIN, Role.SUPER_ADMIN)
   @Post('submit')
   async submitProfile(@Req() req: any, @Body() body: any) {
-    const profile = await this.talentService.submitProfile(req.user.id, body);
+    const userId = req.user?.id || req.user?.sub;
+    const profile = await this.talentService.submitProfile(userId, body);
     return {
       success: true,
       message: 'Profile submitted successfully',

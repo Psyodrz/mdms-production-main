@@ -40,12 +40,30 @@ async function bootstrap() {
   );
   app.use(cookieParser());
 
-  // CORS — strict origin allowlist
+  // CORS — allow localhost origins (including dynamic ports like 3001)
+  const allowedOrigins = [
+    appUrl,
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'http://localhost:3002',
+    'http://127.0.0.1:3000',
+    'http://127.0.0.1:3001',
+  ].filter(Boolean);
+
   app.enableCors({
-    origin: [appUrl, 'http://localhost:3000'],
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      if (
+        allowedOrigins.includes(origin) ||
+        /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin)
+      ) {
+        return callback(null, true);
+      }
+      return callback(new Error('Not allowed by CORS'));
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'apikey'],
   });
 
   // Global prefix

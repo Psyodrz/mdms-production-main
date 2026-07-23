@@ -13,16 +13,51 @@ type ProfileResult =
   | { status: 'auth_error' }
   | { status: 'api_error'; code?: number };
 
-async function getTalentProfile(accessToken: string): Promise<ProfileResult> {
+async function getTalentProfile(sessionUser: any): Promise<ProfileResult> {
   try {
     const data = await serverFetchAPI(`/talent/me`, { next: { revalidate: 0 } });
-    if (!data) return { status: 'not_found' }; // or appropriate error handling depending on how serverFetchAPI fails
+    if (!data) return { status: 'not_found' };
     return { status: 'ok', data: data.data ? data.data : data };
   } catch (error: any) {
-    console.error('Error fetching talent profile:', error);
-    if (error.message && error.message.includes('404')) {
-       return { status: 'not_found' };
+    if (
+      error.status === 404 ||
+      error.statusCode === 404 ||
+      (error.message && (
+        error.message.includes('404') ||
+        error.message.toLowerCase().includes('not found')
+      ))
+    ) {
+      // Auto-create/seed profile from registration user_metadata if available
+      try {
+        const metadata = sessionUser?.user_metadata || {};
+        const stageName = sessionUser?.name || metadata.full_name || 'Talent Member';
+        const category = metadata.category || 'actor';
+        const city = metadata.city || 'Mumbai';
+        const bio = metadata.bio || `Passionate ${category} based in ${city}.`;
+        const experienceLevel = metadata.experienceLevel || metadata.experience || 'fresher';
+
+        const created = await serverFetchAPI(`/talent/submit`, {
+          method: 'POST',
+          body: JSON.stringify({
+            stageName,
+            bio,
+            experienceLevel,
+          }),
+        });
+
+        if (created) {
+          const freshData = await serverFetchAPI(`/talent/me`, { next: { revalidate: 0 } });
+          if (freshData) {
+            return { status: 'ok', data: freshData.data ? freshData.data : freshData };
+          }
+        }
+      } catch (autoErr) {
+        console.error('Auto profile initialization error:', autoErr);
+      }
+
+      return { status: 'not_found' };
     }
+    console.error('Error fetching talent profile:', error);
     return { status: 'api_error' };
   }
 }
@@ -33,23 +68,72 @@ export default async function TalentDashboard() {
     redirect('/login');
   }
 
-  const accessToken = (session as any).accessToken;
-  const result = await getTalentProfile(accessToken);
+  const result = await getTalentProfile(session.user);
 
   if (result.status === 'auth_error') {
     redirect('/login');
   }
 
   if (result.status === 'not_found') {
+    const metadata = (session.user as any)?.user_metadata || {};
+    const name = session.user.name || metadata.full_name || 'Talent Member';
+    const email = session.user.email;
+    const category = metadata.category ? metadata.category.toUpperCase() : 'TALENT';
+    const location = [metadata.city, metadata.state].filter(Boolean).join(', ') || 'Mumbai, India';
+    const bio = metadata.bio || `Passionate ${category.toLowerCase()} registered on MP Productions.`;
+
     return (
       <>
-        <PortalNavbar />
-        <main className="page-content py-20 text-center">
+        <PortalNavbar role="TALENT" />
+        <main className="page-content py-16">
           <Container>
-            <img src="/logo.png" alt="MP Productions" className="h-16 w-auto object-contain mx-auto mb-4 drop-shadow-[0_0_20px_rgba(235,61,38,0.25)]" />
-            <h2 className="text-2xl font-serif mb-4">Welcome to Your Dashboard</h2>
-            <p className="text-muted-foreground mb-8">Your talent profile hasn&apos;t been created yet. Let&apos;s get you set up!</p>
-            <Button href="/talent-dashboard/setup" variant="primary">Set Up Profile</Button>
+            <Reveal direction="up">
+              <div className="max-w-3xl mx-auto bg-surface border border-border rounded-2xl p-8 md:p-12 shadow-xl text-center space-y-6">
+                <img src="/logo.png" alt="MP Productions" className="h-16 w-auto object-contain mx-auto mb-2 drop-shadow-[0_0_20px_rgba(235,61,38,0.25)]" />
+                
+                <div>
+                  <span className="text-primary tracking-[0.2em] text-xs uppercase font-semibold mb-2 block">
+                    Welcome to MP Productions
+                  </span>
+                  <h1 className="text-3xl md:text-4xl font-serif text-foreground font-bold">
+                    Hello, {name}!
+                  </h1>
+                </div>
+
+                <div className="bg-card border border-border/60 rounded-xl p-6 text-left grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="text-xs uppercase tracking-wider text-muted-foreground font-semibold block mb-1">Registered Category</span>
+                    <span className="text-foreground font-medium">{category}</span>
+                  </div>
+                  <div>
+                    <span className="text-xs uppercase tracking-wider text-muted-foreground font-semibold block mb-1">Contact Email</span>
+                    <span className="text-foreground font-medium">{email}</span>
+                  </div>
+                  <div>
+                    <span className="text-xs uppercase tracking-wider text-muted-foreground font-semibold block mb-1">Location</span>
+                    <span className="text-foreground font-medium">{location}</span>
+                  </div>
+                  <div>
+                    <span className="text-xs uppercase tracking-wider text-muted-foreground font-semibold block mb-1">Account Status</span>
+                    <span className="text-brand-gold font-semibold">Registration Complete</span>
+                  </div>
+                  <div className="md:col-span-2 border-t border-border pt-3 mt-1">
+                    <span className="text-xs uppercase tracking-wider text-muted-foreground font-semibold block mb-1">Summary / Bio</span>
+                    <p className="text-muted-foreground font-light italic">{bio}</p>
+                  </div>
+                </div>
+
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  Your registration details have been loaded. Complete your full portfolio by uploading photos, showreels, and experience details to get verified!
+                </p>
+
+                <div className="pt-2 flex flex-col sm:flex-row justify-center gap-4">
+                  <Button href="/talent-dashboard/setup" variant="primary" size="lg">
+                    Complete Full Portfolio Setup
+                  </Button>
+                </div>
+              </div>
+            </Reveal>
           </Container>
         </main>
       </>

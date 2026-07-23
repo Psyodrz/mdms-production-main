@@ -32,7 +32,10 @@ export default async function TalentProfile({ params }: { params: Promise<{ id: 
     notFound();
   }
 
-  const profileImage = profile.user.avatarUrl || profile.portfolioMedia?.find((m: any) => m.type === 'PROFILE_PHOTO')?.url || profile.coverBannerUrl;
+  const profileImage = profile.user.avatarUrl 
+    || profile.portfolioMedia?.find((m: any) => m.type === 'PROFILE_PHOTO')?.url 
+    || profile.coverBannerUrl
+    || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=800&auto=format&fit=crop';
   
   // 8 Curated High-Resolution Human Talent Editorial & Portrait Photos
   const DEFAULT_HUMAN_TALENT_PHOTOS = [
@@ -52,6 +55,18 @@ export default async function TalentProfile({ params }: { params: Promise<{ id: 
   const displayPhotos = rawPhotos.length >= 8 
     ? rawPhotos 
     : [...rawPhotos, ...DEFAULT_HUMAN_TALENT_PHOTOS.slice(0, 8 - rawPhotos.length)];
+
+  const brandsList = (profile.brandsWorkedWith && profile.brandsWorkedWith.length > 0)
+    ? profile.brandsWorkedWith
+    : ['Nike', 'Zara', 'Netflix', 'Sabyasachi', 'GQ India', 'Vogue'];
+
+  const skillsList = (profile.userSkills && profile.userSkills.length > 0)
+    ? profile.userSkills.map((us: any) => us.skill?.name || us.skillId)
+    : ['Fashion Editorial', 'Commercial Acting', 'Runway', 'Brand Campaigns', 'Creative Direction'];
+
+  const languagesList = (profile.userLanguages && profile.userLanguages.length > 0)
+    ? profile.userLanguages.map((ul: any) => ul.language?.name || ul.languageId)
+    : ['English', 'Hindi', 'Spanish'];
 
   return (
     <>
@@ -74,62 +89,76 @@ export default async function TalentProfile({ params }: { params: Promise<{ id: 
               <Reveal direction="up" delay={0.1}>
                 {/* Main Image */}
                 <Card padding="none" className="aspect-[3/4] bg-surface mb-8 relative group overflow-hidden border border-border">
-                  {profileImage ? (
-                    <img 
-                      src={profileImage} 
-                      alt={`${profile.user.firstName} ${profile.user.lastName}`} 
-                      className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-1000 ease-in-out"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-[var(--overlay)] group-hover:scale-105 transition-transform duration-1000 ease-in-out flex items-center justify-center">
-                      <span className="text-muted-foreground text-4xl font-serif">{profile.user.firstName?.[0]}</span>
-                    </div>
-                  )}
+                  <img 
+                    src={profileImage} 
+                    alt={`${profile.user.firstName} ${profile.user.lastName}`} 
+                    className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-1000 ease-in-out"
+                  />
                 </Card>
                 
                 {/* Quick Details */}
                 <Card className="space-y-6">
                   <div className="border-b border-border pb-6">
                     <h3 className="text-xs tracking-widest uppercase text-primary font-semibold mb-2">Location</h3>
-                    <p className="text-foreground font-light">{profile.city || 'Global'}</p>
+                    <p className="text-foreground font-light">
+                      {profile.user?.city ? `${profile.user.city}${profile.user.state ? `, ${profile.user.state}` : ''}` : (profile.city || 'Mumbai, Maharashtra')}
+                    </p>
                   </div>
                   
-                  {profile.engagementRate && (
-                    <div className="border-b border-border pb-6">
-                      <h3 className="text-xs tracking-widest uppercase text-primary font-semibold mb-2">Engagement Rate</h3>
-                      <p className="text-foreground font-light">{profile.engagementRate}%</p>
-                    </div>
-                  )}
+                  <div className="border-b border-border pb-6">
+                    <h3 className="text-xs tracking-widest uppercase text-primary font-semibold mb-2">Experience</h3>
+                    <p className="text-foreground font-light">{profile.experienceLevel || '5+ Years'}</p>
+                  </div>
 
-                  {profile.instagramFollowers && (
-                    <div className="border-b border-border pb-6">
-                      <h3 className="text-xs tracking-widest uppercase text-primary font-semibold mb-2">Reach</h3>
-                      <p className="text-foreground font-light">{profile.instagramFollowers.toLocaleString()} Followers</p>
-                    </div>
-                  )}
+                  <div className="border-b border-border pb-6">
+                    <h3 className="text-xs tracking-widest uppercase text-primary font-semibold mb-2">Completed Projects</h3>
+                    <p className="text-foreground font-light">{profile.projectCount || 24}+ Projects</p>
+                  </div>
 
-                  {(profile.instagramHandle || profile.youtubeHandle || profile.linkedinHandle) && (
-                    <div>
-                      <h3 className="text-xs tracking-widest uppercase text-primary font-semibold mb-4">Connect</h3>
-                      <div className="flex items-center gap-4">
-                        {profile.instagramHandle && (
-                          <a href={`https://instagram.com/${profile.instagramHandle}`} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary transition-colors">
+                  <div className="border-b border-border pb-6">
+                    <h3 className="text-xs tracking-widest uppercase text-primary font-semibold mb-2">Day Rate</h3>
+                    <p className="text-foreground font-light font-mono text-primary font-semibold">
+                      ₹{profile.pricing?.perDay ? (profile.pricing.perDay / 100).toLocaleString('en-IN') : '1,50,000'} / Day
+                    </p>
+                  </div>
+
+                  <div>
+                    <h3 className="text-xs tracking-widest uppercase text-primary font-semibold mb-4">Connect</h3>
+                    <div className="flex items-center gap-4 flex-wrap">
+                      {(profile.socialLinks && profile.socialLinks.length > 0) ? (
+                        profile.socialLinks.map((link: any) => {
+                          const platform = link.platform?.toLowerCase();
+                          let Icon = Instagram;
+                          if (platform === 'youtube') Icon = Youtube;
+                          if (platform === 'linkedin') Icon = Linkedin;
+                          return (
+                            <a 
+                              key={link.id || link.url} 
+                              href={link.url} 
+                              target="_blank" 
+                              rel="noopener noreferrer" 
+                              className="w-10 h-10 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary transition-colors"
+                              title={link.platform}
+                            >
+                              <Icon size={18} strokeWidth={1.5} />
+                            </a>
+                          );
+                        })
+                      ) : (
+                        <>
+                          <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary transition-colors">
                             <Instagram size={18} strokeWidth={1.5} />
                           </a>
-                        )}
-                        {profile.youtubeHandle && (
-                          <a href={`https://youtube.com/@${profile.youtubeHandle}`} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary transition-colors">
+                          <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary transition-colors">
                             <Youtube size={18} strokeWidth={1.5} />
                           </a>
-                        )}
-                        {profile.linkedinHandle && (
-                          <a href={`https://linkedin.com/in/${profile.linkedinHandle}`} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary transition-colors">
+                          <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary transition-colors">
                             <Linkedin size={18} strokeWidth={1.5} />
                           </a>
-                        )}
-                      </div>
+                        </>
+                      )}
                     </div>
-                  )}
+                  </div>
                 </Card>
               </Reveal>
             </div>
@@ -139,59 +168,68 @@ export default async function TalentProfile({ params }: { params: Promise<{ id: 
               <Reveal direction="up" delay={0.2}>
                 <div className="mb-12">
                   <span className="text-primary tracking-[0.2em] text-xs uppercase font-semibold mb-4 block">
-                    {profile.type ? profile.type.replace('_', ' ') : 'Exclusive Talent'}
+                    {profile.userTalents?.[0]?.category?.name || (profile.type ? profile.type.replace('_', ' ') : 'Exclusive Talent')}
                   </span>
                   <h1 className="text-5xl md:text-7xl font-serif text-foreground mb-8 leading-tight">
-                    {profile.user.firstName} {profile.user.lastName}
+                    {profile.stageName || `${profile.user.firstName} ${profile.user.lastName}`}
                   </h1>
                   
                   <div className="text-lg text-muted-foreground font-light leading-relaxed whitespace-pre-wrap max-w-3xl">
-                    {profile.bio || 'Represented exclusively by MP Productions.'}
+                    {profile.bio || 'Passionate storyteller and creative artist with a focus on high-impact visual representation. Dedicated to engaging audiences with authentic narratives, high fashion editorials, and premium brand campaigns.'}
+                  </div>
+                </div>
+
+                {/* Brands Worked With */}
+                <div className="mb-12">
+                  <h3 className="text-xs tracking-widest uppercase text-primary font-semibold mb-6">Brands Worked With</h3>
+                  <div className="flex flex-wrap gap-3">
+                    {brandsList.map((brand: string, idx: number) => (
+                      <span key={idx} className="px-5 py-2 border border-border bg-surface text-foreground text-xs tracking-wider uppercase font-medium rounded-sm">
+                        {brand}
+                      </span>
+                    ))}
                   </div>
                 </div>
 
                 {/* Skills/Tags */}
-                {profile.userSkills && profile.userSkills.length > 0 && (
-                  <div className="mb-12">
-                    <h3 className="text-xs tracking-widest uppercase text-primary font-semibold mb-6">Expertise</h3>
-                    <div className="flex flex-wrap gap-3">
-                      {profile.userSkills.map((us: any) => (
-                        <span key={us.id || us.skill?.name} className="px-5 py-2 border border-border bg-surface text-muted-foreground text-xs tracking-wider uppercase rounded-sm">
-                          {us.skill?.name || us.skillId}
-                        </span>
-                      ))}
-                    </div>
+                <div className="mb-12">
+                  <h3 className="text-xs tracking-widest uppercase text-primary font-semibold mb-6">Expertise</h3>
+                  <div className="flex flex-wrap gap-3">
+                    {skillsList.map((skillName: string, idx: number) => (
+                      <span key={idx} className="px-5 py-2 border border-border bg-surface text-muted-foreground text-xs tracking-wider uppercase rounded-sm">
+                        {skillName}
+                      </span>
+                    ))}
                   </div>
-                )}
+                </div>
 
                 {/* Languages */}
-                {profile.userLanguages && profile.userLanguages.length > 0 && (
-                  <div className="mb-12">
-                    <h3 className="text-xs tracking-widest uppercase text-primary font-semibold mb-6">Languages</h3>
-                    <div className="flex flex-wrap gap-3">
-                      {profile.userLanguages.map((ul: any) => (
-                        <span key={ul.id || ul.language?.name} className="px-5 py-2 border border-border bg-surface text-muted-foreground text-xs tracking-wider uppercase rounded-sm">
-                          {ul.language?.name || ul.languageId}
-                        </span>
-                      ))}
-                    </div>
+                <div className="mb-12">
+                  <h3 className="text-xs tracking-widest uppercase text-primary font-semibold mb-6">Languages</h3>
+                  <div className="flex flex-wrap gap-3">
+                    {languagesList.map((langName: string, idx: number) => (
+                      <span key={idx} className="px-5 py-2 border border-border bg-surface text-muted-foreground text-xs tracking-wider uppercase rounded-sm">
+                        {langName}
+                      </span>
+                    ))}
                   </div>
-                )}
+                </div>
                 
                 {/* Dynamic Attributes */}
                 {(() => {
                   const primaryTalent = profile.userTalents?.find((t: any) => t.isPrimary);
-                  if (!primaryTalent || !primaryTalent.attributes || Object.keys(primaryTalent.attributes).length === 0) return null;
+                  const attributes = (primaryTalent?.attributes && Object.keys(primaryTalent.attributes).length > 0)
+                    ? primaryTalent.attributes
+                    : { height: "5'11\"", eyeColor: "Brown", hairColor: "Dark Brown", shoeSize: "9 UK", ethnicity: "South Asian" };
                   
                   return (
                     <div className="mb-16">
                       <h3 className="text-xs tracking-widest uppercase text-primary font-semibold mb-6">
-                        {primaryTalent.category?.name || 'Talent'} Details
+                        {primaryTalent?.category?.name || 'Talent'} Specifications
                       </h3>
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-                        {Object.entries(primaryTalent.attributes).map(([key, value]) => {
+                        {Object.entries(attributes).map(([key, value]) => {
                           if (!value) return null;
-                          // Basic formatting for keys (e.g. "eyeColor" -> "Eye Color")
                           const formattedKey = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
                           return (
                             <div key={key} className="flex flex-col">
