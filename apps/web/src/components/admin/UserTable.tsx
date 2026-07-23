@@ -289,12 +289,12 @@ export function UserTable({ currentUserRole }: UserTableProps) {
                         )}
                       </button>
                     </td>
-                    <td className="px-6 py-4 text-xs text-muted-foreground">
-                      {new Date(user.createdAt).toLocaleDateString(undefined, {
+                    <td className="px-6 py-4 text-xs text-muted-foreground" suppressHydrationWarning>
+                      {user.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', {
                         year: 'numeric',
                         month: 'short',
                         day: 'numeric',
-                      })}
+                      }) : '—'}
                     </td>
                     <td className="px-6 py-4 text-right">
                       {currentUserRole === 'SUPER_ADMIN' && (
