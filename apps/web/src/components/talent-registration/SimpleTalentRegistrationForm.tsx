@@ -416,6 +416,7 @@ export function SimpleTalentRegistrationForm() {
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <input
                     type="password"
+                    autoComplete="new-password"
                     placeholder="Min. 6 characters for login"
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}

@@ -116,6 +116,7 @@ export function StepAccountCreation({ data, onChange, errors }: StepAccountCreat
           <FloatingInput
             label="Password"
             type="password"
+            autoComplete="new-password"
             value={data.password}
             onChange={(e) => onChange({ password: e.target.value })}
             error={errors.password}
@@ -129,6 +130,7 @@ export function StepAccountCreation({ data, onChange, errors }: StepAccountCreat
           <FloatingInput
             label="Confirm Password"
             type="password"
+            autoComplete="new-password"
             value={data.confirmPassword}
             onChange={(e) => onChange({ confirmPassword: e.target.value })}
             error={errors.confirmPassword}

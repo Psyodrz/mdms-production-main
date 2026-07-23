@@ -96,6 +96,7 @@ export default function AdminLoginPage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
                 required
                 className="w-full bg-background text-foreground pl-10 pr-4 py-2.5 rounded-xl border border-border focus:outline-none focus:border-brand transition-colors text-sm"
               />

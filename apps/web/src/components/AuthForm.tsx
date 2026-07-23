@@ -232,6 +232,7 @@ export function AuthForm({ mode }: AuthFormProps) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="name@example.com"
+              autoComplete="username"
               required
               className="w-full bg-surface text-foreground pl-10 pr-4 py-2.5 rounded-xl border border-border focus:outline-none focus:border-brand transition-colors text-sm placeholder:text-muted-foreground"
             />
@@ -249,6 +250,7 @@ export function AuthForm({ mode }: AuthFormProps) {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
+              autoComplete={isLogin ? "current-password" : "new-password"}
               required
               minLength={isLogin ? undefined : 8}
               className="w-full bg-surface text-foreground pl-10 pr-4 py-2.5 rounded-xl border border-border focus:outline-none focus:border-brand transition-colors text-sm placeholder:text-muted-foreground"
@@ -268,6 +270,7 @@ export function AuthForm({ mode }: AuthFormProps) {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="••••••••"
+                  autoComplete="new-password"
                   required
                   minLength={8}
                   className="w-full bg-surface text-foreground pl-10 pr-4 py-2.5 rounded-xl border border-border focus:outline-none focus:border-brand transition-colors text-sm placeholder:text-muted-foreground"
