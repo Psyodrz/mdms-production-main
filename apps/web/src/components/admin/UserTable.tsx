@@ -23,7 +23,7 @@ export function UserTable({ currentUserRole }: UserTableProps) {
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [limit] = useState(10);
+  const [limit, setLimit] = useState(500);
   
   // Filters
   const [search, setSearch] = useState('');
@@ -79,7 +79,7 @@ export function UserTable({ currentUserRole }: UserTableProps) {
 
   useEffect(() => {
     fetchUsers();
-  }, [page, debouncedSearch, roleFilter]);
+  }, [page, limit, debouncedSearch, roleFilter]);
 
   // Executing Action API Calls
   const handleConfirmAction = async () => {
@@ -157,6 +157,22 @@ export function UserTable({ currentUserRole }: UserTableProps) {
         </div>
 
         <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+          <select
+            value={limit}
+            onChange={(e) => {
+              setLimit(Number(e.target.value));
+              setPage(1);
+            }}
+            className="px-3 py-2 border border-border rounded-lg bg-background text-sm text-foreground focus:outline-none focus:border-primary transition-colors font-medium"
+            title="Rows per page"
+          >
+            <option value={500}>All Users (500)</option>
+            <option value={100}>100 per page</option>
+            <option value={50}>50 per page</option>
+            <option value={20}>20 per page</option>
+            <option value={10}>10 per page</option>
+          </select>
+
           <select
             value={roleFilter}
             onChange={(e) => {
