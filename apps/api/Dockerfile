@@ -32,9 +32,6 @@ RUN npx tsc -p packages/types/tsconfig.json
 # Build the API
 RUN pnpm --filter @mdms/api build
 
-# Prune dev dependencies for production
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store CI=true pnpm config set confirmModulesPurge false && CI=true pnpm install --prod --no-frozen-lockfile
-
 # ==========================================
 # 3. Production Image
 # ==========================================
@@ -48,7 +45,7 @@ RUN apk add --no-cache curl
 # Copy built artifacts from builder
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/packages/types ./packages/types
+COPY --from=builder /app/packages ./packages
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
 COPY --from=builder /app/apps/api/package.json ./apps/api/package.json
 
