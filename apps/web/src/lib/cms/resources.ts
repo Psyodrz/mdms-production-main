@@ -497,21 +497,28 @@ export const RESOURCES: Record<string, ResourceConfig> = {
     icon: 'Folder',
     idField: 'id',
     columns: [
-      { name: 'originalName', label: 'Filename', primary: true },
+      { name: 'originalName', label: 'Filename / Title', primary: true },
       { name: 'mimeType', label: 'MIME Type', type: 'badge' },
       { name: 'size', label: 'Size (Bytes)', type: 'text' },
       { name: 'createdAt', label: 'Uploaded', type: 'date' },
     ],
     fields: [
       { name: 'id', label: 'ID', type: 'text', hidden: true },
-      { name: 'url', label: 'Asset URL', type: 'image', full: true },
-      { name: 'originalName', label: 'Original Name', type: 'text' },
+      { name: 'originalName', label: 'Asset Title / Filename', type: 'text', required: true },
+      { name: 'url', label: 'Media Asset URL', type: 'image', required: true, full: true },
+      { name: 'mimeType', label: 'MIME Type', type: 'select', options: [
+        { label: 'JPEG Image', value: 'image/jpeg' },
+        { label: 'PNG Image', value: 'image/png' },
+        { label: 'MP4 Video', value: 'video/mp4' },
+        { label: 'PDF Document', value: 'application/pdf' },
+      ] },
+      { name: 'size', label: 'Size in Bytes (e.g. 1048576 = 1MB)', type: 'number' },
     ],
     sample: [
-      { id: 'm-1', originalName: 'hero_banner.jpg', mimeType: 'image/jpeg', size: 1048576, createdAt: '2026-07-01' },
+      { id: 'm-1', originalName: 'hero_production.jpg', mimeType: 'image/jpeg', size: 1048576, createdAt: '2026-07-01' },
     ],
-    backend: { list: '/cms/admin/media', base: '/cms/admin/media', updateMode: 'patch' },
-    canCreate: false, canEdit: false, canDelete: true,
+    backend: { list: '/cms/admin/media', base: '/cms/admin/media', updateMode: 'upsert', recycleModelType: 'mediaAsset' },
+    canCreate: true, canEdit: true, canDelete: true,
   },
 
   featureFlags: {
