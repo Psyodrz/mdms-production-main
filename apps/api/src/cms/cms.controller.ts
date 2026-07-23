@@ -358,4 +358,93 @@ export class CmsController {
   async deleteNewsletter(@Req() req: any, @Param('id') id: string) {
     return this.cmsService.deleteNewsletterSubscriber(id, req.user?.id);
   }
+
+  // Casting Calls Admin
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Get('admin/casting-calls')
+  async getAdminCastingCalls(@Query() dto: PaginationDto) {
+    return this.cmsService.getCastingCallsAdmin(dto);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Post('admin/casting-calls')
+  async upsertCastingCall(@Req() req: any, @Body() body: any) {
+    return this.cmsService.upsertCastingCall(body, req.user?.id);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Delete('admin/casting-calls/:id')
+  async deleteCastingCall(@Req() req: any, @Param('id') id: string) {
+    return this.cmsService.deleteCastingCall(id, req.user?.id);
+  }
+
+  // Talents Admin
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Get('admin/talents')
+  async getAdminTalents(@Query() dto: PaginationDto) {
+    return this.cmsService.getTalentsAdmin(dto);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Patch('admin/talents/:id')
+  async updateTalentStatus(@Req() req: any, @Param('id') id: string, @Body() body: any) {
+    return this.cmsService.updateTalentStatus(id, body, req.user?.id);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Delete('admin/talents/:id')
+  async deleteTalent(@Req() req: any, @Param('id') id: string) {
+    return this.cmsService.deleteTalent(id, req.user?.id);
+  }
+
+  // Bookings Admin
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Get('admin/bookings')
+  async getAdminBookings(@Query() dto: PaginationDto) {
+    return this.cmsService.getBookingsAdmin(dto);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Patch('admin/bookings/:id')
+  async updateBookingAdmin(@Req() req: any, @Param('id') id: string, @Body() body: any) {
+    return this.cmsService.updateBookingAdmin(id, body, req.user?.id);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Delete('admin/bookings/:id')
+  async deleteBookingAdmin(@Req() req: any, @Param('id') id: string) {
+    return this.cmsService.deleteBookingAdmin(id, req.user?.id);
+  }
+
+  // Media Admin
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Get('admin/media')
+  async getAdminMedia(@Query() dto: PaginationDto) {
+    return this.cmsService.getMediaAssetsAdmin(dto);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Delete('admin/media/:id')
+  async deleteMediaAsset(@Req() req: any, @Param('id') id: string) {
+    return this.cmsService.deleteMediaAsset(id, req.user?.id);
+  }
+
+  // Feature Flags Admin
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Get('admin/feature-flags')
+  async getAdminFeatureFlags(@Query() dto: PaginationDto) {
+    return this.cmsService.getFeatureFlagsAdmin(dto);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Post('admin/feature-flags')
+  async upsertFeatureFlag(@Req() req: any, @Body() body: any) {
+    return this.cmsService.upsertFeatureFlag(body, req.user?.id);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Delete('admin/feature-flags/:id')
+  async deleteFeatureFlag(@Req() req: any, @Param('id') id: string) {
+    return this.cmsService.deleteFeatureFlag(id, req.user?.id);
+  }
 }

@@ -7,8 +7,10 @@ import {
   HelpCircle,
   Layers,
   Megaphone,
-  Mail,
-  AtSign,
+  UserCheck,
+  Calendar,
+  Folder,
+  Sliders,
   Settings,
   Trash2,
   ArrowUpRight,
@@ -26,6 +28,10 @@ const ICONS: Record<string, LucideIcon> = {
   Megaphone,
   Mail,
   AtSign,
+  UserCheck,
+  Calendar,
+  Folder,
+  Sliders,
 };
 
 const SYSTEM = [

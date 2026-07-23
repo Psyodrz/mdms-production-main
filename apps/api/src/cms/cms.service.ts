@@ -47,6 +47,11 @@ export class CmsService {
       service:      this.prisma.service,
       announcement: this.prisma.announcement,
       contactSubmission: this.prisma.contactSubmission,
+      castingCall:  this.prisma.castingCall,
+      talentProfile:this.prisma.talentProfile,
+      booking:      this.prisma.booking,
+      mediaAsset:   this.prisma.mediaAsset,
+      featureFlag:  this.prisma.featureFlag,
     } as const;
 
     const model = MODEL_MAP[modelType as keyof typeof MODEL_MAP];
@@ -860,6 +865,213 @@ export class CmsService {
       where: { id }
     });
     await this.audit({ actorId, action: 'PERMANENT_DELETE_CMS_ITEM', resource: modelType, resourceId: id });
+    return result;
+  }
+
+  // ── Casting Calls Admin ──────────────────────────────────
+  async getCastingCallsAdmin(dto?: PaginationDto) {
+    const page = dto?.page || 1;
+    const limit = dto?.limit || 20;
+    const [data, total] = await Promise.all([
+      this.prisma.castingCall.findMany({
+        skip: (page - 1) * limit,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.castingCall.count(),
+    ]);
+    return { data, total, page, totalPages: Math.ceil(total / limit) };
+  }
+
+  async upsertCastingCall(data: any, actorId?: string) {
+    const id = data.id;
+    let result;
+    if (id) {
+      result = await this.prisma.castingCall.update({
+        where: { id },
+        data: {
+          title: data.title,
+          description: data.description,
+          projectType: data.projectType,
+          city: data.city,
+          location: data.location,
+          compensationType: data.compensationType,
+          compensationDetails: data.compensationDetails,
+          slotsAvailable: data.slotsAvailable ? Number(data.slotsAvailable) : 1,
+          status: data.status || 'DRAFT',
+        },
+      });
+      await this.audit({ actorId: actorId || 'SYSTEM', action: 'UPDATE_CASTING_CALL', resource: 'CastingCall', resourceId: id });
+    } else {
+      result = await this.prisma.castingCall.create({
+        data: {
+          title: data.title,
+          description: data.description,
+          projectType: data.projectType || 'Production',
+          city: data.city,
+          location: data.location,
+          compensationType: data.compensationType,
+          compensationDetails: data.compensationDetails,
+          slotsAvailable: data.slotsAvailable ? Number(data.slotsAvailable) : 1,
+          status: data.status || 'DRAFT',
+          createdById: actorId || 'SYSTEM',
+        },
+      });
+      await this.audit({ actorId: actorId || 'SYSTEM', action: 'CREATE_CASTING_CALL', resource: 'CastingCall', resourceId: result.id });
+    }
+    return result;
+  }
+
+  async deleteCastingCall(id: string, actorId?: string) {
+    const result = await this.prisma.castingCall.delete({ where: { id } });
+    await this.audit({ actorId: actorId || 'SYSTEM', action: 'DELETE_CASTING_CALL', resource: 'CastingCall', resourceId: id });
+    return result;
+  }
+
+  // ── Talents Admin ──────────────────────────────────────────
+  async getTalentsAdmin(dto?: PaginationDto) {
+    const page = dto?.page || 1;
+    const limit = dto?.limit || 20;
+    const [data, total] = await Promise.all([
+      this.prisma.talentProfile.findMany({
+        skip: (page - 1) * limit,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.talentProfile.count(),
+    ]);
+    return { data, total, page, totalPages: Math.ceil(total / limit) };
+  }
+
+  async updateTalentStatus(id: string, data: any, actorId?: string) {
+    const result = await this.prisma.talentProfile.update({
+      where: { id },
+      data: {
+        ...(data.status && { status: data.status }),
+        ...(data.experienceLevel && { experienceLevel: data.experienceLevel }),
+        ...(data.bio && { bio: data.bio }),
+        ...(data.reviewNote && { reviewNote: data.reviewNote }),
+        ...(data.stageName && { stageName: data.stageName }),
+      },
+    });
+    await this.audit({ actorId: actorId || 'SYSTEM', action: 'UPDATE_TALENT_PROFILE', resource: 'TalentProfile', resourceId: id });
+    return result;
+  }
+
+  async deleteTalent(id: string, actorId?: string) {
+    const result = await this.prisma.talentProfile.delete({ where: { id } });
+    await this.audit({ actorId: actorId || 'SYSTEM', action: 'DELETE_TALENT_PROFILE', resource: 'TalentProfile', resourceId: id });
+    return result;
+  }
+
+  // ── Bookings Admin ────────────────────────────────────────
+  async getBookingsAdmin(dto?: PaginationDto) {
+    const page = dto?.page || 1;
+    const limit = dto?.limit || 20;
+    const [data, total] = await Promise.all([
+      this.prisma.booking.findMany({
+        skip: (page - 1) * limit,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.booking.count(),
+    ]);
+    return { data, total, page, totalPages: Math.ceil(total / limit) };
+  }
+
+  async updateBookingAdmin(id: string, data: any, actorId?: string) {
+    const result = await this.prisma.booking.update({
+      where: { id },
+      data: {
+        ...(data.status && { status: data.status }),
+        ...(data.projectBrief && { projectBrief: data.projectBrief }),
+        ...(data.specialRequirements && { specialRequirements: data.specialRequirements }),
+        ...(data.cancellationReason && { cancellationReason: data.cancellationReason }),
+      },
+    });
+    await this.audit({ actorId: actorId || 'SYSTEM', action: 'UPDATE_BOOKING', resource: 'Booking', resourceId: id });
+    return result;
+  }
+
+  async deleteBookingAdmin(id: string, actorId?: string) {
+    const result = await this.prisma.booking.delete({ where: { id } });
+    await this.audit({ actorId: actorId || 'SYSTEM', action: 'DELETE_BOOKING', resource: 'Booking', resourceId: id });
+    return result;
+  }
+
+  // ── Media Assets Admin ─────────────────────────────────────
+  async getMediaAssetsAdmin(dto?: PaginationDto) {
+    const page = dto?.page || 1;
+    const limit = dto?.limit || 20;
+    const [data, total] = await Promise.all([
+      this.prisma.mediaAsset.findMany({
+        skip: (page - 1) * limit,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.mediaAsset.count(),
+    ]);
+    return { data, total, page, totalPages: Math.ceil(total / limit) };
+  }
+
+  async deleteMediaAsset(id: string, actorId?: string) {
+    const result = await this.prisma.mediaAsset.delete({ where: { id } });
+    await this.audit({ actorId: actorId || 'SYSTEM', action: 'DELETE_MEDIA_ASSET', resource: 'MediaAsset', resourceId: id });
+    return result;
+  }
+
+  // ── Feature Flags Admin ────────────────────────────────────
+  async getFeatureFlagsAdmin(dto?: PaginationDto) {
+    const page = dto?.page || 1;
+    const limit = dto?.limit || 20;
+    const [data, total] = await Promise.all([
+      this.prisma.featureFlag.findMany({
+        skip: (page - 1) * limit,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.featureFlag.count(),
+    ]);
+    return { data, total, page, totalPages: Math.ceil(total / limit) };
+  }
+
+  async upsertFeatureFlag(data: any, actorId?: string) {
+    const id = data.id;
+    let result;
+    if (id) {
+      result = await this.prisma.featureFlag.update({
+        where: { id },
+        data: {
+          key: data.key,
+          description: data.description,
+          environment: data.environment || 'all',
+          enabled: data.enabled ?? false,
+        },
+      });
+      await this.audit({ actorId: actorId || 'SYSTEM', action: 'UPDATE_FEATURE_FLAG', resource: 'FeatureFlag', resourceId: id });
+    } else {
+      result = await this.prisma.featureFlag.upsert({
+        where: { key: data.key },
+        update: {
+          description: data.description,
+          environment: data.environment || 'all',
+          enabled: data.enabled ?? false,
+        },
+        create: {
+          key: data.key,
+          description: data.description,
+          environment: data.environment || 'all',
+          enabled: data.enabled ?? false,
+        },
+      });
+      await this.audit({ actorId: actorId || 'SYSTEM', action: 'CREATE_FEATURE_FLAG', resource: 'FeatureFlag', resourceId: result.id });
+    }
+    return result;
+  }
+
+  async deleteFeatureFlag(id: string, actorId?: string) {
+    const result = await this.prisma.featureFlag.delete({ where: { id } });
+    await this.audit({ actorId: actorId || 'SYSTEM', action: 'DELETE_FEATURE_FLAG', resource: 'FeatureFlag', resourceId: id });
     return result;
   }
 }
