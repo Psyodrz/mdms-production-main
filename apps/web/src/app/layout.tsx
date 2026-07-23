@@ -40,6 +40,7 @@ import { PageTransitionWrapper } from '@/components/motion/PageTransitionWrapper
 import { LayoutPreloader } from '@/components/ui/layout-preloader';
 
 import { AuthProvider } from '@/components/AuthProvider';
+import { WhatsAppWidget } from '@/components/ui/WhatsAppWidget';
 
 export default function RootLayout({
   children,
@@ -60,6 +61,7 @@ export default function RootLayout({
                   {children}
                 </PageTransitionWrapper>
                 <Footer />
+                <WhatsAppWidget />
               </div>
             </LenisProvider>
           </AuthProvider>

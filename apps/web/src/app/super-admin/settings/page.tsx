@@ -1,8 +1,6 @@
 import { PortalNavbar } from '@/components/ui/PortalNavbar';
 import { Reveal } from '@/components/ui/Reveal';
-
-
-
+import { WhatsAppConfigCard } from '@/components/admin/WhatsAppConfigCard';
 import { serverFetchAPI } from '@/lib/server-api-client';
 
 async function getFeatureFlags() {
@@ -27,12 +25,19 @@ export default async function AdminSettings() {
             <div className="mb-12 border-b border-(--color-border) pb-8 flex justify-between items-end">
               <div>
                 <span className="text-(--color-primary) tracking-[0.2em] text-xs uppercase font-semibold mb-2 block">
-                  Configuration
+                  Super Admin Configuration
                 </span>
                 <h1 className="text-4xl font-serif text-foreground">
-                  System Settings
+                  System & Integration Settings
                 </h1>
               </div>
+            </div>
+          </Reveal>
+
+          {/* WhatsApp & InboxWA Credentials Card (SUPER_ADMIN ONLY) */}
+          <Reveal direction="up" delay={0.05}>
+            <div className="mb-10">
+              <WhatsAppConfigCard />
             </div>
           </Reveal>
 
@@ -93,4 +98,5 @@ export default async function AdminSettings() {
     </>
   );
 }
+
 

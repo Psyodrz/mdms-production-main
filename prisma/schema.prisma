@@ -731,21 +731,30 @@ model Notification {
 model WhatsAppLog {
   id             String    @id @default(cuid())
   userId         String?
-  recipientPhone String
-  templateName   String
+  phone          String?
+  recipientPhone String?
+  direction      String    @default("OUTBOUND") // INBOUND or OUTBOUND
+  messageType    String    @default("TEXT")     // TEXT, TEMPLATE, MEDIA
+  content        String?   @db.Text
+  templateName   String?
   variables      Json?
-  messageId      String? // Meta message ID
-  status         String    @default("sent") // sent, delivered, read, failed
-  errorMessage   String?
+  messageId      String?   @unique
+  status         String    @default("SENT")     // SENT, DELIVERED, READ, FAILED
+  provider       String    @default("INBOXWA")  // INBOXWA or META
+  error          String?
+  metadata       Json?
   sentAt         DateTime  @default(now())
   deliveredAt    DateTime?
   readAt         DateTime?
 
-  user User? @relation(fields: [userId], references: [id])
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@index([userId])
-  @@index([templateName, sentAt])
+  @@index([phone])
+  @@index([messageId])
+  @@index([status])
 }
+
 
 // ── Audit Log ───────────────────────────────
 
@@ -1191,4 +1200,9 @@ model MediaAsset {
 
   @@index([uploadedById])
 }
+
+
+
+
+
 
