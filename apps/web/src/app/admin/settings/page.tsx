@@ -152,8 +152,13 @@ export default function AdminSettings() {
               </div>
             </div>
           ) : (
-            <Reveal direction="up" delay={0.1}>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="space-y-10">
+              <Reveal direction="up" delay={0.05}>
+                <WhatsAppConfigCard />
+              </Reveal>
+
+              <Reveal direction="up" delay={0.1}>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 
                 {/* Feature Flags */}
                 <div className="bg-[var(--color-surface)] border border-[var(--color-border)] p-6 rounded-xl shadow-sm">
@@ -219,6 +224,7 @@ export default function AdminSettings() {
 
               </div>
             </Reveal>
+          </div>
           )}
 
           {isModalOpen && (

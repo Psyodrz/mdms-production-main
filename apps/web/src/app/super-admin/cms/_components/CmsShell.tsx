@@ -27,6 +27,8 @@ import {
   UserCheck,
   type LucideIcon,
   FolderKanban,
+  MessageSquare,
+  Bot,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -50,6 +52,8 @@ const ICONS: Record<string, LucideIcon> = {
   Shield,
   UserCheck,
   FolderKanban,
+  MessageSquare,
+  Bot,
 };
 
 interface NavItem {
@@ -91,6 +95,7 @@ const NAV: { section: string; items: NavItem[] }[] = [
   {
     section: 'Inbox & Leads',
     items: [
+      { href: '/studio-8f2k/cms/inboxwa', label: 'WhatsApp & InboxWA System', icon: 'MessageSquare' },
       { href: '/studio-8f2k/cms/contacts', label: 'Contact Submissions', icon: 'Mail' },
       { href: '/studio-8f2k/cms/newsletter', label: 'Newsletter Subscribers', icon: 'AtSign' },
     ],
