@@ -37,12 +37,12 @@ const nextConfig: NextConfig = {
       },
       {
         source: '/casting-calls',
-        destination: '/talent/projects',
+        destination: '/casting',
         permanent: true,
       },
       {
         source: '/casting-calls/:path*',
-        destination: '/talent/projects',
+        destination: '/casting',
         permanent: true,
       },
     ];
