@@ -35,6 +35,11 @@ const nextConfig: NextConfig = {
         destination: '/portfolio/:path*',
         permanent: true,
       },
+      {
+        source: '/casting-calls',
+        destination: '/talent/projects',
+        permanent: false,
+      },
     ];
   },
   async rewrites() {
