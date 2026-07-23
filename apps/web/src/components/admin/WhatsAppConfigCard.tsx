@@ -22,6 +22,7 @@ export const WhatsAppConfigCard: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [testing, setTesting] = useState(false);
   const [showApiKey, setShowApiKey] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
 
   const [testPhone, setTestPhone] = useState('');
 
@@ -40,13 +41,18 @@ export const WhatsAppConfigCard: React.FC = () => {
 
   const fetchConfig = async () => {
     setLoading(true);
+    setAuthError(null);
     try {
       const json = await fetchAPI('/whatsapp/config');
       if (json && json.success && json.data) {
         setForm(json.data);
       }
-    } catch (err) {
-      console.error('Failed to load WhatsApp config', err);
+    } catch (err: any) {
+      if (err?.message?.includes('401') || err?.message?.includes('Unauthorized')) {
+        setAuthError('Super Admin authentication required. Please sign in to view and save live credentials.');
+      } else {
+        setAuthError('Could not sync remote config. You can enter and save credentials below.');
+      }
     } finally {
       setLoading(false);
     }
@@ -134,6 +140,15 @@ export const WhatsAppConfigCard: React.FC = () => {
           Active Provider: {form.provider.toUpperCase()}
         </span>
       </div>
+
+      {authError && (
+        <div className="mb-6 p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-xs flex items-center justify-between">
+          <span>🔒 {authError}</span>
+          <a href="/login" className="px-3 py-1 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-semibold transition-colors shrink-0">
+            Sign In
+          </a>
+        </div>
+      )}
 
       <form onSubmit={handleSave} className="space-y-6">
         {/* Provider Select */}
