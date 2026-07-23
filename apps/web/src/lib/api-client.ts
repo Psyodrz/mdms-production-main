@@ -15,25 +15,36 @@ export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
   // the NestJS API (which validates Supabase JWTs) authorizes the request.
   if (typeof window !== 'undefined') {
     try {
-      // 1. Try Supabase Auth session first
-      const supabase = createClient();
-      const { data: { session } } = await supabase.auth.getSession();
-      token = session?.access_token || '';
+      // 1. Direct localStorage tokens (fastest & most reliable)
+      token = localStorage.getItem('token') || localStorage.getItem('mdms_auth_token') || localStorage.getItem('accessToken') || '';
 
-      // 2. Fallback to localStorage JWT tokens
+      // 2. Parse Supabase session token directly from localStorage if key matches sb-*-auth-token
       if (!token) {
-        token = localStorage.getItem('token') || localStorage.getItem('mdms_auth_token') || localStorage.getItem('accessToken') || '';
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          if (k && (k.startsWith('sb-') || k.includes('supabase')) && k.endsWith('-auth-token')) {
+            try {
+              const val = localStorage.getItem(k);
+              if (val) {
+                const parsed = JSON.parse(val);
+                token = parsed?.access_token || parsed?.currentSession?.access_token || '';
+                if (token) {
+                  localStorage.setItem('token', token);
+                  break;
+                }
+              }
+            } catch {}
+          }
+        }
       }
 
-      // 3. Fallback to raw JWT cookies (excluding NextAuth encrypted session cookies)
-      if (!token && typeof document !== 'undefined') {
-        const cookies = document.cookie.split(';');
-        for (const cookie of cookies) {
-          const [key, val] = cookie.trim().split('=');
-          if ((key === 'token' || key === 'mdms_auth_token' || key.includes('access_token')) && !key.includes('next-auth')) {
-            token = decodeURIComponent(val || '');
-            break;
-          }
+      // 3. Fallback to Supabase client async getSession()
+      if (!token) {
+        const supabase = createClient();
+        const { data: { session } } = await supabase.auth.getSession();
+        token = session?.access_token || '';
+        if (token) {
+          localStorage.setItem('token', token);
         }
       }
     } catch {

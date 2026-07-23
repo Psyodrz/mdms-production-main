@@ -109,6 +109,11 @@ export function AuthForm({ mode }: AuthFormProps) {
 
         if (error) throw error;
 
+        if (data?.session?.access_token) {
+          localStorage.setItem('token', data.session.access_token);
+          localStorage.setItem('mdms_auth_token', data.session.access_token);
+        }
+
         const role = data.user?.user_metadata?.role;
         const lowerRole = role?.toLowerCase();
         
