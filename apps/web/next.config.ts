@@ -48,10 +48,6 @@ const nextConfig: NextConfig = {
         source: '/api/v1/:path*',
         destination: `${apiBase}/api/v1/:path*`,
       },
-      {
-        source: '/casting-calls',
-        destination: '/talent/projects',
-      },
       // Secret admin base paths — the browser shows /studio-8f2k while the
       // real /super-admin and /admin panels are served internally. The more
       // specific /mgmt (Admin) rules MUST precede the generic Super Admin ones.
