@@ -40,7 +40,7 @@ async function bootstrap() {
   );
   app.use(cookieParser());
 
-  // CORS — allow localhost origins (including dynamic ports like 3001)
+  // CORS — allow localhost + production origins
   const allowedOrigins = [
     appUrl,
     'http://localhost:3000',
@@ -48,6 +48,8 @@ async function bootstrap() {
     'http://localhost:3002',
     'http://127.0.0.1:3000',
     'http://127.0.0.1:3001',
+    'https://mpproductions.vercel.app',
+    process.env.FRONTEND_URL,
   ].filter(Boolean);
 
   app.enableCors({
@@ -55,7 +57,8 @@ async function bootstrap() {
       if (!origin) return callback(null, true);
       if (
         allowedOrigins.includes(origin) ||
-        /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin)
+        /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin) ||
+        /\.vercel\.app$/.test(origin)
       ) {
         return callback(null, true);
       }

@@ -13,7 +13,7 @@ interface FeaturedTalent {
 
 async function getFeaturedTalent(): Promise<FeaturedTalent[]> {
   try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1';
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://mp-backend-api.onrender.com/api/v1';
     const res = await fetch(`${apiUrl}/talent/featured`, { next: { revalidate: 300 } });
     if (!res.ok) return [];
     const json = await res.json();

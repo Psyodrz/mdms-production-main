@@ -11,7 +11,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: 'Missing basic fields' }, { status: 400 });
     }
 
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1';
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://mp-backend-api.onrender.com/api/v1';
 
     // Step 1: Register user via NestJS backend
     const registerRes = await fetch(`${apiUrl}/auth/register`, {

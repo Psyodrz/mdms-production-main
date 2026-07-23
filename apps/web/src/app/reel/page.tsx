@@ -70,7 +70,7 @@ export default function ReelPage() {
   useEffect(() => {
     async function fetchReels() {
       try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://mp-backend-api.onrender.com/api/v1';
         const res = await fetch(`${apiUrl}/cms/config/showreels`);
         if (res.ok) {
           const json = await res.json();

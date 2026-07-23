@@ -39,7 +39,7 @@ export function UploadVersionUI({
       });
 
       // Step 2: Register version in NestJS database
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1';
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://mp-backend-api.onrender.com/api/v1';
       const versionRes = await fetch(`${apiUrl}/editor/projects/${projectId}/versions`, {
         method: 'POST',
         headers: {
