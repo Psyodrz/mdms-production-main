@@ -24,6 +24,9 @@ COPY apps/web/ ./apps/web/
 
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --no-frozen-lockfile
 
+# Build shared packages first
+RUN pnpm --filter @mdms/types build
+
 # Set environment variables for build time
 ARG NEXT_PUBLIC_API_URL
 ARG NEXT_PUBLIC_BASE_URL

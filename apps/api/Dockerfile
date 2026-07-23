@@ -26,6 +26,9 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --no-frozen-lockf
 # Generate Prisma Client
 RUN npx prisma generate
 
+# Build shared packages first
+RUN pnpm --filter @mdms/types build
+
 # Build the API
 RUN pnpm --filter @mdms/api build
 
