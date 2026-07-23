@@ -4,17 +4,16 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export function LayoutPreloader() {
-  const [isLoading, setIsLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    // Only play the intro preloader once per browser session (i.e. on the
-    // initial site load). Subsequent navigations/refreshes skip it so the
-    // experience is just smooth in-page animations after that.
-    if (typeof window !== 'undefined' && sessionStorage.getItem('mp_preloaded') === '1') {
-      setIsLoading(false);
+    setMounted(true);
+    if (sessionStorage.getItem('mp_preloaded') === '1') {
       return;
     }
+    setIsLoading(true);
 
     // Cinematic progress simulation
     const duration = 2500;
@@ -35,6 +34,8 @@ export function LayoutPreloader() {
 
     return () => clearInterval(timer);
   }, []);
+
+  if (!mounted || !isLoading) return null;
 
   return (
     <AnimatePresence>
