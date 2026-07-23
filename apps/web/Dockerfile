@@ -16,15 +16,17 @@ WORKDIR /app
 RUN apk add --no-cache libc6-compat
 
 # Copy workspace
-COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json turbo.json ./
 
-# Copy packages and Web app
+# Copy packages, prisma, and Web app
 COPY packages/ ./packages/
+COPY prisma/ ./prisma/
 COPY apps/web/ ./apps/web/
 
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --no-frozen-lockfile
 
-# Build shared packages first
+# Generate Prisma Client & build shared packages
+RUN npx prisma generate
 RUN pnpm --filter @mdms/types build
 
 # Set environment variables for build time

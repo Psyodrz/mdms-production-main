@@ -13,7 +13,7 @@ FROM base AS builder
 WORKDIR /app
 
 # Copy workspace configs
-COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json turbo.json ./
 
 # Copy packages, prisma, and API
 COPY packages/ ./packages/
@@ -26,11 +26,8 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --no-frozen-lockf
 # Generate Prisma Client
 RUN npx prisma generate
 
-# Build shared packages first
-RUN pnpm --filter @mdms/types build
-
-# Build the API
-RUN pnpm --filter @mdms/api build
+# Build shared packages & API
+RUN pnpm --filter @mdms/types build && pnpm --filter @mdms/api build
 
 # Prune dev dependencies for production
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store CI=true pnpm config set confirmModulesPurge false && CI=true pnpm install --prod --no-frozen-lockfile
