@@ -25,7 +25,7 @@ export class WhatsappController {
   /**
    * SUPER_ADMIN ONLY: Fetch current WhatsApp & InboxWA configuration settings
    */
-  @Roles(Role.SUPER_ADMIN)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @Get('config')
   getConfig() {
     const config = this.whatsappService.getConfig();
@@ -38,7 +38,7 @@ export class WhatsappController {
   /**
    * SUPER_ADMIN ONLY: Update & Activate InboxWA / WhatsApp credentials instantly
    */
-  @Roles(Role.SUPER_ADMIN)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @Post('config')
   async updateConfig(@Body() body: Partial<WhatsAppConfig>) {
     const updatedConfig = await this.whatsappService.updateConfig(body);
@@ -52,7 +52,7 @@ export class WhatsappController {
   /**
    * SUPER_ADMIN ONLY: Send a live test WhatsApp message to verify connection
    */
-  @Roles(Role.SUPER_ADMIN)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @Post('test')
   async sendTestMessage(@Body() body: { phone: string; message?: string }) {
     const testPhone = body.phone;

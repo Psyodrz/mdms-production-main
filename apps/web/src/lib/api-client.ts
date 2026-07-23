@@ -15,9 +15,24 @@ export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
   // the NestJS API (which validates Supabase JWTs) authorizes the request.
   if (typeof window !== 'undefined') {
     try {
-      const supabase = createClient();
-      const { data: { session } } = await supabase.auth.getSession();
-      token = session?.access_token || '';
+      token = localStorage.getItem('token') || localStorage.getItem('mdms_auth_token') || localStorage.getItem('accessToken') || '';
+      
+      if (!token && typeof document !== 'undefined') {
+        const cookies = document.cookie.split(';');
+        for (const cookie of cookies) {
+          const [key, val] = cookie.trim().split('=');
+          if (key === 'token' || key === 'mdms_auth_token' || key === 'next-auth.session-token' || key === '__Secure-next-auth.session-token') {
+            token = decodeURIComponent(val || '');
+            break;
+          }
+        }
+      }
+
+      if (!token) {
+        const supabase = createClient();
+        const { data: { session } } = await supabase.auth.getSession();
+        token = session?.access_token || '';
+      }
     } catch {
       token = '';
     }
