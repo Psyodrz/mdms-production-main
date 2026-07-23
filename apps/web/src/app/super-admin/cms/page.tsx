@@ -7,6 +7,8 @@ import {
   HelpCircle,
   Layers,
   Megaphone,
+  Mail,
+  AtSign,
   UserCheck,
   Calendar,
   Folder,
