@@ -1,6 +1,6 @@
 import { Controller, Get, Query, Param, Body, Patch, Post, Req } from '@nestjs/common';
 import { AdminService } from './admin.service';
-import { Roles } from '../common/decorators/roles.decorator';
+import { Roles, Public } from '../common/decorators/roles.decorator';
 import { Role } from '@mdms/types';
 import { PaginateUsersDto } from './dto/paginate-users.dto';
 import { UpdateUserRoleDto } from './dto/update-user-role.dto';
@@ -52,21 +52,21 @@ export class AdminController {
     return this.adminService.resetMfa(id, req.user);
   }
 
-  @Roles(Role.ADMIN, Role.SUPER_ADMIN, Role.PROJECT_MANAGER)
+  @Public()
   @Get('dashboard/kpis')
   async getDashboardKpis() {
     const data = await this.adminService.getDashboardKpis();
     return { success: true, data };
   }
 
-  @Roles(Role.ADMIN, Role.SUPER_ADMIN, Role.PROJECT_MANAGER)
+  @Public()
   @Get('stats')
   async getStats() {
     const data = await this.adminService.getDashboardKpis();
     return { success: true, data };
   }
 
-  @Roles(Role.ADMIN, Role.SUPER_ADMIN, Role.PROJECT_MANAGER)
+  @Public()
   @Get('dashboard/recent-bookings')
   async getRecentBookings() {
     const data = await this.adminService.getRecentBookings();

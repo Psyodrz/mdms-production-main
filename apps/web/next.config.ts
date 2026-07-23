@@ -7,20 +7,15 @@ const nextConfig: NextConfig = {
   },
   transpilePackages: ['@mdms/types', '@mdms/design-tokens'],
   images: {
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'images.unsplash.com',
+        hostname: '**',
       },
       {
-        protocol: 'https',
-        hostname: 'randomuser.me',
-      },
-      {
-        protocol: 'https',
-        hostname: '*.supabase.co',
-        port: '',
-        pathname: '/storage/v1/object/public/**',
+        protocol: 'http',
+        hostname: '**',
       },
     ],
   },
