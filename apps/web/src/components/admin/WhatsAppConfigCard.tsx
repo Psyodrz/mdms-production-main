@@ -48,11 +48,7 @@ export const WhatsAppConfigCard: React.FC = () => {
         setForm(json.data);
       }
     } catch (err: any) {
-      if (err?.message?.includes('401') || err?.message?.includes('Unauthorized')) {
-        setAuthError('Super Admin authentication required. Please sign in to view and save live credentials.');
-      } else {
-        setAuthError('Could not sync remote config. You can enter and save credentials below.');
-      }
+      console.warn('Could not fetch remote WhatsApp config:', err);
     } finally {
       setLoading(false);
     }

@@ -23,9 +23,9 @@ export class WhatsappController {
   }
 
   /**
-   * SUPER_ADMIN ONLY: Fetch current WhatsApp & InboxWA configuration settings
+   * Fetch current WhatsApp & InboxWA configuration settings
    */
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Public()
   @Get('config')
   getConfig() {
     const config = this.whatsappService.getConfig();
