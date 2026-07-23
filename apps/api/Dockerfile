@@ -21,7 +21,7 @@ COPY prisma/ ./prisma/
 COPY apps/api/ ./apps/api/
 
 # Install all dependencies (including dev)
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --no-frozen-lockfile
 
 # Generate Prisma Client
 RUN npx prisma generate
@@ -30,7 +30,7 @@ RUN npx prisma generate
 RUN pnpm --filter @mdms/api build
 
 # Prune dev dependencies for production
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store CI=true pnpm config set confirmModulesPurge false && CI=true pnpm install --prod --frozen-lockfile
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store CI=true pnpm config set confirmModulesPurge false && CI=true pnpm install --prod --no-frozen-lockfile
 
 # ==========================================
 # 3. Production Image

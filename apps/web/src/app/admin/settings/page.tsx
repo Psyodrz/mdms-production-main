@@ -5,6 +5,7 @@ import { Reveal } from '@/components/ui/Reveal';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { RefreshCw, Loader2, Plus } from 'lucide-react';
+import { WhatsAppConfigCard } from '@/components/admin/WhatsAppConfigCard';
 
 
 
