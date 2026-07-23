@@ -27,7 +27,7 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --no-frozen-lockf
 
 # Generate Prisma Client & build shared packages
 RUN npx prisma generate
-RUN pnpm --filter @mdms/types build
+RUN npx tsc -p packages/types/tsconfig.json
 
 # Set environment variables for build time
 ARG NEXT_PUBLIC_API_URL

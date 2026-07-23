@@ -51,6 +51,9 @@ jobs:
       - name: Generate Prisma Client
         run: npx prisma generate --schema=prisma/schema.prisma
 
+      - name: Build Types
+        run: npx tsc -p packages/types/tsconfig.json
+
       - name: Lint
         run: pnpm --recursive run lint --if-present || true
         continue-on-error: true

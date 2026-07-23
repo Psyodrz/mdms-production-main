@@ -26,8 +26,11 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --no-frozen-lockf
 # Generate Prisma Client
 RUN npx prisma generate
 
-# Build shared packages & API
-RUN pnpm --filter @mdms/types build && pnpm --filter @mdms/api build
+# Build shared packages
+RUN npx tsc -p packages/types/tsconfig.json
+
+# Build the API
+RUN pnpm --filter @mdms/api build
 
 # Prune dev dependencies for production
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store CI=true pnpm config set confirmModulesPurge false && CI=true pnpm install --prod --no-frozen-lockfile
