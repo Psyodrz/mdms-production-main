@@ -2,7 +2,7 @@ services:
   - type: web
     name: mp-backend-api
     env: node
-    buildCommand: "npm install -g pnpm && pnpm install --production=false && pnpm run db:generate && pnpm --filter @mdms/types build && pnpm --filter @mdms/api build"
+    buildCommand: "npm install -g pnpm && pnpm install --production=false && npx prisma generate --schema=prisma/schema.prisma && pnpm --filter @mdms/types build && pnpm --filter @mdms/api build"
     startCommand: "pnpm --filter @mdms/api start:prod"
     envVars:
       - key: NODE_ENV

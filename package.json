@@ -10,7 +10,7 @@
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
     "test:e2e": "turbo run test:e2e",
-    "db:generate": "pnpm --filter api prisma generate",
+    "db:generate": "npx prisma generate --schema=prisma/schema.prisma",
     "db:migrate": "pnpm --filter api prisma migrate dev",
     "db:push": "pnpm --filter api prisma db push",
     "db:seed": "pnpm --filter api prisma db seed",
