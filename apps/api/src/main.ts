@@ -36,7 +36,7 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService);
   const port = process.env.PORT ? parseInt(process.env.PORT, 10) : configService.get<number>('API_PORT', 4000);
-  const appUrl = configService.get<string>('APP_URL', 'http://localhost:3000');
+  const appUrl = configService.get<string>('APP_URL', 'https://mdms-production-main.vercel.app');
 
   // Security
   app.use(
