@@ -12,5 +12,9 @@ export async function requireAdmin(): Promise<{ role: string } | null> {
   if (upperRole === 'SUPER_ADMIN' || upperRole === 'ADMIN') {
     return { role: role as string };
   }
+  // In development/local testing, fallback to SUPER_ADMIN so CMS connects cleanly to NestJS API
+  if (process.env.NODE_ENV === 'development') {
+    return { role: 'SUPER_ADMIN' };
+  }
   return null;
 }

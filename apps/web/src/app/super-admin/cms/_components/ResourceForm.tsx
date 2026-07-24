@@ -53,6 +53,7 @@ export function ResourceForm({ config, initial, submitting, onSubmit, onCancel }
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [mediaOpen, setMediaOpen] = useState(false);
   const [mediaCallback, setMediaCallback] = useState<((url: string) => void) | null>(null);
+  const [uploadingField, setUploadingField] = useState<string | null>(null);
 
   const triggerMediaLibrary = (callback: (url: string) => void) => {
     setMediaCallback(() => callback);
