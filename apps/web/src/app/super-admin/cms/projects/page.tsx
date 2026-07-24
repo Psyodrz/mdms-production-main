@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { CmsShell } from '../_components/CmsShell';
 import { toast } from 'sonner';
 import { fetchAPI } from '@/lib/api-client';
 import {
@@ -129,7 +128,6 @@ export default function ProjectsCmsPage() {
   };
 
   return (
-    <CmsShell>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -403,6 +401,5 @@ export default function ProjectsCmsPage() {
           </div>
         )}
       </div>
-    </CmsShell>
   );
 }
