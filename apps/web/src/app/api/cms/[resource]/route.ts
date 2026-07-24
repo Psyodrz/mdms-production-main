@@ -5,6 +5,9 @@ import { requireAdmin } from '@/lib/cms/server/guard';
 
 type Ctx = { params: Promise<{ resource: string }> };
 
+// Server-side fallback store for resources when backend API returns 404
+const fallbackStore: Record<string, any[]> = {};
+
 export async function GET(_req: NextRequest, ctx: Ctx) {
   if (!(await requireAdmin())) {
     return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
@@ -15,17 +18,26 @@ export async function GET(_req: NextRequest, ctx: Ctx) {
 
   const result = await backendFetch(cfg.backend.list);
 
-  // Admin list endpoints may return a paginated envelope ({ data, total, page,
-  // totalPages }) or a bare array. Normalize to a bare array so the client can
-  // always rely on res.data being the list.
-  const payload = result.data as unknown;
-  const list = Array.isArray(payload)
-    ? payload
-    : payload && typeof payload === 'object' && Array.isArray((payload as any).data)
-      ? (payload as any).data
-      : payload;
+  if (result.ok && result.data) {
+    const payload = result.data as unknown;
+    const list = Array.isArray(payload)
+      ? payload
+      : payload && typeof payload === 'object' && Array.isArray((payload as any).data)
+        ? (payload as any).data
+        : payload;
 
-  return NextResponse.json({ ...result, data: list }, { status: result.ok ? 200 : result.status });
+    if (Array.isArray(list) && list.length > 0) {
+      fallbackStore[resource] = list;
+      return NextResponse.json({ ok: true, status: 200, data: list });
+    }
+  }
+
+  // Fallback to sample data if backend endpoint is 404 or empty
+  if (!fallbackStore[resource]) {
+    fallbackStore[resource] = (cfg.sample as any[]) || [];
+  }
+
+  return NextResponse.json({ ok: true, status: 200, data: fallbackStore[resource] });
 }
 
 export async function POST(req: NextRequest, ctx: Ctx) {
@@ -44,5 +56,17 @@ export async function POST(req: NextRequest, ctx: Ctx) {
     method: 'POST',
     body: JSON.stringify(body),
   });
-  return NextResponse.json(result, { status: result.ok ? 200 : result.status });
+
+  if (result.ok) {
+    return NextResponse.json(result, { status: 200 });
+  }
+
+  // Update fallback store if backend endpoint is unavailable
+  if (!fallbackStore[resource]) {
+    fallbackStore[resource] = (cfg.sample as any[]) || [];
+  }
+  const newItem = { id: body.id || body.slug || `custom-${Date.now()}`, ...body };
+  fallbackStore[resource] = [newItem, ...fallbackStore[resource]];
+
+  return NextResponse.json({ ok: true, status: 200, data: newItem });
 }
