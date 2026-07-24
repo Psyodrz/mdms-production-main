@@ -1,5 +1,7 @@
 import { Navbar } from '@/components/ui/Navbar';
 
+export const dynamic = 'force-dynamic';
+
 import { Reveal } from '@/components/ui/Reveal';
 import { Container } from '@/components/ui/Container';
 import { Camera, Film, Users, Sparkles, ArrowUpRight, Award, CircleDot } from 'lucide-react';

@@ -23,92 +23,30 @@ interface ProductScrollItem {
 // 2. Minimal Product Card Component
 function MinimalProductCard({ product }: { product: ProductScrollItem }) {
   const fullImageUrl = product.thumbnail ?? ""
-  const cardRef = useRef<HTMLDivElement>(null)
-  const [active, setActive] = useState(false)
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    const card = cardRef.current
-    if (!card) return
-
-    const touch = e.touches[0]
-    const rect = card.getBoundingClientRect()
-    const x = ((touch.clientX - rect.left) / rect.width) * 100
-    const y = ((touch.clientY - rect.top) / rect.height) * 100
-
-    card.style.setProperty("--reveal-x", `${String(x)}%`)
-    card.style.setProperty("--reveal-y", `${String(y)}%`)
-    setActive(true)
-  }
-
-  const handleMouseEnter = (e: React.MouseEvent) => {
-    const card = cardRef.current
-    if (!card) return
-
-    const rect = card.getBoundingClientRect()
-    const x = ((e.clientX - rect.left) / rect.width) * 100
-    const y = ((e.clientY - rect.top) / rect.height) * 100
-
-    card.style.setProperty("--reveal-x", `${String(x)}%`)
-    card.style.setProperty("--reveal-y", `${String(y)}%`)
-    setActive(true)
-  }
 
   return (
     <div
-      ref={cardRef}
-      onMouseEnter={handleMouseEnter}
-      onTouchStart={handleTouchStart}
-      onMouseLeave={() => setActive(false)}
-      className="group relative block w-full h-full bg-transparent overflow-hidden border border-border/30 hover:border-primary/50 transition-colors duration-700"
+      className="group relative block w-full h-full bg-card overflow-hidden border border-border rounded-2xl hover:border-brand/60 transition-[border-color,box-shadow,transform] duration-300 transform-gpu shadow-md hover:shadow-xl"
     >
       {/* Image Section */}
       <div className="relative aspect-[3/4] w-full overflow-hidden bg-muted">
-        {/* Background: Grayscale Image */}
         {fullImageUrl && (
           <Image
             src={fullImageUrl}
             alt={product.title || 'Showcase'}
             fill
-            className="object-cover object-top grayscale opacity-90 transition-all duration-1000 ease-out"
             sizes="(max-width: 768px) 100vw, 33vw"
+            className="object-cover object-top grayscale group-hover:grayscale-0 opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500 ease-out"
+            loading="lazy"
           />
         )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent opacity-60 group-hover:opacity-30 transition-opacity duration-300"></div>
 
-        {/* Foreground: Color Image (Clipped by circle) */}
-        {fullImageUrl && (
-          <div
-            className="absolute inset-0 w-full h-full transition-all duration-1000 ease-out"
-            style={{
-              clipPath: `circle(${
-                active ? "150%" : "0%"
-              } at var(--reveal-x, 50%) var(--reveal-y, 50%))`,
-              transition: "clip-path 2.8s cubic-bezier(0.15, 0.85, 0.35, 1)",
-            }}
-          >
-            <Image
-              src={fullImageUrl}
-              alt={product.title || 'Showcase'}
-              fill
-              className="object-cover object-top"
-              sizes="(max-width: 768px) 100vw, 33vw"
-            />
-          </div>
-        )}
-
-        {/* Subtle dark gradient overlay on hover */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-
-        {/* Custom Hover Action */}
-        <div
-          className={`absolute bottom-6 left-1/2 -translate-x-1/2 transition-all duration-700 cubic-bezier(0.4, 0, 0.2, 1) z-30 w-fit ${
-            active
-              ? "translate-y-0 opacity-100"
-              : "translate-y-8 opacity-0 group-hover:translate-y-0 group-hover:opacity-100"
-          }`}
-        >
+        {/* View Details Hover Button */}
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 transition-all duration-300 z-30 opacity-0 group-hover:opacity-100 group-hover:translate-y-0 translate-y-2">
           <Link
             href={`/portfolio/${product.handle}`}
-            className="block bg-background/80 backdrop-blur-md text-foreground text-[8px] sm:text-[10px] uppercase tracking-normal font-medium py-1.5 px-3 sm:py-3 sm:px-8 rounded-full border border-border whitespace-nowrap shadow-xl hover:bg-primary hover:text-primary-foreground transition-colors duration-300 cursor-pointer"
+            className="block bg-brand text-white text-[10px] uppercase tracking-wider font-bold py-2 px-6 rounded-full shadow-lg hover:bg-foreground hover:text-background transition-colors duration-300 whitespace-nowrap"
           >
             View Details
           </Link>
@@ -116,27 +54,21 @@ function MinimalProductCard({ product }: { product: ProductScrollItem }) {
       </div>
 
       {/* Typography Section */}
-      <div className="flex flex-col items-center justify-center text-center p-3 sm:p-6 md:p-8 bg-transparent relative z-20">
-        <span className="text-xs sm:text-sm text-muted-foreground uppercase tracking-[0.3em] mb-2 font-bold">
+      <div className="flex flex-col items-center justify-center text-center p-4 bg-card relative z-20">
+        <span className="text-[10px] text-brand uppercase tracking-[0.2em] mb-1 font-bold">
           {product.collection?.title ?? "MP PRODUCTIONS"}
         </span>
 
-        <h4 className="text-sm sm:text-lg md:text-xl uppercase font-bold text-foreground mb-2 w-full line-clamp-2 transition-colors duration-500 tracking-widest">
+        <h4 className="text-sm font-bold text-foreground mb-1 w-full line-clamp-1 group-hover:text-brand transition-colors tracking-wide font-serif">
           {product.title}
         </h4>
 
         <div className="flex items-center justify-center">
-          <span className="text-xs sm:text-base font-semibold tracking-[0.15em] text-foreground transition-colors duration-500">
+          <span className="text-xs font-semibold text-muted-foreground tracking-wider">
             {product.price}
           </span>
         </div>
       </div>
-
-      {/* Decorative Architectural Corners */}
-      <div className="absolute top-0 left-0 w-8 h-[1px] bg-foreground/30 opacity-0 group-hover:opacity-100 transition-opacity duration-700 delay-100"></div>
-      <div className="absolute top-0 left-0 w-[1px] h-8 bg-foreground/30 opacity-0 group-hover:opacity-100 transition-opacity duration-700 delay-100"></div>
-      <div className="absolute top-0 right-0 w-8 h-[1px] bg-foreground/30 opacity-0 group-hover:opacity-100 transition-opacity duration-700 delay-100"></div>
-      <div className="absolute top-0 right-0 w-[1px] h-8 bg-foreground/30 opacity-0 group-hover:opacity-100 transition-opacity duration-700 delay-100"></div>
     </div>
   )
 }
@@ -417,32 +349,6 @@ export function CinematicProductScrollSection({ items = [] }: { items?: any[] })
   const animeTriggered = useRef(false)
 
   useEffect(() => {
-    if (!finalCollectionRef.current) return
-    if (products.length === 0) return
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && !animeTriggered.current) {
-          if (!finalCollectionRef.current) return
-          animeTriggered.current = true
-          
-          animate(finalCollectionRef.current.querySelectorAll('.anime-card'), {
-            translateY: [-200, 0],
-            opacity: [0, 1],
-            delay: stagger(150),
-            duration: 1000,
-            easing: 'easeOutElastic(1, .6)'
-          })
-        }
-      },
-      { threshold: 0.2 }
-    )
-
-    observer.observe(finalCollectionRef.current)
-    return () => observer.disconnect()
-  }, [products])
-
-  useEffect(() => {
     const container = scrollContainerRef.current
     if (!container) return
 
@@ -478,35 +384,6 @@ export function CinematicProductScrollSection({ items = [] }: { items?: any[] })
     }
   }, [])
 
-  useEffect(() => {
-    if (!containerRef.current) return
-
-    const gridItems = containerRef.current.querySelectorAll(
-      ".grid-item, .reveal"
-    )
-
-    const observerOptions = {
-      threshold: 0.1,
-      rootMargin: "0px",
-    }
-
-    const gridObserver = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("show", "active")
-        }
-      })
-    }, observerOptions)
-
-    gridItems.forEach((item) => {
-      gridObserver.observe(item)
-    })
-
-    return () => {
-      gridObserver.disconnect()
-    }
-  }, [])
-
   if (products.length === 0) return null
 
   const mainTitleParts = finalTitle.split(" ")
@@ -521,17 +398,15 @@ export function CinematicProductScrollSection({ items = [] }: { items?: any[] })
       {/* Intro Section - Cinematic Version */}
       <section className="relative h-[100dvh] w-full flex flex-col justify-center items-center overflow-hidden bg-transparent">
 
-        {/* Light Effects — static (no animate-pulse) and lighter blur to avoid
-            continuous GPU repaint that caused scroll jank. */}
-        <div className="absolute top-[-10%] left-[-10%] w-[45%] h-[45%] bg-primary/5 blur-[70px] rounded-full will-change-transform"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-muted-foreground/10 blur-[80px] rounded-full will-change-transform"></div>
+        {/* Light Effects — static GPU radial gradients */}
+        <div className="absolute top-[-10%] left-[-10%] w-[45%] h-[45%] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent rounded-full transform-gpu pointer-events-none"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-muted-foreground/10 via-transparent to-transparent rounded-full transform-gpu pointer-events-none"></div>
 
         {/* Content */}
         <div className="relative z-10 text-center px-6 -mt-16 md:-mt-32 w-full flex flex-col items-center justify-center">
           <div className="overflow-hidden mb-4 md:mb-6 w-full flex justify-center">
             <span
-              className="block text-[9px] md:text-[10px] font-black text-primary uppercase reveal text-center tracking-[0.3em] md:tracking-[0.8em] ps-[0.3em] md:ps-[0.8em]"
-              style={{ animationDelay: "0.2s" }}
+              className="block text-[9px] md:text-[10px] font-black text-primary uppercase text-center tracking-[0.3em] md:tracking-[0.8em] ps-[0.3em] md:ps-[0.8em]"
             >
               {finalSubtitle}
             </span>
@@ -540,16 +415,14 @@ export function CinematicProductScrollSection({ items = [] }: { items?: any[] })
           <h1 className="text-4xl sm:text-6xl md:text-[8rem] lg:text-[10rem] font-black leading-[0.85] text-foreground w-full flex flex-col items-center justify-center text-center tracking-tighter">
             <div className="overflow-hidden w-full flex justify-center">
               <span
-                className="block reveal text-center font-display"
-                style={{ animationDelay: "0.4s" }}
+                className="block text-center font-display"
               >
                 {mainTitleFirst}
               </span>
             </div>
             <div className="overflow-hidden mt-2 w-full flex justify-center">
               <span
-                className="block italic font-light text-muted-foreground reveal text-center font-serif"
-                style={{ animationDelay: "0.6s" }}
+                className="block italic font-light text-muted-foreground text-center font-serif"
               >
                 {mainTitleRest}
               </span>
@@ -558,8 +431,7 @@ export function CinematicProductScrollSection({ items = [] }: { items?: any[] })
 
           <div className="mt-6 md:mt-12 overflow-hidden w-full flex justify-center">
             <p
-              className="text-muted-foreground text-center text-sm md:text-base max-w-lg font-light leading-relaxed tracking-wide reveal"
-              style={{ animationDelay: "0.8s" }}
+              className="text-muted-foreground text-center text-sm md:text-base max-w-lg font-light leading-relaxed tracking-wide"
             >
               {finalDescription}
             </p>
@@ -568,11 +440,10 @@ export function CinematicProductScrollSection({ items = [] }: { items?: any[] })
 
         {/* Scroll Indicator */}
         <div
-          className="absolute bottom-8 md:bottom-12 flex flex-col items-center gap-4 reveal"
-          style={{ animationDelay: "1.2s" }}
+          className="absolute bottom-8 md:bottom-12 flex flex-col items-center gap-4"
         >
           <div className="w-[1px] h-12 md:h-20 bg-foreground/10 relative overflow-hidden">
-            <div className="absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-transparent via-foreground/50 to-transparent animate-scroll-light"></div>
+            <div className="absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-transparent via-foreground/50 to-transparent"></div>
           </div>
           <span className="text-[9px] font-bold text-foreground/40 tracking-normal uppercase">
             SCROLL DOWN
@@ -613,7 +484,7 @@ export function CinematicProductScrollSection({ items = [] }: { items?: any[] })
             {products.map((product) => (
               <div
                 key={product.id}
-                className="anime-card grid-item group cursor-pointer w-[calc(50%-8px)] min-w-[calc(50%-8px)] max-w-[calc(50%-8px)] sm:w-[calc(33.333%-11px)] sm:min-w-[calc(33.333%-11px)] sm:max-w-[calc(33.333%-11px)] md:w-[300px] md:min-w-[300px] md:max-w-[320px] snap-center flex-shrink-0 opacity-0"
+                className="group cursor-pointer w-[calc(50%-8px)] min-w-[calc(50%-8px)] max-w-[calc(50%-8px)] sm:w-[calc(33.333%-11px)] sm:min-w-[calc(33.333%-11px)] sm:max-w-[calc(33.333%-11px)] md:w-[300px] md:min-w-[300px] md:max-w-[320px] snap-center flex-shrink-0 opacity-100 transform-gpu"
               >
                 <MinimalProductCard product={product} />
               </div>

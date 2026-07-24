@@ -37,9 +37,9 @@ export function CinematicTestimonial() {
     <div className="w-full bg-[var(--cinematic-bg)] relative">
       {/* ── Testimonial + Video ─────────────────────────────────── */}
       <section className="min-h-screen w-full flex items-center justify-center px-6 py-24 relative overflow-hidden">
-        {/* Subtle bg glow */}
+        {/* Subtle bg glow — GPU radial gradient */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[60vh] bg-brand/5 blur-[120px] rounded-full" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[60vh] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-brand/10 via-transparent to-transparent rounded-full transform-gpu" />
         </div>
 
         <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center relative z-10">

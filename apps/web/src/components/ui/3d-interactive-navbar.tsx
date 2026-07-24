@@ -4,7 +4,8 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, ArrowRight } from "lucide-react";
+import { Menu, X, ArrowRight, Sparkles } from "lucide-react";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useTheme } from "next-themes";
@@ -14,6 +15,7 @@ import { fetchAPI } from "@/lib/api-client";
 /* ─── Default nav items (structural fallback while CMS loads) ─── */
 const DEFAULT_NAV_ITEMS = [
   { title: "Home", href: "/" },
+  { title: "Become a YouTuber", href: "/become-a-youtuber" },
   { title: "Showreels", href: "/reel" },
   { title: "Portfolio", href: "/portfolio" },
   { title: "Services", href: "/services" },
@@ -26,6 +28,7 @@ const DEFAULT_NAV_ITEMS = [
 /* Default image map for flowing menu — maps href to image */
 const DEFAULT_MENU_IMAGES: Record<string, string> = {
   "/": "/assets/cinematic-16-9.png",
+  "/become-a-youtuber": "/images/services-lighting.jpg",
   "/reel": "/images/about-bts.jpg",
   "/portfolio": "/assets/project-fashion.jpg",
   "/services": "/assets/service_pre_production.png",
@@ -42,6 +45,32 @@ export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { resolvedTheme } = useTheme();
   const [navItems, setNavItems] = useState(DEFAULT_NAV_ITEMS);
+  const [studentUser, setStudentUser] = useState<{ name: string; email: string } | null>(null);
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const isLoggedIn = sessionStorage.getItem('mp_student_logged_in') === 'true';
+      const name = sessionStorage.getItem('mp_student_name');
+      const email = sessionStorage.getItem('mp_student_email');
+      if (isLoggedIn && name) {
+        setStudentUser({ name, email: email || '' });
+      }
+    }
+  }, []);
+
+  function handleSignOut() {
+    if (typeof window !== 'undefined') {
+      sessionStorage.removeItem('mp_student_logged_in');
+      sessionStorage.removeItem('mp_student_name');
+      sessionStorage.removeItem('mp_student_email');
+      sessionStorage.removeItem('mp_student_phone');
+      sessionStorage.removeItem('mp_sec_token');
+    }
+    setStudentUser(null);
+    setUserDropdownOpen(false);
+    toast.success('👋 Signed out successfully!');
+  }
   
   const isForcedDark = false; // Deprecated, theme variables are now light-aware
   const useLightText = resolvedTheme === "dark";
@@ -112,18 +141,63 @@ export function Navbar() {
           </Link>
 
           {/* ── Right Side ── */}
-          <div className="flex items-center gap-2 sm:gap-4">
+          <div className="flex items-center gap-2 sm:gap-3">
             <Link
-              href="/login"
-              className={cn(
-                "inline-flex items-center text-xs font-bold tracking-widest uppercase transition-all px-3 py-1.5 rounded-full border shadow-sm backdrop-blur-md",
-                scrolled 
-                  ? "text-foreground hover:text-brand bg-surface/80 border-border" 
-                  : "text-white hover:text-brand bg-black/50 border-white/20 drop-shadow"
-              )}
+              href="/become-a-youtuber"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 text-[11px] sm:text-xs font-extrabold tracking-wider uppercase rounded-full transition-all duration-300 bg-gradient-to-r from-amber-500 via-rose-500 to-brand text-white hover:opacity-95 shadow-md shrink-0 border border-amber-300/40"
+              data-cursor="hover"
             >
-              Sign In
+              <Sparkles className="w-3.5 h-3.5 text-amber-200 fill-amber-200" />
+              <span>Become a YouTuber</span>
             </Link>
+
+            {studentUser ? (
+              <div className="relative">
+                <button
+                  onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-emerald-500/40 bg-emerald-500/15 text-emerald-500 text-xs font-bold shadow-sm hover:bg-emerald-500/25 transition-all cursor-pointer"
+                >
+                  <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span>👤 {studentUser.name}</span>
+                  <svg className="w-3.5 h-3.5 fill-none stroke-current stroke-2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="m6 9 6 6 6-6"/></svg>
+                </button>
+
+                {userDropdownOpen && (
+                  <div 
+                    onClick={() => setUserDropdownOpen(false)}
+                    className="absolute right-0 mt-2 w-48 rounded-2xl bg-card border border-border p-2 shadow-2xl z-50 text-xs space-y-1 animate-in fade-in zoom-in-95 duration-150"
+                  >
+                    <Link
+                      href="/creator-lab"
+                      className="flex items-center gap-2 p-2 rounded-xl text-foreground font-bold hover:bg-muted transition-colors"
+                    >
+                      <svg className="w-4 h-4 text-brand fill-none stroke-current stroke-2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path strokeLinecap="round" strokeLinejoin="round" d="M6 6h10M6 10h10"/></svg>
+                      <span>My Student Academy</span>
+                    </Link>
+                    <button
+                      onClick={handleSignOut}
+                      className="w-full flex items-center gap-2 p-2 rounded-xl text-rose-500 font-bold hover:bg-rose-500/10 transition-colors text-left cursor-pointer"
+                    >
+                      <svg className="w-4 h-4 text-rose-500 fill-none stroke-current stroke-2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+                      <span>Sign Out / Logout</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link
+                href="/login"
+                className={cn(
+                  "inline-flex items-center text-xs font-bold tracking-widest uppercase transition-all px-3 py-1.5 rounded-full border shadow-sm backdrop-blur-md hidden sm:inline-flex",
+                  scrolled 
+                    ? "text-foreground hover:text-brand bg-surface/80 border-border" 
+                    : "text-white hover:text-brand bg-black/50 border-white/20 drop-shadow"
+                )}
+              >
+                Sign In
+              </Link>
+            )}
+
             <Link
               href="/join/talent"
               className="inline-flex items-center gap-1.5 px-3.5 py-1.5 sm:px-4 sm:py-2 text-[11px] sm:text-xs font-bold tracking-wider uppercase rounded-full transition-all duration-300 bg-brand text-white hover:bg-brand/90 hover:shadow-[0_0_15px_rgba(235,61,38,0.4)] shadow-md shrink-0 border border-brand/30"
@@ -131,6 +205,7 @@ export function Navbar() {
             >
               Talent Register
             </Link>
+
 
             <ThemeToggle />
 

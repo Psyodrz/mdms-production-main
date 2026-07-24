@@ -25,6 +25,7 @@ import {
   Building2,
   Shield,
   UserCheck,
+  GraduationCap,
   type LucideIcon,
   FolderKanban,
   MessageSquare,
@@ -51,6 +52,7 @@ const ICONS: Record<string, LucideIcon> = {
   Building2,
   Shield,
   UserCheck,
+  GraduationCap,
   FolderKanban,
   MessageSquare,
   Bot,
@@ -101,6 +103,25 @@ const NAV: { section: string; items: NavItem[] }[] = [
     ],
   },
   {
+    section: 'Creator Academy & Students',
+    items: [
+      { href: '/super-admin/cms/courses', label: 'Creator Courses & Videos', icon: 'GraduationCap' },
+      { href: '/super-admin/cms/students', label: 'Student Access & UTR Approvals', icon: 'UserCheck' },
+    ],
+  },
+  {
+    section: 'Sales & CRM Pipeline',
+    items: [
+      { href: '/super-admin/cms/sales', label: 'Sales Manager Control Hub', icon: 'Target' },
+      { href: '/super-admin/cms/salesLeads', label: 'Sales Leads & CRM', icon: 'FolderKanban' },
+      { href: '/super-admin/cms/salesTargets', label: 'Sales Targets & Quotas', icon: 'Sliders' },
+      { href: '/super-admin/cms/referrals', label: 'Referrals & Rewards', icon: 'Users' },
+      { href: '/super-admin/cms/bookings', label: 'Bookings & Inquiries', icon: 'Layers' },
+    ],
+  },
+
+
+  {
     section: 'Super Admin Operations',
     items: [
       { href: '/studio-8f2k/users', label: 'Users & Roles (RBAC)', icon: 'Users' },
@@ -115,7 +136,8 @@ const NAV: { section: string; items: NavItem[] }[] = [
 
 function NavLinks({ pathname, onNavigate }: { pathname: string; onNavigate?: () => void }) {
   return (
-    <nav className="flex flex-col gap-8 pb-16">
+    <nav className="flex flex-col gap-8 pb-36">
+
       {NAV.map((group) => (
         <div key={group.section} className="flex flex-col gap-2">
           <p className="px-3 text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground/85">
@@ -162,19 +184,19 @@ export function CmsShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-background">
-      {/* Desktop sidebar — smooth scrollable overflow */}
-      <aside className="hidden md:flex md:w-64 md:flex-col md:fixed md:top-0 md:bottom-0 h-screen max-h-screen border-r border-border bg-surface px-4 py-6 overflow-y-auto scrollbar-thin z-40 shadow-xl pb-24">
-        <div className="px-3 py-4 mb-4 border-b border-border/60 shrink-0">
+      {/* Desktop sidebar — single smooth scrollable container */}
+      <aside className="hidden md:block fixed top-0 left-0 bottom-0 w-64 h-screen overflow-y-auto border-r border-border bg-surface px-4 py-6 z-40 shadow-xl">
+        <div className="px-3 py-4 mb-4 border-b border-border/60">
           <div className="flex items-center gap-2.5 mb-1">
             <div className="w-2.5 h-2.5 rounded-full bg-[#eb3d26] animate-pulse" />
             <p className="text-base font-serif font-bold text-foreground tracking-wide">Command Center</p>
           </div>
           <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold">Super Admin & CMS Studio</p>
         </div>
-        <div className="flex-1 overflow-y-auto pr-1">
-          <NavLinks pathname={pathname} />
-        </div>
+        <NavLinks pathname={pathname} />
       </aside>
+
+
 
       {/* Mobile top bar */}
       <header className="md:hidden sticky top-0 z-40 flex items-center justify-between border-b border-border bg-surface/95 backdrop-blur px-4 py-3">

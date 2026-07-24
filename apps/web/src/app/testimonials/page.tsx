@@ -1,4 +1,6 @@
 import { Navbar } from '@/components/ui/Navbar';
+
+export const dynamic = 'force-dynamic';
 import { Footer } from '@/components/ui/Footer';
 import { Reveal } from '@/components/ui/Reveal';
 import { Container } from '@/components/ui/Container';

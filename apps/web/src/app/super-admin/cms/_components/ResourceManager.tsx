@@ -66,15 +66,19 @@ export function ResourceManager({ config }: { config: ResourceConfig }) {
   const load = useCallback(async () => {
     setLoading(true);
     const res = await cms.list<Item[]>(config.key);
-    if (res.ok && Array.isArray(res.data)) {
+    if (res.ok && Array.isArray(res.data) && res.data.length > 0) {
       setItems(res.data);
       setDemo(false);
+    } else if (config.sample && config.sample.length > 0) {
+      setItems(config.sample as Item[]);
+      setDemo(true);
     } else {
       setItems([]);
       setDemo(false);
     }
     setLoading(false);
   }, [config]);
+
 
   useEffect(() => {
     load();

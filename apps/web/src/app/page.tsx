@@ -158,6 +158,7 @@ export default function Home() {
       <CinematicProductScrollSection items={portfolio} />
       <Intro intro={intro} />
       <Services services={services} loading={loading} />
+      <BecomeAYouTuberSection />
       <FeaturedProjects portfolio={portfolio} loading={loading} onOpenModal={setActiveModalProject} />
       <FeaturedTalent talent={talent} loading={loading} />
       <Stats stats={stats} />
@@ -165,6 +166,7 @@ export default function Home() {
       <CinematicTestimonial />
       <Faq faqs={faqs} loading={loading} />
       <ContactCta />
+
 
       {/* Theatrical Production Reel & Spec Sheet Lightbox Modal */}
       <CinematicViewerModal
@@ -214,9 +216,10 @@ function Hero({ hero, onOpenModal }: { hero?: any; onOpenModal?: (project: Proje
     <section className="relative min-h-screen flex items-end overflow-hidden isolate pb-0 px-0 sm:px-4 lg:px-6">
       {/* Background layer — Full Bleed Merged With Navbar */}
       <div className="absolute inset-0 top-0 bottom-4 -z-10 bg-[#060608] overflow-hidden select-none rounded-none sm:rounded-b-[3rem] border-b border-[var(--cinematic-border)]/50">
-        <div ref={bgRef} className="absolute inset-0 h-[120%] w-full -top-[10%]">
+        <div ref={bgRef} className="absolute inset-0 h-[120%] w-full -top-[10%] transform-gpu" style={{ transform: 'translateZ(0)' }}>
+
           <video
-            className="absolute inset-0 h-full w-full object-cover object-center"
+            className="absolute inset-0 h-full w-full object-cover object-center transform-gpu"
             autoPlay={true}
             muted={true}
             loop={true}
@@ -226,6 +229,7 @@ function Hero({ hero, onOpenModal }: { hero?: any; onOpenModal?: (project: Proje
             <source src="https://zmpeiobdilrgtuzggzuj.supabase.co/storage/v1/object/public/mdms/videos/hero.mp4" type="video/mp4" />
           </video>
         </div>
+
         {/* Top Vignette Gradient for Navbar Contrast */}
         <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-black/80 via-black/40 to-transparent z-1 pointer-events-none" />
         <div className="absolute inset-0 dark:bg-black/65 bg-black/45 pointer-events-none" />
@@ -300,13 +304,15 @@ function Hero({ hero, onOpenModal }: { hero?: any; onOpenModal?: (project: Proje
 
           <MagneticButton strength={20}>
             <Link
-              href="/reel"
-              className="group bg-white/20 hover:bg-white/35 text-white inline-flex items-center gap-3 rounded-full border border-white/30 px-9 py-4 text-base sm:text-lg font-bold tracking-wide backdrop-blur-md transition-all cursor-pointer shadow-md"
+              href="/become-a-youtuber"
+              className="group inline-flex items-center gap-3 rounded-full border border-border bg-surface hover:bg-surface-elevated text-foreground px-9 py-4 text-base sm:text-lg font-bold tracking-wide backdrop-blur-md transition-all cursor-pointer shadow-md hover:border-brand/60"
             >
-              <Play className="h-4 w-4 fill-white text-white" />
-              <span>Play Reel</span>
+              <Sparkles className="h-5 w-5 text-brand fill-brand" />
+              <span>Become a YouTuber</span>
             </Link>
           </MagneticButton>
+
+
 
           <MagneticButton strength={20}>
             <Link
@@ -567,7 +573,7 @@ function Services({ services = [], loading }: { services?: any[]; loading?: bool
 
               return (
                 <Reveal key={s.id || idx} direction="up" delay={idx * 0.05}>
-                  <div className="group relative rounded-[2rem] border border-border bg-card hover:border-brand/60 transition-all duration-500 overflow-hidden shadow-xl p-8 sm:p-12">
+                  <div className="group relative rounded-[2rem] border border-border bg-card hover:border-brand/60 transition-[border-color,box-shadow,transform] duration-300 overflow-hidden shadow-xl p-8 sm:p-12 transform-gpu">
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
                       
                       {/* Left: Metadata & Titles */}
@@ -1066,9 +1072,9 @@ function ContactCta() {
   return (
     <section className="px-4 sm:px-6 lg:px-8 pb-12 md:pb-16">
       <div className="relative overflow-hidden rounded-[2rem] md:rounded-[3rem] py-16 md:py-24 bg-gradient-to-br from-[var(--cinematic-bg)] via-[#0e0810] to-[var(--cinematic-bg)] border border-white/20">
-      {/* Ambient glow */}
-      <div className="pointer-events-none absolute -right-40 -top-40 h-[500px] w-[500px] rounded-full bg-brand/10 blur-[160px]" />
-      <div className="pointer-events-none absolute -left-20 bottom-0 h-80 w-80 rounded-full bg-brand/5 blur-[120px]" />
+      {/* Ambient glow — GPU radial gradients */}
+      <div className="pointer-events-none absolute -right-40 -top-40 h-[500px] w-[500px] rounded-full bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-brand/15 via-brand/5 to-transparent transform-gpu" />
+      <div className="pointer-events-none absolute -left-20 bottom-0 h-80 w-80 rounded-full bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-brand/10 via-brand/2 to-transparent transform-gpu" />
 
       <div className="relative mx-auto max-w-4xl px-6 sm:px-10 text-center">
         <Reveal direction="up">
@@ -1115,3 +1121,165 @@ function ContactCta() {
     </section>
   );
 }
+
+/* ═══════════════════════════════════════════════════════════
+   BECOME A YOUTUBER — GenZ Creator Lab Spotlight Section
+   ═══════════════════════════════════════════════════════════ */
+function BecomeAYouTuberSection() {
+  return (
+    <section className="relative py-28 px-6 sm:px-10 overflow-hidden bg-background text-foreground isolate border-t border-b border-border/50">
+      {/* Ambient Radial Lights — Hardware-accelerated GPU radial gradients */}
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[90vw] h-[60vh] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-brand/15 via-brand/5 to-transparent rounded-full pointer-events-none transform-gpu -z-10" />
+      <div className="absolute bottom-0 right-0 w-[45vw] h-[45vh] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-amber-500/10 via-amber-500/2 to-transparent rounded-full pointer-events-none transform-gpu -z-10" />
+
+      <div className="mx-auto max-w-7xl space-y-16">
+        {/* Top Header & Eyebrow */}
+        <Reveal direction="up">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-border/60 pb-10">
+            <div className="space-y-4 max-w-3xl">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand/15 border border-brand/40 text-brand text-xs font-bold uppercase tracking-[0.3em] shadow-[0_0_20px_rgba(229,9,20,0.25)]">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>GenZ Creator Lab</span>
+              </div>
+
+              <h2 className="font-display text-5xl sm:text-7xl lg:text-8xl font-bold text-foreground tracking-tight leading-[0.95]">
+                Become a <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand via-rose-500 to-amber-500">YouTuber</span>
+              </h2>
+
+              <p className="text-lg sm:text-xl text-muted-foreground font-medium leading-relaxed max-w-2xl">
+                Stop guessing the algorithm. Access MP Production&apos;s battle-tested Creator Masterclasses — 4K camera setups, viral retention hooks, DaVinci color grading, and 6-figure sponsor deal playbooks.
+              </p>
+            </div>
+
+            <div className="shrink-0">
+              <MagneticButton strength={20}>
+                <Link
+                  href="/become-a-youtuber"
+                  className="group inline-flex items-center gap-3 rounded-full bg-brand hover:bg-foreground hover:text-background px-9 py-4 text-base sm:text-lg font-bold tracking-wide text-white transition-all duration-300 shadow-[0_0_40px_rgba(229,9,20,0.4)] cursor-pointer"
+                >
+                  <span>Explore Courses</span>
+                  <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+                </Link>
+              </MagneticButton>
+            </div>
+          </div>
+        </Reveal>
+
+        {/* 4-Card Masterclass Showcase Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[
+            {
+              title: '4K Cinematic Vlogging Masterclass',
+              category: 'CAMERA & LIGHTING',
+              duration: '4.5 Hours',
+              rating: '4.9 ★',
+              image: '/images/services-lighting.jpg',
+              bullets: ['3-Point Studio Lighting', 'Sony/Canon Log Setup'],
+              color: 'text-amber-500 dark:text-amber-400',
+            },
+            {
+              title: 'Viral Hooks & 100K Algorithm Hacking',
+              category: 'VIRAL GROWTH',
+              duration: '3.2 Hours',
+              rating: '5.0 ★',
+              image: '/assets/project-fashion.jpg',
+              bullets: ['3-Second Retention Hooks', 'High-CTR Thumbnails'],
+              color: 'text-rose-500 dark:text-rose-400',
+            },
+            {
+              title: 'DaVinci Resolve Hollywood Color Grading',
+              category: 'EDITING & VFX',
+              duration: '5.0 Hours',
+              rating: '4.9 ★',
+              image: '/images/about-bts.jpg',
+              bullets: ['Node Graph Architecture', 'Skin Tone Qualifiers'],
+              color: 'text-cyan-500 dark:text-cyan-400',
+            },
+            {
+              title: '6-Figure Brand Deals & Monetization',
+              category: 'MONETIZATION',
+              duration: '2.8 Hours',
+              rating: '4.8 ★',
+              image: '/assets/service_casting.png',
+              bullets: ['Media Kit Templates', 'Brand Pitch Scripts'],
+              color: 'text-emerald-500 dark:text-emerald-400',
+            },
+          ].map((card, idx) => (
+            <Reveal key={idx} direction="up" delay={idx * 0.1}>
+              <Link
+                href="/become-a-youtuber"
+                className="group border border-border rounded-3xl overflow-hidden bg-card hover:border-brand/60 transition-[border-color,box-shadow,transform] duration-300 shadow-xl flex flex-col justify-between h-full transform-gpu"
+              >
+                <div>
+                  {/* Thumbnail Image */}
+                  <div className="relative aspect-[16/10] w-full overflow-hidden bg-muted">
+                    <Image
+                      src={card.image}
+                      alt={card.title}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 25vw"
+                      className="object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                    
+                    <div className="absolute top-3 left-3 z-10">
+                      <span className="px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-brand text-white shadow-md">
+                        {card.category}
+                      </span>
+                    </div>
+
+                    <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-[11px] font-semibold text-white z-10">
+                      <span>{card.duration}</span>
+                      <span className={card.color}>{card.rating}</span>
+                    </div>
+                  </div>
+
+                  {/* Card Info */}
+                  <div className="p-5 space-y-3">
+                    <h3 className="text-base font-bold font-serif text-foreground group-hover:text-brand transition-colors leading-snug">
+                      {card.title}
+                    </h3>
+                    <div className="space-y-1.5 pt-1">
+                      {card.bullets.map((b, bIdx) => (
+                        <div key={bIdx} className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                          <CheckCircle2 className="w-3 h-3 text-emerald-500 shrink-0" />
+                          <span>{b}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Footer Action */}
+                <div className="p-5 pt-0">
+                  <div className="w-full py-2.5 rounded-xl border border-border bg-muted/50 group-hover:bg-brand group-hover:border-brand group-hover:text-white text-center text-xs font-bold uppercase tracking-wider text-foreground transition-colors duration-300 flex items-center justify-center gap-2">
+                    <span>Explore Blueprint</span>
+                    <ArrowUpRight className="w-3.5 h-3.5" />
+                  </div>
+                </div>
+              </Link>
+            </Reveal>
+          ))}
+        </div>
+
+        {/* Bottom Banner Stats Strip */}
+        <Reveal direction="up">
+          <div className="p-6 md:p-8 rounded-3xl border border-border bg-card/80 backdrop-blur-xl flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left shadow-xl">
+            <div className="space-y-1">
+              <h4 className="text-xl font-bold font-serif text-foreground">Ready to scale your YouTube channel to 100K+?</h4>
+              <p className="text-xs text-muted-foreground font-medium">10,000+ Creators Trained · 100% Practical & RAW Workflows · 4.9★ Average Rating</p>
+            </div>
+            <Link
+              href="/become-a-youtuber"
+              className="px-8 py-3.5 rounded-full bg-brand text-white hover:bg-foreground hover:text-background text-xs font-bold tracking-wider uppercase transition-all duration-300 shadow-xl shrink-0"
+            >
+              Explore All Masterclasses →
+            </Link>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+

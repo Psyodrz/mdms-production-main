@@ -52,7 +52,15 @@ export class CmsService {
       booking:      this.prisma.booking,
       mediaAsset:   this.prisma.mediaAsset,
       featureFlag:  this.prisma.featureFlag,
+      salesLead:    this.prisma.salesLead,
+      salesTarget:  this.prisma.salesTarget,
+      referral:     this.prisma.referral,
+      course:       this.prisma.course,
+      lesson:       this.prisma.lesson,
+      student:      this.prisma.studentEnrollment,
+      studentEnrollment: this.prisma.studentEnrollment,
     } as const;
+
 
     const model = MODEL_MAP[modelType as keyof typeof MODEL_MAP];
     if (!model) {
@@ -1074,4 +1082,258 @@ export class CmsService {
     await this.audit({ actorId: actorId || 'SYSTEM', action: 'DELETE_FEATURE_FLAG', resource: 'FeatureFlag', resourceId: id });
     return result;
   }
+
+  // ── Sales Leads Admin ─────────────────────────────────────
+  async getSalesLeadsAdmin(dto?: PaginationDto) {
+    const page = dto?.page || 1;
+    const limit = dto?.limit || 20;
+    const [data, total] = await Promise.all([
+      this.prisma.salesLead.findMany({
+        where: { deletedAt: null },
+        skip: (page - 1) * limit,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.salesLead.count({ where: { deletedAt: null } }),
+    ]);
+    return { data, total, page, totalPages: Math.ceil(total / limit) };
+  }
+
+  async upsertSalesLead(data: any, actorId?: string) {
+    const id = data.id;
+    let result;
+    const payload = {
+      clientName: data.clientName,
+      email: data.email || null,
+      phone: data.phone || null,
+      source: data.source || 'WEBSITE',
+      stage: data.stage || 'NEW',
+      estimatedValue: data.estimatedValue ? parseInt(data.estimatedValue, 10) : null,
+      notes: data.notes || null,
+    };
+
+    if (id) {
+      result = await this.prisma.salesLead.update({ where: { id }, data: payload });
+      await this.audit({ actorId: actorId || 'SYSTEM', action: 'UPDATE_SALES_LEAD', resource: 'SalesLead', resourceId: id });
+    } else {
+      result = await this.prisma.salesLead.create({ data: payload });
+      await this.audit({ actorId: actorId || 'SYSTEM', action: 'CREATE_SALES_LEAD', resource: 'SalesLead', resourceId: result.id });
+    }
+    return result;
+  }
+
+  async deleteSalesLead(id: string, actorId?: string) {
+    const result = await this.prisma.salesLead.update({ where: { id }, data: { deletedAt: new Date() } });
+    await this.audit({ actorId: actorId || 'SYSTEM', action: 'SOFT_DELETE_SALES_LEAD', resource: 'SalesLead', resourceId: id });
+    return result;
+  }
+
+  // ── Sales Targets Admin ───────────────────────────────────
+  async getSalesTargetsAdmin(dto?: PaginationDto) {
+    const page = dto?.page || 1;
+    const limit = dto?.limit || 20;
+    const [data, total] = await Promise.all([
+      this.prisma.salesTarget.findMany({
+        where: { deletedAt: null },
+        skip: (page - 1) * limit,
+        take: limit,
+        orderBy: [{ year: 'desc' }, { month: 'desc' }],
+      }),
+      this.prisma.salesTarget.count({ where: { deletedAt: null } }),
+    ]);
+    return { data, total, page, totalPages: Math.ceil(total / limit) };
+  }
+
+  async upsertSalesTarget(data: any, actorId?: string) {
+    const id = data.id;
+    let result;
+    const year = parseInt(data.year, 10);
+    const month = parseInt(data.month, 10);
+    const payload = {
+      year,
+      month,
+      targetAmount: parseInt(data.targetAmount, 10) || 0,
+      achievedAmount: data.achievedAmount ? parseInt(data.achievedAmount, 10) : 0,
+      targetBookings: data.targetBookings ? parseInt(data.targetBookings, 10) : 10,
+      achievedBookings: data.achievedBookings ? parseInt(data.achievedBookings, 10) : 0,
+      notes: data.notes || null,
+    };
+
+    if (id) {
+      result = await this.prisma.salesTarget.update({ where: { id }, data: payload });
+      await this.audit({ actorId: actorId || 'SYSTEM', action: 'UPDATE_SALES_TARGET', resource: 'SalesTarget', resourceId: id });
+    } else {
+      result = await this.prisma.salesTarget.upsert({
+        where: { year_month: { year, month } },
+        update: payload,
+        create: payload,
+      });
+      await this.audit({ actorId: actorId || 'SYSTEM', action: 'UPSERT_SALES_TARGET', resource: 'SalesTarget', resourceId: result.id });
+    }
+    return result;
+  }
+
+  async deleteSalesTarget(id: string, actorId?: string) {
+    const result = await this.prisma.salesTarget.update({ where: { id }, data: { deletedAt: new Date() } });
+    await this.audit({ actorId: actorId || 'SYSTEM', action: 'SOFT_DELETE_SALES_TARGET', resource: 'SalesTarget', resourceId: id });
+    return result;
+  }
+
+  // ── Referrals Admin ────────────────────────────────────────
+  async getReferralsAdmin(dto?: PaginationDto) {
+    const page = dto?.page || 1;
+    const limit = dto?.limit || 20;
+    const [data, total] = await Promise.all([
+      this.prisma.referral.findMany({
+        where: { deletedAt: null },
+        skip: (page - 1) * limit,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.referral.count({ where: { deletedAt: null } }),
+    ]);
+    return { data, total, page, totalPages: Math.ceil(total / limit) };
+  }
+
+  async upsertReferral(data: any, actorId?: string) {
+    const id = data.id;
+    let result;
+    const payload = {
+      referrerName: data.referrerName,
+      referrerEmail: data.referrerEmail,
+      referredClientName: data.referredClientName,
+      referredClientPhone: data.referredClientPhone || null,
+      status: data.status || 'PENDING',
+      rewardAmount: data.rewardAmount ? parseInt(data.rewardAmount, 10) : null,
+      referralCode: data.referralCode || null,
+    };
+
+    if (id) {
+      result = await this.prisma.referral.update({ where: { id }, data: payload });
+      await this.audit({ actorId: actorId || 'SYSTEM', action: 'UPDATE_REFERRAL', resource: 'Referral', resourceId: id });
+    } else {
+      result = await this.prisma.referral.create({ data: payload });
+      await this.audit({ actorId: actorId || 'SYSTEM', action: 'CREATE_REFERRAL', resource: 'Referral', resourceId: result.id });
+    }
+    return result;
+  }
+
+  async deleteReferral(id: string, actorId?: string) {
+    const result = await this.prisma.referral.update({ where: { id }, data: { deletedAt: new Date() } });
+    await this.audit({ actorId: actorId || 'SYSTEM', action: 'SOFT_DELETE_REFERRAL', resource: 'Referral', resourceId: id });
+    return result;
+  }
+
+  // ── Student Management & Creator Academy Realtime Security ──
+  async blockStudent(id: string, actorId?: string) {
+    const student = await this.prisma.studentEnrollment.update({
+      where: { id },
+      data: { isBlocked: true },
+    });
+    await this.audit({ actorId: actorId || 'SYSTEM', action: 'BLOCK_STUDENT', resource: 'StudentEnrollment', resourceId: id });
+    return student;
+  }
+
+  async unblockStudent(id: string, actorId?: string) {
+    const student = await this.prisma.studentEnrollment.update({
+      where: { id },
+      data: { isBlocked: false },
+    });
+    await this.audit({ actorId: actorId || 'SYSTEM', action: 'UNBLOCK_STUDENT', resource: 'StudentEnrollment', resourceId: id });
+    return student;
+  }
+
+  async approveEnrollment(id: string, actorId?: string) {
+    const student = await this.prisma.studentEnrollment.update({
+      where: { id },
+      data: { status: 'APPROVED' },
+    });
+    await this.audit({ actorId: actorId || 'SYSTEM', action: 'APPROVE_STUDENT_ENROLLMENT', resource: 'StudentEnrollment', resourceId: id });
+    return student;
+  }
+
+  async submitStudentUtr(dto: { name: string; email: string; phone?: string; courseId: string; utrNumber: string }) {
+    let course = await this.prisma.course.findFirst({ where: { OR: [{ id: dto.courseId }, { slug: dto.courseId }] } });
+    if (!course) {
+      course = await this.prisma.course.create({
+        data: {
+          id: dto.courseId,
+          slug: dto.courseId,
+          title: 'Creator Masterclass',
+          categoryLabel: 'Masterclass',
+          duration: '4 Hours',
+          price: '₹4,999',
+          numericPrice: 4999,
+          originalPrice: '₹12,999',
+          image: '/images/services-lighting.jpg',
+          instructorName: 'Master Instructor',
+        },
+      });
+    }
+
+    const existing = await this.prisma.studentEnrollment.findFirst({
+      where: { studentEmail: dto.email, courseId: course.id },
+    });
+
+    if (existing) {
+      return this.prisma.studentEnrollment.update({
+        where: { id: existing.id },
+        data: {
+          utrNumber: dto.utrNumber,
+          status: 'PENDING_APPROVAL',
+          studentPhone: dto.phone || existing.studentPhone,
+        },
+      });
+    }
+
+    return this.prisma.studentEnrollment.create({
+      data: {
+        studentName: dto.name,
+        studentEmail: dto.email,
+        studentPhone: dto.phone || '',
+        courseId: course.id,
+        utrNumber: dto.utrNumber,
+        status: 'PENDING_APPROVAL',
+      },
+    });
+  }
+
+  async getAdminStudentsList(dto?: PaginationDto) {
+    const page = dto?.page || 1;
+    const limit = dto?.limit || 50;
+    const [data, total] = await Promise.all([
+      this.prisma.studentEnrollment.findMany({
+        skip: (page - 1) * limit,
+        take: limit,
+        include: { course: true },
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.studentEnrollment.count(),
+    ]);
+    return { data, total, page, totalPages: Math.ceil(total / limit) };
+  }
+
+  async checkStudentStatus(email: string, courseId: string) {
+    if (!email) return { status: 'UNAUTHENTICATED', isBlocked: false, isUnlocked: false };
+
+    const enrollment = await this.prisma.studentEnrollment.findFirst({
+      where: { studentEmail: email },
+      include: { course: true },
+      orderBy: { updatedAt: 'desc' },
+    });
+
+    if (!enrollment) {
+      return { status: 'NOT_ENROLLED', isBlocked: false, isUnlocked: false };
+    }
+
+    return {
+      status: enrollment.status,
+      isBlocked: enrollment.isBlocked,
+      isUnlocked: enrollment.status === 'APPROVED' && !enrollment.isBlocked,
+      studentName: enrollment.studentName,
+      utrNumber: enrollment.utrNumber,
+      courseTitle: enrollment.course?.title,
+    };
+  }
 }
+

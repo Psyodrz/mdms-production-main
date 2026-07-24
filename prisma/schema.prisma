@@ -1201,6 +1201,122 @@ model MediaAsset {
   @@index([uploadedById])
 }
 
+// ── Sales & Pipeline Management ──────────────────────────────
+
+model SalesLead {
+  id             String    @id @default(cuid())
+  clientName     String
+  email          String?
+  phone          String?
+  source         String    @default("WEBSITE") // CALL, SOCIAL_MEDIA, WHATSAPP, REFERRAL, WEBSITE
+  stage          String    @default("NEW") // NEW, CONTACTED, REQUIREMENT_GATHERED, PROPOSAL_SENT, NEGOTIATION, WON, LOST
+  estimatedValue Int?      // in paise
+  notes          String?   @db.Text
+  assignedToId   String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  deletedAt      DateTime?
+
+  @@index([stage])
+  @@index([source])
+}
+
+model SalesTarget {
+  id               String    @id @default(cuid())
+  month            Int       // 1-12
+  year             Int       // e.g. 2026
+  targetAmount     Int       // in paise
+  achievedAmount   Int       @default(0) // in paise
+  targetBookings   Int       @default(10)
+  achievedBookings Int       @default(0)
+  notes            String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  deletedAt        DateTime?
+
+  @@unique([year, month])
+}
+
+model Referral {
+  id                  String    @id @default(cuid())
+  referrerName        String
+  referrerEmail       String
+  referredClientName  String
+  referredClientPhone String?
+  status              String    @default("PENDING") // PENDING, BOOKED, REWARD_PAID, EXPIRED
+  rewardAmount        Int?      // in paise
+  referralCode        String?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  deletedAt           DateTime?
+
+  @@index([status])
+}
+
+// ── Creator Academy & Student Management ─────────────
+
+model Course {
+  id            String    @id @default(cuid())
+  slug          String    @unique
+  title         String
+  categoryLabel String
+  duration      String
+  lessonsCount  Int       @default(0)
+  price         String
+  numericPrice  Int
+  originalPrice String
+  image         String
+  instructorName String
+  description   String?   @db.Text
+  isPublished   Boolean   @default(true)
+  sortOrder     Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  lessons       Lesson[]
+  enrollments   StudentEnrollment[]
+
+  @@index([isPublished])
+}
+
+model Lesson {
+  id            String    @id @default(cuid())
+  courseId      String
+  course        Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  title         String
+  duration      String
+  videoUrl      String
+  isFreePreview Boolean   @default(false)
+  sortOrder     Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([courseId])
+}
+
+model StudentEnrollment {
+  id            String    @id @default(cuid())
+  studentName   String
+  studentEmail  String
+  studentPhone  String?
+  courseId      String
+  course        Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  utrNumber     String?
+  status        String    @default("PENDING") // PENDING, APPROVED, REJECTED
+  isBlocked     Boolean   @default(false)
+  secToken      String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([studentEmail])
+  @@index([courseId])
+  @@index([status])
+  @@index([isBlocked])
+}
+
+
+
 
 
 

@@ -447,4 +447,99 @@ export class CmsController {
   async deleteFeatureFlag(@Req() req: any, @Param('id') id: string) {
     return this.cmsService.deleteFeatureFlag(id, req.user?.id);
   }
+
+  // ── Sales Leads & CRM ──────────────────────────────────────
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Get('admin/sales-leads')
+  async getAdminSalesLeads(@Query() dto: PaginationDto) {
+    return this.cmsService.getSalesLeadsAdmin(dto);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Post('admin/sales-leads')
+  async upsertSalesLead(@Req() req: any, @Body() body: any) {
+    return this.cmsService.upsertSalesLead(body, req.user?.id);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Delete('admin/sales-leads/:id')
+  async deleteSalesLead(@Req() req: any, @Param('id') id: string) {
+    return this.cmsService.deleteSalesLead(id, req.user?.id);
+  }
+
+  // ── Sales Targets & Quotas ────────────────────────────────
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Get('admin/sales-targets')
+  async getAdminSalesTargets(@Query() dto: PaginationDto) {
+    return this.cmsService.getSalesTargetsAdmin(dto);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Post('admin/sales-targets')
+  async upsertSalesTarget(@Req() req: any, @Body() body: any) {
+    return this.cmsService.upsertSalesTarget(body, req.user?.id);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Delete('admin/sales-targets/:id')
+  async deleteSalesTarget(@Req() req: any, @Param('id') id: string) {
+    return this.cmsService.deleteSalesTarget(id, req.user?.id);
+  }
+
+  // ── Referrals ─────────────────────────────────────────────
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Get('admin/referrals')
+  async getAdminReferrals(@Query() dto: PaginationDto) {
+    return this.cmsService.getReferralsAdmin(dto);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Post('admin/referrals')
+  async upsertReferral(@Req() req: any, @Body() body: any) {
+    return this.cmsService.upsertReferral(body, req.user?.id);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Delete('admin/referrals/:id')
+  async deleteReferral(@Req() req: any, @Param('id') id: string) {
+    return this.cmsService.deleteReferral(id, req.user?.id);
+  }
+
+  // ── Student Management & Creator Academy Realtime Security ──
+  @Public()
+  @Post('students/submit-utr')
+  async submitStudentUtr(@Body() body: { name: string; email: string; phone?: string; courseId: string; utrNumber: string }) {
+    return this.cmsService.submitStudentUtr(body);
+  }
+
+  @Public()
+  @Get('students/check-status')
+  async checkStudentStatus(@Query('email') email: string, @Query('courseId') courseId: string) {
+    return this.cmsService.checkStudentStatus(email, courseId);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Get('admin/students')
+  async getAdminStudents(@Query() dto: PaginationDto) {
+    return this.cmsService.getAdminStudentsList(dto);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Patch('admin/students/:id/approve')
+  async approveStudent(@Req() req: any, @Param('id') id: string) {
+    return this.cmsService.approveEnrollment(id, req.user?.id);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Patch('admin/students/:id/block')
+  async blockStudent(@Req() req: any, @Param('id') id: string) {
+    return this.cmsService.blockStudent(id, req.user?.id);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Patch('admin/students/:id/unblock')
+  async unblockStudent(@Req() req: any, @Param('id') id: string) {
+    return this.cmsService.unblockStudent(id, req.user?.id);
+  }
 }
+
