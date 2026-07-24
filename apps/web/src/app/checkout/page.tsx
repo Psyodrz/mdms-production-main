@@ -208,14 +208,17 @@ function CheckoutContent() {
     setShowGatewayModal(true);
     setIsProcessing(true);
 
-    // Send real API request to NestJS /cms/students/submit-utr to record payment UTR for Super Admin verification
-    fetchAPI('/cms/students/submit-utr', {
+    // Submit UTR enrollment record via Next.js BFF endpoint to Supabase for Super Admin verification
+    fetch('/api/cms/students', {
       method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         name: studentInfo.name,
         email: studentInfo.email,
         phone: studentInfo.phone,
         courseId: course.id,
+        courseTitle: course.title,
+        coursePrice: `₹${finalPrice}`,
         utrNumber: utrInput.trim(),
       }),
     }).catch(() => {});

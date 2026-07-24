@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { fetchAPI } from '@/lib/api-client';
+import React, { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
 import {
   Users,
@@ -34,71 +33,63 @@ interface Student {
   };
 }
 
+/** Call same-origin Next.js BFF routes (NOT the NestJS API) */
+async function bffFetch(path: string, opts: RequestInit = {}) {
+  const res = await fetch(path, {
+    ...opts,
+    headers: { 'Content-Type': 'application/json', ...opts.headers },
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.error || `Request failed (${res.status})`);
+  }
+  return res.json();
+}
+
 export function StudentManagementClient() {
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [search, setSearch] = useState<string>('');
 
-  async function loadStudents() {
+  const loadStudents = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetchAPI('/cms/admin/students');
-      if (res && res.data) {
+      const res = await bffFetch('/api/cms/students');
+      if (res && res.data && Array.isArray(res.data)) {
         setStudents(res.data);
       } else {
-        // Fallback sample data if DB is empty
-        setStudents([
-          {
-            id: 'std-1',
-            studentName: 'Sahil Sharma',
-            studentEmail: 'sahil@creator.com',
-            studentPhone: '+91 98765 43210',
-            utrNumber: '420918239012',
-            status: 'PENDING_APPROVAL',
-            isBlocked: false,
-            createdAt: new Date().toISOString(),
-            course: {
-              title: 'How to Become a YouTuber: 100K Algorithm',
-              price: '₹4,999',
-            },
-          },
-        ]);
+        setStudents([]);
       }
-    } catch (e) {
-      toast.error('Could not fetch student list from backend.');
+    } catch {
+      toast.error('Could not fetch student list.');
+      setStudents([]);
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
 
   useEffect(() => {
     loadStudents();
-  }, []);
+  }, [loadStudents]);
 
   async function handleApprove(id: string, name: string) {
     try {
-      await fetchAPI(`/cms/admin/students/${id}/approve`, { method: 'PATCH' });
+      await bffFetch(`/api/cms/students/${id}?action=approve`, { method: 'PATCH' });
       toast.success(`🎉 Approved UTR & Unlocked Course for ${name}!`);
       loadStudents();
-    } catch (e) {
-      toast.success(`🎉 Approved UTR & Unlocked Course for ${name}! (Simulated)`);
-      setStudents(prev =>
-        prev.map(s => (s.id === id ? { ...s, status: 'APPROVED' } : s))
-      );
+    } catch {
+      toast.error(`Failed to approve ${name}.`);
     }
   }
 
   async function handleBlockToggle(id: string, currentBlocked: boolean, name: string) {
-    const endpoint = currentBlocked ? 'unblock' : 'block';
+    const action = currentBlocked ? 'unblock' : 'block';
     try {
-      await fetchAPI(`/cms/admin/students/${id}/${endpoint}`, { method: 'PATCH' });
+      await bffFetch(`/api/cms/students/${id}?action=${action}`, { method: 'PATCH' });
       toast.success(currentBlocked ? `✅ Unblocked ${name}` : `🚫 Blocked ${name}`);
       loadStudents();
-    } catch (e) {
-      toast.success(currentBlocked ? `✅ Unblocked ${name}` : `🚫 Blocked ${name}`);
-      setStudents(prev =>
-        prev.map(s => (s.id === id ? { ...s, isBlocked: !currentBlocked } : s))
-      );
+    } catch {
+      toast.error(`Failed to ${action} ${name}.`);
     }
   }
 
@@ -161,7 +152,14 @@ export function StudentManagementClient() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border text-xs">
-              {filteredStudents.length === 0 ? (
+              {loading ? (
+                <tr>
+                  <td colSpan={6} className="p-8 text-center text-muted-foreground">
+                    <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2" />
+                    Loading students from Supabase...
+                  </td>
+                </tr>
+              ) : filteredStudents.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="p-8 text-center text-muted-foreground">
                     No student enrollments found matching query.
