@@ -15,3 +15,7 @@ export function createAdminClient() {
     },
   });
 }
+
+// Alias for HMR cache compatibility
+export const getSupabaseAdmin = createAdminClient;
+
