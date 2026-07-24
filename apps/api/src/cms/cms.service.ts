@@ -1335,5 +1335,63 @@ export class CmsService {
       courseTitle: enrollment.course?.title,
     };
   }
+
+  // ── Creator Academy Courses Admin ──
+  async getCoursesAdmin(publishedOnly: boolean = false, dto?: PaginationDto) {
+    const page = dto?.page || 1;
+    const limit = dto?.limit || 50;
+    const where = {
+      deletedAt: null,
+      ...(publishedOnly ? { isPublished: true } : {}),
+    };
+
+    const [data, total] = await Promise.all([
+      this.prisma.course.findMany({
+        where,
+        skip: (page - 1) * limit,
+        take: limit,
+        include: { lessons: true },
+        orderBy: { sortOrder: 'asc' },
+      }),
+      this.prisma.course.count({ where }),
+    ]);
+    return { data, total, page, totalPages: Math.ceil(total / limit) };
+  }
+
+  async upsertCourse(data: any, actorId?: string) {
+    const id = data.id;
+    let result;
+    const payload = {
+      slug: data.slug || `course-${Date.now()}`,
+      title: data.title,
+      categoryLabel: data.categoryLabel || 'Masterclass',
+      duration: data.duration || '4 Hours',
+      price: data.price || '₹4,999',
+      numericPrice: data.numericPrice ? parseInt(data.numericPrice, 10) : 4999,
+      originalPrice: data.originalPrice || '₹12,999',
+      image: data.image || '/images/services-lighting.jpg',
+      instructorName: data.instructorName || 'Master Instructor',
+      description: data.description || null,
+      isPublished: data.isPublished !== undefined ? Boolean(data.isPublished) : true,
+    };
+
+    if (id) {
+      result = await this.prisma.course.update({ where: { id }, data: payload });
+      await this.audit({ actorId: actorId || 'SYSTEM', action: 'UPDATE_COURSE', resource: 'Course', resourceId: id });
+    } else {
+      result = await this.prisma.course.create({ data: payload });
+      await this.audit({ actorId: actorId || 'SYSTEM', action: 'CREATE_COURSE', resource: 'Course', resourceId: result.id });
+    }
+    return result;
+  }
+
+  async softDeleteCourse(id: string, actorId?: string) {
+    const result = await this.prisma.course.update({
+      where: { id },
+      data: { deletedAt: new Date() },
+    });
+    await this.audit({ actorId: actorId || 'SYSTEM', action: 'SOFT_DELETE_COURSE', resource: 'Course', resourceId: id });
+    return result;
+  }
 }
 

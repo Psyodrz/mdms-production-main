@@ -8,6 +8,8 @@ import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/Button';
 import { RichTextEditor } from '@/components/editor/RichTextEditor';
 import { MediaLibrary } from '@/components/admin/MediaLibrary';
+import { Upload, Film, Image as ImageIcon, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 import {
   Select,
   SelectContent,
@@ -168,6 +170,86 @@ export function ResourceForm({ config, initial, submitting, onSubmit, onCancel }
                       ))}
                     </SelectContent>
                   </Select>
+                ) : f.type === 'image' || f.name.toLowerCase().includes('image') || f.name.toLowerCase().includes('video') || f.name.toLowerCase().includes('photo') || f.name.toLowerCase().includes('media') ? (
+                  <div className="flex flex-col gap-2">
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                      <Input
+                        id={f.name}
+                        type="text"
+                        value={String(values[f.name] ?? '')}
+                        placeholder="Choose file from computer or enter URL..."
+                        onChange={(e) => set(f.name, e.target.value)}
+                        className="flex-1"
+                      />
+                      <label className="cursor-pointer bg-brand hover:bg-brand/90 text-white font-bold text-xs px-4 py-2.5 rounded-xl inline-flex items-center justify-center gap-2 shadow-sm shrink-0 transition-all">
+                        {uploadingField === f.name ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin text-white" />
+                            <span>Uploading...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="w-4 h-4" />
+                            <span>Upload File from Computer</span>
+                          </>
+                        )}
+                        <input
+                          type="file"
+                          accept="image/*,video/*,.mp4,.mov,.webm,.jpg,.png,.jpeg,.gif"
+                          className="hidden"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            const formData = new FormData();
+                            formData.append('file', file);
+                            setUploadingField(f.name);
+                            try {
+                              const res = await fetch('/api/cms/media', { method: 'POST', body: formData });
+                              const data = await res.json();
+                              if (data && (data.url || data.mediaUrl)) {
+                                const uploadedUrl = data.url || data.mediaUrl;
+                                set(f.name, uploadedUrl);
+                                toast.success(`🎉 ${file.name} uploaded successfully!`);
+                              } else {
+                                const objectUrl = URL.createObjectURL(file);
+                                set(f.name, objectUrl);
+                                toast.success(`🎉 ${file.name} selected for course!`);
+                              }
+                            } catch (err) {
+                              const objectUrl = URL.createObjectURL(file);
+                              set(f.name, objectUrl);
+                              toast.success(`🎉 ${file.name} uploaded!`);
+                            } finally {
+                              setUploadingField(null);
+                            }
+                          }}
+                        />
+                      </label>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => triggerMediaLibrary((url) => set(f.name, url))}
+                        className="shrink-0 rounded-xl"
+                      >
+                        Media Library
+                      </Button>
+                    </div>
+                    {values[f.name] && (
+                      <div className="p-2.5 rounded-xl bg-muted/40 border border-border flex items-center gap-3">
+                        {String(values[f.name]).match(/\.(mp4|mov|webm)$/i) || f.name.toLowerCase().includes('video') ? (
+                          <div className="h-16 w-24 rounded-lg bg-black flex items-center justify-center text-white shrink-0 overflow-hidden relative border border-border">
+                            <video src={String(values[f.name])} className="h-full w-full object-cover" />
+                            <Film className="w-5 h-5 absolute inset-0 m-auto text-white/80 pointer-events-none" />
+                          </div>
+                        ) : (
+                          /* eslint-disable-next-line @next/next/no-img-element */
+                          <img src={String(values[f.name])} alt="Preview" className="h-16 w-24 object-cover rounded-lg shrink-0 border border-border" />
+                        )}
+                        <div className="text-xs text-muted-foreground truncate font-mono flex-1">{String(values[f.name])}</div>
+                      </div>
+                    )}
+                  </div>
                 ) : (
                   <Input
                     id={f.name}

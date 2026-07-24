@@ -541,5 +541,30 @@ export class CmsController {
   async unblockStudent(@Req() req: any, @Param('id') id: string) {
     return this.cmsService.unblockStudent(id, req.user?.id);
   }
+
+  // ── Creator Academy Courses Endpoints ──
+  @Public()
+  @Get('courses')
+  async getPublicCourses(@Query() dto: PaginationDto) {
+    return this.cmsService.getCoursesAdmin(true, dto);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Get('admin/courses')
+  async getAdminCourses(@Query() dto: PaginationDto) {
+    return this.cmsService.getCoursesAdmin(false, dto);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Post('admin/courses')
+  async upsertCourse(@Req() req: any, @Body() body: any) {
+    return this.cmsService.upsertCourse(body, req.user?.id);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Delete('admin/courses/:id')
+  async deleteCourse(@Req() req: any, @Param('id') id: string) {
+    return this.cmsService.softDeleteCourse(id, req.user?.id);
+  }
 }
 
