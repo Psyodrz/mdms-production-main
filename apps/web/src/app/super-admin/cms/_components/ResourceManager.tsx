@@ -281,7 +281,7 @@ export function ResourceManager({ config }: { config: ResourceConfig }) {
 
       {/* Create / Edit dialog */}
       <Dialog open={formOpen} onOpenChange={(o) => { setFormOpen(o); if (!o) setEditing(null); }}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent data-lenis-prevent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>
               {editing ? `Edit ${config.label}` : `New ${config.label}`}

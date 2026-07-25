@@ -1003,7 +1003,7 @@ export default function SuperAdminDashboard() {
                     <p className="text-[11px] text-gray-400 font-bold uppercase tracking-wider mb-1.5">
                       About / Pitch Summary
                     </p>
-                    <p className="text-xs text-gray-200 leading-relaxed italic bg-black/40 p-3 rounded-lg border border-white/5 max-h-32 overflow-y-auto">
+                    <p data-lenis-prevent className="text-xs text-gray-200 leading-relaxed italic bg-black/40 p-3 rounded-lg border border-white/5 max-h-32 overflow-y-auto">
                       "{selectedTalentModal.bio || 'No custom bio submitted.'}"
                     </p>
                   </div>

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma, SocialPlatform, HireRequestStatus } from '@prisma/client';
 import { TalentProfileStatus } from '@mdms/types';
@@ -7,6 +7,8 @@ import { CreateHireRequestDto } from './dto/create-hire-request.dto';
 
 @Injectable()
 export class TalentService {
+  private readonly logger = new Logger(TalentService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly whatsappService: WhatsappService
@@ -364,6 +366,31 @@ export class TalentService {
         status: HireRequestStatus.NEW,
       },
     });
+
+    // Auto-create SalesLead for sales pipeline tracking
+    try {
+      let estimatedValuePaise = 1500000; // Default ₹15,000 in paise
+      if (data.budgetRange) {
+        const nums = data.budgetRange.replace(/\D/g, '');
+        if (nums) {
+          const parsed = parseInt(nums, 10);
+          if (!isNaN(parsed) && parsed > 0) estimatedValuePaise = parsed * 100;
+        }
+      }
+      await this.prisma.salesLead.create({
+        data: {
+          clientName: data.requesterName || 'Talent Booking Client',
+          email: data.requesterEmail || null,
+          phone: data.requesterPhone || null,
+          source: 'WEBSITE',
+          stage: 'NEW',
+          estimatedValue: estimatedValuePaise,
+          notes: `[Talent Hire Inquiry for ${profile.user.firstName || 'Talent'}]\nProject: ${data.projectType || 'N/A'}\nCity: ${data.city || 'N/A'}\nBudget: ${data.budgetRange || 'N/A'}\nBrief: ${data.briefDescription || 'N/A'}`,
+        }
+      });
+    } catch (err) {
+      this.logger.error('Failed to auto-create SalesLead from HireRequest:', err);
+    }
 
     // Notify the talent (optional) or admins
     if (profile.user.phone) {

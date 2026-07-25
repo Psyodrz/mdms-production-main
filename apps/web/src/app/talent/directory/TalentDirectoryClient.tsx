@@ -215,9 +215,12 @@ export default function TalentDirectoryClient({ initialTalents }: { initialTalen
 
   return (
     <Container>
+      <div className="flex flex-col lg:flex-row gap-8 items-start">
+        {/* Sticky Left Sidebar: Search + Filters (stays pinned while grid scrolls) */}
+        <aside className="w-full lg:w-80 lg:shrink-0 lg:sticky lg:top-24 lg:self-start space-y-4">
       {/* Search Bar & City Input Controls */}
       <Reveal direction="up">
-        <div className="flex flex-col md:flex-row justify-between items-stretch md:items-center mb-8 gap-4">
+        <div className="flex flex-col gap-4">
           
           {/* Main Keyword Search */}
           <div className="flex-1 relative">
@@ -240,7 +243,7 @@ export default function TalentDirectoryClient({ initialTalents }: { initialTalen
           </div>
 
           {/* Searchable City Input Field + Full Indian Cities Autocomplete Datalist */}
-          <div className="w-full md:w-80 relative">
+          <div className="w-full relative">
             <div className="relative">
               <input
                 type="text"
@@ -275,7 +278,7 @@ export default function TalentDirectoryClient({ initialTalents }: { initialTalen
 
       {/* Category Filter Pills & Quick City Dropdown */}
       <Reveal direction="up" delay={0.1}>
-        <Card padding="md" className="flex flex-col lg:flex-row gap-4 mb-8 bg-surface/90 border-border shadow-sm">
+        <Card padding="md" className="flex flex-col gap-4 bg-surface/90 border-border shadow-sm">
           {/* Category Pills */}
           <div className="flex gap-2 flex-wrap flex-grow items-center">
             {TALENT_TYPES.map((type) => (
@@ -294,11 +297,11 @@ export default function TalentDirectoryClient({ initialTalents }: { initialTalen
           </div>
 
           {/* Quick City Select Dropdown */}
-          <div className="flex items-center gap-2 self-end lg:self-center">
+          <div className="flex items-center gap-2 w-full">
             <select
               value={cityFilter}
               onChange={(e) => setCityFilter(e.target.value)}
-              className="bg-background border border-border text-foreground px-3.5 py-1.5 text-xs font-semibold rounded-md focus:outline-none focus:border-primary transition-colors cursor-pointer max-w-[220px]"
+              className="bg-background border border-border text-foreground px-3.5 py-1.5 text-xs font-semibold rounded-md focus:outline-none focus:border-primary transition-colors cursor-pointer w-full"
             >
               <option value="">All Cities ({initialTalents?.length || 0} Talents)</option>
               {activeCities.length > 0 && (
@@ -324,6 +327,35 @@ export default function TalentDirectoryClient({ initialTalents }: { initialTalen
         </Card>
       </Reveal>
 
+      {/* Sidebar CTA / stats — fills the sticky column and adds value */}
+      <Reveal direction="up" delay={0.15}>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="rounded-lg bg-surface/90 border border-border py-3 text-center shadow-sm">
+            <p className="text-2xl font-serif text-primary leading-none mb-1">{initialTalents?.length || 0}</p>
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Profiles</p>
+          </div>
+          <div className="rounded-lg bg-surface/90 border border-border py-3 text-center shadow-sm">
+            <p className="text-2xl font-serif text-primary leading-none mb-1">{activeCities.length}</p>
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Cities</p>
+          </div>
+        </div>
+      </Reveal>
+
+      <Reveal direction="up" delay={0.2}>
+        <Card padding="md" className="bg-gradient-to-br from-primary/10 to-surface/90 border-border shadow-sm text-center">
+          <p className="text-base font-serif text-foreground mb-1">Are you a creator?</p>
+          <p className="text-xs text-muted-foreground mb-4">
+            Join our roster and get discovered by top brands & agencies.
+          </p>
+          <Link href="/join/talent" className="block">
+            <Button variant="primary" className="w-full">Register as Talent</Button>
+          </Link>
+        </Card>
+      </Reveal>
+        </aside>
+
+        {/* Main Results Column (scrolls independently of the sticky sidebar) */}
+        <div className="flex-1 min-w-0 w-full">
       {/* Active Filter Badges */}
       {(typeFilter !== 'All' || cityFilter || searchQuery) && (
         <div className="flex flex-wrap items-center gap-2 mb-6 text-xs">
@@ -381,7 +413,7 @@ export default function TalentDirectoryClient({ initialTalents }: { initialTalen
       </p>
 
       {/* Talent Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {results.slice(0, displayCount).map((talent: any, idx: number) => {
           const name =
             talent.stageName ||
@@ -482,6 +514,8 @@ export default function TalentDirectoryClient({ initialTalents }: { initialTalen
           )}
         </div>
       )}
+        </div>
+      </div>
     </Container>
   );
 }

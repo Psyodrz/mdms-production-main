@@ -1,11 +1,21 @@
 import { createClient } from '@supabase/supabase-js';
 
+/**
+ * Server-only Supabase admin client (service-role). NEVER import into client
+ * components. Credentials come strictly from environment variables — there are
+ * no hardcoded fallbacks, and the client fails fast if either is missing so a
+ * misconfigured deploy is caught immediately instead of silently using a
+ * committed secret.
+ */
 export function createAdminClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://zmpeiobdilrgtuzggzuj.supabase.co';
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InptcGVpb2JkaWxyZ3R1emdnenVqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MzU1NzYxNSwiZXhwIjoyMDk5MTMzNjE1fQ.i9dGoqDJhqrcq0X0HboQwFUFj36vFZBprEt5QWrN43o';
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
+  if (!url) {
+    throw new Error('NEXT_PUBLIC_SUPABASE_URL is not defined. Cannot initialize Supabase admin client.');
+  }
   if (!serviceRoleKey) {
-    throw new Error('SUPABASE_SERVICE_ROLE_KEY is not defined. Cannot initialize admin client.');
+    throw new Error('SUPABASE_SERVICE_ROLE_KEY is not defined. Cannot initialize Supabase admin client.');
   }
 
   return createClient(url, serviceRoleKey, {
@@ -18,4 +28,3 @@ export function createAdminClient() {
 
 // Alias for HMR cache compatibility
 export const getSupabaseAdmin = createAdminClient;
-

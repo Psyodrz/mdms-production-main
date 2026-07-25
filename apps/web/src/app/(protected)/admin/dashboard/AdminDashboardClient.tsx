@@ -193,7 +193,7 @@ export function AdminDashboardClient({ user }: AdminDashboardClientProps) {
       {currentTab === 'overview' && (
         <div className="space-y-8">
           {/* Welcome Banner */}
-          <div className="p-8 rounded-2xl bg-gradient-to-r from-surface via-surface-elevated to-surface border border-border relative overflow-hidden shadow-xl">
+          <div className="p-8 rounded-2xl bg-gradient-to-r from-surface via-surface-elevated to-surface border border-border relative overflow-hidden shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="absolute -right-10 -bottom-10 w-48 h-48 bg-purple-600/10 rounded-full blur-2xl pointer-events-none" />
             <div className="relative z-10">
               <span className="text-xs font-bold uppercase tracking-widest text-purple-400 mb-2 block">
@@ -205,6 +205,15 @@ export function AdminDashboardClient({ user }: AdminDashboardClientProps) {
               <p className="text-sm text-muted-foreground font-light max-w-2xl">
                 Manage ongoing shoot schedules, client deliverables, model bookings, and studio floor allocations across all 4 production stages.
               </p>
+            </div>
+            <div className="relative z-10 shrink-0">
+              <Link
+                href="/admin/sales"
+                className="inline-flex items-center gap-2 bg-brand hover:bg-brand/90 text-white font-bold px-5 py-3 rounded-xl text-xs shadow-lg transition-all transform hover:scale-105"
+              >
+                <FolderKanban className="w-4 h-4" />
+                <span>Sales & Leads CRM (Realtime)</span>
+              </Link>
             </div>
           </div>
 

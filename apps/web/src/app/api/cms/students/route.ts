@@ -6,6 +6,7 @@
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/utils/supabase/admin';
+import { requireAdmin } from '@/lib/cms/server/guard';
 
 const TABLE = 'course_enrollments';
 
@@ -47,6 +48,10 @@ async function ensureTable() {
 }
 
 export async function GET() {
+  // Lists student PII (names, emails, phones) — admins only.
+  if (!(await requireAdmin())) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
   try {
     const supabase = createAdminClient();
     const { data, error } = await supabase
@@ -84,6 +89,13 @@ export async function GET() {
   }
 }
 
+/**
+ * Public, create-only enrollment submission (called from the checkout flow).
+ * Intentionally NOT admin-guarded so anonymous users can enroll — same posture
+ * as the public contact form. It only inserts and returns the created record;
+ * it never exposes other students' data or approve/block actions. Reading the
+ * roster (GET) and moderation (PATCH) remain admin-only.
+ */
 export async function POST(req: NextRequest) {
   try {
     await ensureTable();

@@ -117,6 +117,9 @@ export function PortalNavbar({ role, title, className, user, ...props }: PortalN
                   <Link href="/admin/users" className={`transition-colors ${pathname.startsWith('/admin/users') ? 'text-brand font-bold' : 'text-muted-foreground hover:text-foreground'}`}>
                     Users
                   </Link>
+                  <Link href="/admin/sales" className={`transition-colors ${pathname.startsWith('/admin/sales') ? 'text-brand font-bold' : 'text-muted-foreground hover:text-foreground'}`}>
+                    Sales & Leads CRM
+                  </Link>
                   <Link href="/admin/cms/blog" className={`transition-colors ${pathname.startsWith('/admin/cms') ? 'text-brand font-bold' : 'text-muted-foreground hover:text-foreground'}`}>
                     CMS Content
                   </Link>

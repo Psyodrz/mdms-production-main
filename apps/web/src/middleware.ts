@@ -7,9 +7,17 @@ const ROLE_ROUTES: Record<string, Role[]> = {
   // Secret admin base paths (served via next.config rewrites). The more
   // specific /mgmt (Admin) entry MUST come before the generic Super Admin one
   // because matching uses the first prefix that matches.
+  '/studio-8f2k/mgmt/cms/sales':      [Role.ADMIN, Role.SUPER_ADMIN],
+  '/studio-8f2k/mgmt/cms/salesLeads': [Role.ADMIN, Role.SUPER_ADMIN],
+  '/studio-8f2k/mgmt/cms/salesTargets':[Role.ADMIN, Role.SUPER_ADMIN],
+  '/studio-8f2k/mgmt/sales':           [Role.ADMIN, Role.SUPER_ADMIN],
   '/studio-8f2k/mgmt':[Role.ADMIN, Role.SUPER_ADMIN],
-  '/studio-8f2k':     [Role.SUPER_ADMIN],
+  '/super-admin/cms/sales':           [Role.ADMIN, Role.SUPER_ADMIN],
+  '/super-admin/cms/salesLeads':      [Role.ADMIN, Role.SUPER_ADMIN],
+  '/super-admin/cms/salesTargets':    [Role.ADMIN, Role.SUPER_ADMIN],
+  '/super-admin/cms/referrals':       [Role.ADMIN, Role.SUPER_ADMIN],
   '/super-admin':     [Role.SUPER_ADMIN],
+  '/admin/sales':     [Role.ADMIN, Role.SUPER_ADMIN],
   '/admin':           [Role.ADMIN, Role.SUPER_ADMIN],
   '/client-portal':   [Role.CLIENT, Role.ADMIN, Role.SUPER_ADMIN],
   '/talent-dashboard':[Role.TALENT, Role.ADMIN, Role.SUPER_ADMIN],
