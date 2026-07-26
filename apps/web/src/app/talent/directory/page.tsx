@@ -27,7 +27,7 @@ export default async function TalentDirectory() {
   return (
     <>
       <Navbar />
-      <main className="min-h-screen bg-background text-foreground pb-32 relative overflow-hidden">
+      <main className="min-h-screen bg-background text-foreground pb-32 relative overflow-x-clip">
         {/* Header — Full Bleed Merged With Navbar */}
         <section className="relative w-full h-[70vh] sm:h-[80vh] flex items-center justify-center overflow-hidden mb-12 text-center pt-28 sm:pt-36">
           <Image 

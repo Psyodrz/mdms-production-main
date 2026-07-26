@@ -370,9 +370,42 @@ const ACADEMY_COURSES: Blueprint[] = [
   },
 ];
 
+// Map a DB Course row (from GET /cms/courses) to the Blueprint shape the UI uses.
+function mapCourseRowToBlueprint(row: any): Blueprint {
+  return {
+    id: row.slug || row.id,
+    title: row.title,
+    category: (row.category || 'CREATOR') as Blueprint['category'],
+    categoryLabel: row.categoryLabel || 'Masterclass',
+    badgeColor: row.badgeColor || 'bg-brand text-white',
+    duration: row.duration || '',
+    lessonsCount: Number(row.lessonsCount) || 0,
+    level: (row.level || 'Creator') as Blueprint['level'],
+    rating: Number(row.rating) || 5,
+    enrolledCount: Number(row.enrolledCount) || 0,
+    price: row.price || '',
+    originalPrice: row.originalPrice || '',
+    image: row.image || '/images/services-lighting.jpg',
+    trailerVideoUrl: row.trailerVideoUrl || '',
+    description: row.description || '',
+    topics: Array.isArray(row.topics) ? row.topics : [],
+    modules: Array.isArray(row.modules) ? row.modules : [],
+    resources: Array.isArray(row.resources) ? row.resources : [],
+    instructor: {
+      name: row.instructorName || 'MP Instructor',
+      role: row.instructorRole || '',
+      avatar: row.instructorAvatar || '',
+      bio: row.instructorBio || '',
+    },
+  };
+}
+
 export default function BecomeAYouTuberPage({ defaultCategory = 'ALL' }: { defaultCategory?: string }) {
   const [activeCategory, setActiveCategory] = useState<string>(defaultCategory);
   const [searchQuery, setSearchQuery] = useState<string>('');
+  // Courses are CMS-managed via the NestJS backend. Seed the static array as a
+  // fallback so the page still renders if the API is cold/unreachable.
+  const [courses, setCourses] = useState<Blueprint[]>(ACADEMY_COURSES);
   const [previewBlueprint, setPreviewBlueprint] = useState<Blueprint | null>(null);
   const [showCheckoutModal, setShowCheckoutModal] = useState<boolean>(false);
   const [activePreviewTab, setActivePreviewTab] = useState<'overview' | 'syllabus' | 'resources' | 'instructor'>('overview');
@@ -400,7 +433,25 @@ export default function BecomeAYouTuberPage({ defaultCategory = 'ALL' }: { defau
     };
   }, [previewBlueprint, showCheckoutModal]);
 
-  const filteredPlaybooks = ACADEMY_COURSES.filter(bp => {
+  // Load CMS-managed courses from the backend; keep the static fallback on error.
+  React.useEffect(() => {
+    let cancelled = false;
+    fetchAPI('/cms/courses', { cache: 'no-store' })
+      .then((res: any) => {
+        const rows = Array.isArray(res?.data) ? res.data : Array.isArray(res?.data?.data) ? res.data.data : [];
+        if (!cancelled && Array.isArray(rows) && rows.length > 0) {
+          setCourses(rows.map(mapCourseRowToBlueprint));
+        }
+      })
+      .catch(() => {
+        /* keep static fallback */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const filteredPlaybooks = courses.filter(bp => {
     const matchesCat = activeCategory === 'ALL' || bp.category === activeCategory;
     const matchesSearch = bp.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           bp.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -464,11 +515,11 @@ export default function BecomeAYouTuberPage({ defaultCategory = 'ALL' }: { defau
   }
 
   return (
-    <div className="bg-background min-h-screen text-foreground selection:bg-brand selection:text-white">
+    <div className="bg-background min-h-screen text-foreground selection:bg-brand selection:text-white overflow-x-hidden">
       <Navbar />
 
       {/* Hero Header */}
-      <section className="relative pt-36 pb-20 px-6 sm:px-10 overflow-hidden bg-background text-foreground isolate border-b border-border/50">
+      <section className="relative pt-28 sm:pt-36 pb-16 sm:pb-20 px-4 sm:px-10 overflow-hidden bg-background text-foreground isolate border-b border-border/50">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[90vw] h-[60vh] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-brand/15 via-brand/5 to-transparent rounded-full pointer-events-none transform-gpu -z-10" />
         
         <div className="mx-auto max-w-7xl">
@@ -479,7 +530,7 @@ export default function BecomeAYouTuberPage({ defaultCategory = 'ALL' }: { defau
                 <span>MP Creator Academy & Blueprint Store</span>
               </div>
 
-              <h1 className="font-display text-5xl sm:text-7xl lg:text-8xl font-bold tracking-tight leading-[0.95] text-foreground">
+              <h1 className="font-display text-4xl sm:text-6xl lg:text-8xl font-bold tracking-tight leading-[1.05] sm:leading-[0.95] text-foreground">
                 Become a <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand via-rose-500 to-amber-500">Creator</span>
               </h1>
 
@@ -512,7 +563,7 @@ export default function BecomeAYouTuberPage({ defaultCategory = 'ALL' }: { defau
       </section>
 
       {/* Main Blueprints Directory */}
-      <section className="py-20 px-6 sm:px-10 mx-auto max-w-7xl space-y-12">
+      <section className="py-12 sm:py-20 px-4 sm:px-10 mx-auto max-w-7xl space-y-8 sm:space-y-12">
         {/* Category Filters & Search */}
         <Reveal direction="up">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-border pb-6">
@@ -578,14 +629,14 @@ export default function BecomeAYouTuberPage({ defaultCategory = 'ALL' }: { defau
                     </span>
                   </div>
 
-                  <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-white text-xs font-medium z-10">
-                    <div className="flex items-center gap-3">
+                  <div className="absolute bottom-4 left-4 right-4 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-white text-[11px] sm:text-xs font-medium z-10">
+                    <div className="flex items-center gap-2 sm:gap-3">
                       <span className="flex items-center gap-1"><BookOpen className="w-3.5 h-3.5 text-amber-400" /> {bp.lessonsCount} Modules</span>
                       <span>·</span>
                       <span className="flex items-center gap-1"><Tv className="w-3.5 h-3.5 text-emerald-400" /> {bp.duration}</span>
                     </div>
-                    <span className="text-amber-400 font-bold flex items-center gap-1">
-                      ★ {bp.rating} ({bp.enrolledCount.toLocaleString()} creators)
+                    <span className="text-amber-400 font-bold flex items-center gap-1 whitespace-nowrap">
+                      ★ {bp.rating} ({bp.enrolledCount.toLocaleString()})
                     </span>
                   </div>
                 </div>
@@ -606,7 +657,7 @@ export default function BecomeAYouTuberPage({ defaultCategory = 'ALL' }: { defau
                     {/* Topics Checklist */}
                     <div className="pt-2 grid grid-cols-2 gap-2">
                       {bp.topics.map((t, idx) => (
-                        <div key={idx} className="flex items-center gap-1.5 text-[11px] font-medium text-foreground">
+                        <div key={idx} className="flex items-center gap-1.5 text-[11px] font-medium text-foreground min-w-0">
                           <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
                           <span className="truncate">{t}</span>
                         </div>
@@ -615,7 +666,7 @@ export default function BecomeAYouTuberPage({ defaultCategory = 'ALL' }: { defau
                   </div>
 
                   {/* Pricing & CTA Buttons */}
-                  <div className="pt-4 border-t border-border flex items-center justify-between gap-4">
+                  <div className="pt-4 border-t border-border flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                     <div>
                       <div className="flex items-baseline gap-2">
                         <span className="text-xl font-bold font-serif text-brand">{bp.price}</span>
@@ -624,7 +675,7 @@ export default function BecomeAYouTuberPage({ defaultCategory = 'ALL' }: { defau
                       <p className="text-[10px] text-emerald-500 font-bold">Lifetime VIP Access</p>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 w-full sm:w-auto">
                       <Button
                         onClick={() => {
                           setPreviewBlueprint(bp);
@@ -632,7 +683,7 @@ export default function BecomeAYouTuberPage({ defaultCategory = 'ALL' }: { defau
                           setIsPlayingTrailer(false);
                         }}
                         variant="outline"
-                        className="text-xs font-bold rounded-full px-4 py-2 flex items-center gap-1.5 border-border"
+                        className="flex-1 sm:flex-none justify-center text-xs font-bold rounded-full px-4 py-2 flex items-center gap-1.5 border-border"
                       >
                         <Eye className="w-3.5 h-3.5 text-brand" />
                         <span>Mini Preview</span>
@@ -643,7 +694,7 @@ export default function BecomeAYouTuberPage({ defaultCategory = 'ALL' }: { defau
                           setPreviewBlueprint(bp);
                           setShowCheckoutModal(true);
                         }}
-                        className="bg-brand hover:bg-brand/90 text-white text-xs font-bold rounded-full px-4 py-2 flex items-center gap-1.5 shadow-md"
+                        className="flex-1 sm:flex-none justify-center bg-brand hover:bg-brand/90 text-white text-xs font-bold rounded-full px-4 py-2 flex items-center gap-1.5 shadow-md"
                       >
                         <span>Enroll Now</span>
                         <ArrowRight className="w-3.5 h-3.5" />

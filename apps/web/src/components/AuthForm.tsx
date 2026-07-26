@@ -114,13 +114,21 @@ export function AuthForm({ mode }: AuthFormProps) {
           localStorage.setItem('mdms_auth_token', data.session.access_token);
         }
 
-        const role = data.user?.user_metadata?.role;
-        const lowerRole = role?.toLowerCase();
-        
-        if (lowerRole === 'super_admin') router.push('/studio-8f2k');
-        else if (lowerRole === 'admin') router.push('/studio-8f2k/mgmt');
-        else if (lowerRole === 'model' || lowerRole === 'talent') router.push('/talent-dashboard');
-        else if (lowerRole === 'editor') router.push('/editor-portal');
+        const role = (
+          data.user?.user_metadata?.role ||
+          data.user?.app_metadata?.role ||
+          ''
+        )
+          .toString()
+          .toLowerCase()
+          .replace(/-/g, '_');
+
+        if (role === 'super_admin') router.push('/studio-8f2k');
+        else if (role === 'admin') router.push('/studio-8f2k/mgmt');
+        else if (role === 'model' || role === 'talent') router.push('/talent-dashboard');
+        else if (role === 'editor') router.push('/editor-portal');
+        else if (role === 'employee') router.push('/employee-portal');
+        else if (role === 'project_manager') router.push('/project-manager');
         else router.push('/client-portal');
       }
       

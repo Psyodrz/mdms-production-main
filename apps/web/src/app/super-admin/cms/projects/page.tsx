@@ -283,6 +283,7 @@ export default function ProjectsCmsPage() {
         {(selectedProject || detailLoading) && (
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setSelectedProject(null)}>
             <div
+              data-lenis-prevent
               className="bg-background border border-border rounded-2xl w-full max-w-3xl max-h-[85vh] overflow-y-auto shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >

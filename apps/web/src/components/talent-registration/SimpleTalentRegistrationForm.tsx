@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Country, State, City } from 'country-state-city';
 import { toast } from 'sonner';
 import { ArrowRight, Sparkles, CheckCircle2, Globe, Award, Briefcase, User, Mail, Phone, Lock, MapPin, Film, ChevronDown, Search, Check } from 'lucide-react';
 import Link from 'next/link';
@@ -195,13 +196,15 @@ export function SimpleTalentRegistrationForm() {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
-    mobile: '+91 ',
+    dialCode: '+91',
+    mobile: '',
     email: '',
     password: '',
     category: 'actor',
     experience: 'fresher',
-    state: 'Maharashtra',
-    city: 'Mumbai',
+    country: 'India',
+    state: '',
+    city: '',
     pincode: '',
     bio: '',
     acceptTerms: false,
@@ -209,15 +212,65 @@ export function SimpleTalentRegistrationForm() {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  // ── Worldwide cascading location data (offline dataset) ──
+  const allCountries = useMemo(() => Country.getAllCountries(), []);
+  const countryOptions = useMemo(() => allCountries.map((c) => c.name), [allCountries]);
+
+  const selectedCountry = useMemo(
+    () => allCountries.find((c) => c.name === formData.country),
+    [allCountries, formData.country],
+  );
+
+  const stateList = useMemo(
+    () => (selectedCountry ? State.getStatesOfCountry(selectedCountry.isoCode) : []),
+    [selectedCountry],
+  );
+  const stateOptions = useMemo(
+    () => (stateList.length ? stateList.map((s) => s.name) : ['Other']),
+    [stateList],
+  );
+
+  const selectedState = useMemo(
+    () => stateList.find((s) => s.name === formData.state),
+    [stateList, formData.state],
+  );
+
+  const cityList = useMemo(
+    () =>
+      selectedCountry && selectedState
+        ? City.getCitiesOfState(selectedCountry.isoCode, selectedState.isoCode)
+        : [],
+    [selectedCountry, selectedState],
+  );
+  const cityOptions = useMemo(
+    () => (cityList.length ? cityList.map((c) => c.name) : ['Other']),
+    [cityList],
+  );
+
+  // Worldwide phone dial codes (flag + country + code), sorted by country.
+  const dialCodes = useMemo(
+    () =>
+      allCountries
+        .map((c) => {
+          const code = `+${String(c.phonecode).replace(/[^0-9]/g, '')}`;
+          return { iso: c.isoCode, code, label: `${c.flag} ${c.name} ${code}` };
+        })
+        .filter((c) => c.code !== '+')
+        .sort((a, b) => a.label.localeCompare(b.label)),
+    [allCountries],
+  );
+
   const validate = () => {
     const newErrors: Record<string, string> = {};
     if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
     if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
-    if (!formData.mobile || formData.mobile.length < 8) newErrors.mobile = 'Enter a valid contact number';
+    if (!formData.mobile || formData.mobile.length < 6) newErrors.mobile = 'Enter a valid contact number';
     if (!formData.email.includes('@')) newErrors.email = 'Enter a valid email address';
     if (formData.password.length < 6) newErrors.password = 'Password must be at least 6 characters';
+    if (!formData.country.trim()) newErrors.country = 'Country is required';
+    if (!formData.state.trim()) newErrors.state = 'State / Province is required';
     if (!formData.city.trim()) newErrors.city = 'City is required';
-    if (!formData.pincode.trim()) newErrors.pincode = 'Pincode is required';
+    if (!formData.pincode.trim()) newErrors.pincode = 'Postal / Zip code is required';
     if (!formData.acceptTerms) newErrors.acceptTerms = 'You must accept the terms to proceed';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -241,12 +294,14 @@ export function SimpleTalentRegistrationForm() {
           email: formData.email,
           password: formData.password,
           role: 'talent',
+          phone: `${formData.dialCode} ${formData.mobile}`.trim(),
           category: formData.category,
           experienceLevel: formData.experience,
+          country: formData.country,
           city: formData.city,
           state: formData.state,
           pincode: formData.pincode,
-          bio: formData.bio || `Passionate ${formData.category} from ${formData.city}.`,
+          bio: formData.bio || `Passionate ${formData.category} from ${formData.city}, ${formData.country}.`,
         }),
       });
 
@@ -377,15 +432,29 @@ export function SimpleTalentRegistrationForm() {
                   <label className="block text-sm font-bold text-foreground uppercase tracking-wider mb-2">
                     Mobile Number <span className="text-brand">*</span>
                   </label>
-                  <div className="relative">
-                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <input
-                      type="text"
-                      placeholder="+91 9876543210"
-                      value={formData.mobile}
-                      onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
-                      className="input-premium bg-surface border border-border focus:border-brand rounded-xl text-foreground font-medium placeholder:text-muted-foreground/60 focus:bg-background w-full py-3.5 pl-11 pr-4 transition-colors"
-                    />
+                  <div className="flex gap-2">
+                    <select
+                      value={formData.dialCode}
+                      onChange={(e) => setFormData({ ...formData, dialCode: e.target.value })}
+                      aria-label="Country dial code"
+                      className="input-premium bg-surface border border-border focus:border-brand rounded-xl text-foreground font-medium w-28 shrink-0 py-3.5 px-2 cursor-pointer transition-colors"
+                    >
+                      {dialCodes.map((d) => (
+                        <option key={d.iso} value={d.code} className="bg-card text-card-foreground">
+                          {d.label}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="relative flex-1">
+                      <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <input
+                        type="tel"
+                        placeholder="9876543210"
+                        value={formData.mobile}
+                        onChange={(e) => setFormData({ ...formData, mobile: e.target.value.replace(/[^0-9]/g, '') })}
+                        className="input-premium bg-surface border border-border focus:border-brand rounded-xl text-foreground font-medium placeholder:text-muted-foreground/60 focus:bg-background w-full py-3.5 pl-11 pr-4 transition-colors"
+                      />
+                    </div>
                   </div>
                   {errors.mobile && <p className="text-destructive text-xs mt-1.5 font-medium">{errors.mobile}</p>}
                 </div>
@@ -471,25 +540,33 @@ export function SimpleTalentRegistrationForm() {
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
                 <SearchableDropdown
+                  label="Country"
+                  value={formData.country}
+                  options={countryOptions}
+                  placeholder="Select Country"
+                  required={true}
+                  error={errors.country}
+                  onChange={(newCountry) =>
+                    setFormData({ ...formData, country: newCountry, state: '', city: '' })
+                  }
+                />
+
+                <SearchableDropdown
                   label="State / Province"
                   value={formData.state}
-                  options={Object.keys(INDIAN_STATES_AND_CITIES)}
+                  options={stateOptions}
                   placeholder="Select State"
                   required={true}
-                  onChange={(newState) => {
-                    const cities = INDIAN_STATES_AND_CITIES[newState] || ['Other City'];
-                    setFormData({
-                      ...formData,
-                      state: newState,
-                      city: cities[0] || 'Other City'
-                    });
-                  }}
+                  error={errors.state}
+                  onChange={(newState) =>
+                    setFormData({ ...formData, state: newState, city: '' })
+                  }
                 />
 
                 <SearchableDropdown
                   label="Current City / Hub"
                   value={formData.city}
-                  options={INDIAN_STATES_AND_CITIES[formData.state] || ['Other City']}
+                  options={cityOptions}
                   placeholder="Select City"
                   required={true}
                   error={errors.city}
@@ -498,14 +575,14 @@ export function SimpleTalentRegistrationForm() {
 
                 <div>
                   <label className="block text-sm font-bold text-foreground uppercase tracking-wider mb-2">
-                    Pincode <span className="text-brand">*</span>
+                    Postal / Zip Code <span className="text-brand">*</span>
                   </label>
                   <input
                     type="text"
-                    maxLength={6}
-                    placeholder="e.g. 400001"
+                    maxLength={12}
+                    placeholder="e.g. 400001 / SW1A 1AA"
                     value={formData.pincode}
-                    onChange={(e) => setFormData({ ...formData, pincode: e.target.value.replace(/\D/g, '') })}
+                    onChange={(e) => setFormData({ ...formData, pincode: e.target.value.replace(/[^a-zA-Z0-9 -]/g, '') })}
                     className="input-premium bg-surface border border-border focus:border-brand-gold rounded-xl text-foreground font-medium placeholder:text-muted-foreground/60 focus:bg-background w-full py-3.5 px-4 tracking-wider transition-colors"
                   />
                   {errors.pincode && <p className="text-destructive text-xs mt-1.5 font-medium">{errors.pincode}</p>}

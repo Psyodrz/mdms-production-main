@@ -600,9 +600,49 @@ export class CmsService {
 
   // ── Contact Submissions ────────────────────────────────────
   async submitContactForm(data: { name: string; email: string; phone?: string; subject?: string; message: string }) {
-    return this.prisma.contactSubmission.create({
+    const contact = await this.prisma.contactSubmission.create({
       data
     });
+
+    // Auto-create a SalesLead in sales pipeline in DB so it shows up in Sales Management Hub!
+    try {
+      let estimatedValuePaise = 500000; // Default ₹5,000 in paise
+      if (data.message) {
+        const match = data.message.match(/₹\s*([\d,]+)/);
+        if (match && match[1]) {
+          const parsedNum = parseInt(match[1].replace(/,/g, ''), 10);
+          if (!isNaN(parsedNum) && parsedNum > 0) {
+            estimatedValuePaise = parsedNum * 100;
+          }
+        }
+      }
+
+      let source = 'WEBSITE';
+      const text = `${data.subject || ''} ${data.message || ''}`.toLowerCase();
+      if (text.includes('whatsapp')) {
+        source = 'WHATSAPP';
+      } else if (text.includes('call') || text.includes('phone')) {
+        source = 'CALL';
+      } else if (text.includes('instagram') || text.includes('youtube') || text.includes('social')) {
+        source = 'SOCIAL_MEDIA';
+      }
+
+      await this.prisma.salesLead.create({
+        data: {
+          clientName: data.name.trim() || 'Website Visitor Lead',
+          email: data.email ? data.email.trim() : null,
+          phone: data.phone ? data.phone.trim() : null,
+          source,
+          stage: 'NEW',
+          estimatedValue: estimatedValuePaise,
+          notes: `Subject: ${data.subject || 'Website Inquiry'}\n${data.message || ''}`,
+        }
+      });
+    } catch (err) {
+      this.logger.error('Failed to auto-create SalesLead from contact form submission:', err);
+    }
+
+    return contact;
   }
 
   async getContactSubmissions(dto?: PaginationDto) {
@@ -1361,18 +1401,34 @@ export class CmsService {
   async upsertCourse(data: any, actorId?: string) {
     const id = data.id;
     let result;
-    const payload = {
+    const payload: any = {
       slug: data.slug || `course-${Date.now()}`,
       title: data.title,
       categoryLabel: data.categoryLabel || 'Masterclass',
       duration: data.duration || '4 Hours',
+      lessonsCount: data.lessonsCount !== undefined ? parseInt(String(data.lessonsCount), 10) : 0,
       price: data.price || '₹4,999',
-      numericPrice: data.numericPrice ? parseInt(data.numericPrice, 10) : 4999,
+      numericPrice: data.numericPrice ? parseInt(String(data.numericPrice), 10) : 4999,
       originalPrice: data.originalPrice || '₹12,999',
       image: data.image || '/images/services-lighting.jpg',
       instructorName: data.instructorName || 'Master Instructor',
       description: data.description || null,
       isPublished: data.isPublished !== undefined ? Boolean(data.isPublished) : true,
+      sortOrder: data.sortOrder !== undefined ? parseInt(String(data.sortOrder), 10) : 0,
+
+      // Rich storefront fields
+      category: data.category || 'CREATOR',
+      badgeColor: data.badgeColor || 'bg-brand text-white',
+      level: data.level || 'Creator',
+      rating: data.rating !== undefined ? Number(data.rating) : 5,
+      enrolledCount: data.enrolledCount !== undefined ? parseInt(String(data.enrolledCount), 10) : 0,
+      trailerVideoUrl: data.trailerVideoUrl || null,
+      topics: Array.isArray(data.topics) ? data.topics : [],
+      resources: Array.isArray(data.resources) ? data.resources : [],
+      modules: data.modules ?? undefined,
+      instructorRole: data.instructorRole || null,
+      instructorAvatar: data.instructorAvatar || null,
+      instructorBio: data.instructorBio || null,
     };
 
     if (id) {

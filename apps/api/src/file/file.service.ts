@@ -131,12 +131,15 @@ export class FileService {
     if (endpoint.includes('localhost') || endpoint.includes('127.0.0.1')) {
       url = `${endpoint}/${this.bucket}/${key}`;
     } else {
-      if (endpoint.includes('/storage/v1/s3')) {
-        const base = endpoint.replace('/storage/v1/s3', '');
-        url = `${base}/storage/v1/object/public/${this.bucket}/${key}`;
-      } else {
-        url = `${endpoint}/${this.bucket}/${key}`;
-      }
+      // Supabase Storage public object URLs MUST include the `/public/` segment.
+      // Normalize whatever S3_ENDPOINT form is configured (base domain,
+      // `/storage/v1/s3`, or `/storage/v1/object`) down to the project base,
+      // then build the canonical public URL.
+      const base = endpoint
+        .replace(/\/storage\/v1\/s3\/?$/, '')
+        .replace(/\/storage\/v1\/object\/?$/, '')
+        .replace(/\/$/, '');
+      url = `${base}/storage/v1/object/public/${this.bucket}/${key}`;
     }
 
     const asset = await this.prisma.mediaAsset.create({

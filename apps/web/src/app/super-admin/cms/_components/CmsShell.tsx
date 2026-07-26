@@ -185,7 +185,7 @@ export function CmsShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-background">
       {/* Desktop sidebar — single smooth scrollable container */}
-      <aside className="hidden md:block fixed top-0 left-0 bottom-0 w-64 h-screen overflow-y-auto border-r border-border bg-surface px-4 py-6 z-40 shadow-xl">
+      <aside data-lenis-prevent className="hidden md:block fixed top-0 left-0 bottom-0 w-64 h-screen overflow-y-auto border-r border-border bg-surface px-4 py-6 z-40 shadow-xl">
         <div className="px-3 py-4 mb-4 border-b border-border/60">
           <div className="flex items-center gap-2.5 mb-1">
             <div className="w-2.5 h-2.5 rounded-full bg-[#eb3d26] animate-pulse" />
@@ -220,7 +220,7 @@ export function CmsShell({ children }: { children: React.ReactNode }) {
             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             onClick={() => setMobileOpen(false)}
           />
-          <div className="absolute left-0 top-0 h-full w-72 max-w-[85%] bg-surface border-r border-border px-4 py-6 overflow-y-auto shadow-2xl">
+          <div data-lenis-prevent className="absolute left-0 top-0 h-full w-72 max-w-[85%] bg-surface border-r border-border px-4 py-6 overflow-y-auto shadow-2xl">
             <div className="flex items-center justify-between mb-6 px-3 border-b border-border/60 pb-4">
               <div className="flex items-center gap-2">
                 <div className="w-2.5 h-2.5 rounded-full bg-[#eb3d26]" />

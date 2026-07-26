@@ -1270,6 +1270,22 @@ model Course {
   description   String?   @db.Text
   isPublished   Boolean   @default(true)
   sortOrder     Int       @default(0)
+
+  // ── Rich display fields (Creator Academy storefront) ──
+  // All additive/defaulted so existing rows and the running API stay valid.
+  category         String   @default("CREATOR") // YOUTUBER, REELER, CREATOR, INFLUENCER, EDITING, MONETIZATION
+  badgeColor       String   @default("bg-brand text-white")
+  level            String   @default("Creator") // Beginner, Creator, Pro Master
+  rating           Float    @default(5)
+  enrolledCount    Int      @default(0)
+  trailerVideoUrl  String?
+  topics           String[] @default([])
+  resources        String[] @default([])
+  modules          Json?    // [{ title, duration, lessonsCount }]
+  instructorRole   String?
+  instructorAvatar String?
+  instructorBio    String?  @db.Text
+
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   deletedAt     DateTime?

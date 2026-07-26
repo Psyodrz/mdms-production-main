@@ -144,7 +144,37 @@ function CheckoutContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const courseId = searchParams.get('courseId') || 'course-youtuber';
-  const course = COURSES_MAP[courseId] || COURSES_MAP['course-youtuber'];
+  // CMS-managed course, with the static map as an offline fallback.
+  const [course, setCourse] = useState<CourseData>(COURSES_MAP[courseId] || COURSES_MAP['course-youtuber']);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchAPI('/cms/courses', { cache: 'no-store' })
+      .then((res: any) => {
+        const rows = Array.isArray(res?.data) ? res.data : Array.isArray(res?.data?.data) ? res.data.data : [];
+        const match = rows.find((r: any) => r.slug === courseId || r.id === courseId);
+        if (!cancelled && match) {
+          setCourse({
+            id: match.slug || match.id,
+            title: match.title,
+            categoryLabel: match.categoryLabel || 'Masterclass',
+            duration: match.duration || '',
+            lessonsCount: Number(match.lessonsCount) || 0,
+            price: match.price || '',
+            numericPrice: Number(match.numericPrice) || 0,
+            originalPrice: match.originalPrice || '',
+            image: match.image || '/images/services-lighting.jpg',
+            instructorName: match.instructorName || 'MP Instructor',
+          });
+        }
+      })
+      .catch(() => {
+        /* keep static fallback */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [courseId]);
 
   const [paymentMethod, setPaymentMethod] = useState<'UPI' | 'CARD' | 'NETBANKING'>('UPI');
   const [couponInput, setCouponInput] = useState<string>('');

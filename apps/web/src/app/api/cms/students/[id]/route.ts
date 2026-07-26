@@ -5,6 +5,7 @@
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/utils/supabase/admin';
+import { requireAdmin } from '@/lib/cms/server/guard';
 
 const TABLE = 'course_enrollments';
 
@@ -12,6 +13,10 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  // Approve / block / unblock a student enrollment — admins only.
+  if (!(await requireAdmin())) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
   try {
     const { id } = await params;
     const { searchParams } = new URL(req.url);

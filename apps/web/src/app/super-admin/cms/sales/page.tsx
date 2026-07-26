@@ -107,10 +107,17 @@ export default function SalesManagementPage() {
       }
     }
     fetchSalesData();
+
+    // Auto-poll every 4 seconds so website lead submissions land in realtime!
+    const interval = setInterval(() => {
+      fetchSalesData(true);
+    }, 4000);
+
+    return () => clearInterval(interval);
   }, []);
 
-  async function fetchSalesData() {
-    setLoading(true);
+  async function fetchSalesData(isSilent = false) {
+    if (!isSilent) setLoading(true);
     try {
       const [leadsRes, targetsRes, referralsRes] = await Promise.all([
         cms.list<SalesLead[]>('salesLeads'),
@@ -123,11 +130,8 @@ export default function SalesManagementPage() {
       const backendReferrals = Array.isArray(referralsRes.data) ? referralsRes.data : Array.isArray(referralsRes as any) ? (referralsRes as any) : [];
 
       const leadsMap = new Map<string, SalesLead>();
-      INITIAL_LEADS.forEach((l, idx) => {
-        const id = l.id || `init-sl-${idx}`;
-        leadsMap.set(id, { ...l, id });
-      });
 
+      // Load DB leads first (or overwrite initial dummy leads)
       backendLeads.forEach((l, idx) => {
         const id = l.id ? String(l.id) : `db-sl-${idx}-${Date.now()}`;
         leadsMap.set(id, {
@@ -137,7 +141,22 @@ export default function SalesManagementPage() {
         });
       });
 
-      setLeads(Array.from(leadsMap.values()));
+      // Fill in initial mock leads if DB has fewer demo entries
+      INITIAL_LEADS.forEach((l, idx) => {
+        const id = l.id || `init-sl-${idx}`;
+        if (!leadsMap.has(id)) {
+          leadsMap.set(id, { ...l, id });
+        }
+      });
+
+      // Sort leads with newest creation date first
+      const allLeads = Array.from(leadsMap.values()).sort((a, b) => {
+        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return dateB - dateA;
+      });
+
+      setLeads(allLeads);
 
       const targetsMap = new Map<string, SalesTarget>();
       INITIAL_TARGETS.forEach((t, idx) => {
@@ -163,7 +182,7 @@ export default function SalesManagementPage() {
     } catch (err) {
       console.error('Failed to fetch sales data from database:', err);
     } finally {
-      setLoading(false);
+      if (!isSilent) setLoading(false);
     }
   }
 

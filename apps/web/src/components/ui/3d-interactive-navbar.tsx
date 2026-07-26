@@ -144,7 +144,7 @@ export function Navbar() {
           <div className="flex items-center gap-2 sm:gap-3">
             <Link
               href="/become-a-youtuber"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 text-[11px] sm:text-xs font-extrabold tracking-wider uppercase rounded-full transition-all duration-300 bg-gradient-to-r from-amber-500 via-rose-500 to-brand text-white hover:opacity-95 shadow-md shrink-0 border border-amber-300/40"
+              className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 text-[11px] sm:text-xs font-extrabold tracking-wider uppercase rounded-full transition-all duration-300 bg-gradient-to-r from-amber-500 via-rose-500 to-brand text-white hover:opacity-95 shadow-md shrink-0 border border-amber-300/40"
               data-cursor="hover"
             >
               <Sparkles className="w-3.5 h-3.5 text-amber-200 fill-amber-200" />
@@ -200,7 +200,7 @@ export function Navbar() {
 
             <Link
               href="/join/talent"
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 sm:px-4 sm:py-2 text-[11px] sm:text-xs font-bold tracking-wider uppercase rounded-full transition-all duration-300 bg-brand text-white hover:bg-brand/90 hover:shadow-[0_0_15px_rgba(235,61,38,0.4)] shadow-md shrink-0 border border-brand/30"
+              className="hidden md:inline-flex items-center gap-1.5 px-3.5 py-1.5 sm:px-4 sm:py-2 text-[11px] sm:text-xs font-bold tracking-wider uppercase rounded-full transition-all duration-300 bg-brand text-white hover:bg-brand/90 hover:shadow-[0_0_15px_rgba(235,61,38,0.4)] shadow-md shrink-0 border border-brand/30"
               data-cursor="hover"
             >
               Talent Register
