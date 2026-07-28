@@ -21,6 +21,7 @@ import {
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
+import { uploadToSupabase } from '@/lib/upload';
 
 export interface LessonItem {
   id?: string;
@@ -169,22 +170,42 @@ export function CourseLessonManagerModal({
     const toastId = toast.loading(`Uploading "${file.name}" (up to 250MB)...`);
 
     try {
-      const formData = new FormData();
-      formData.append('file', file);
+      let uploadedUrl: string | null = null;
 
-      const res = await fetch('/api/cms/media', {
-        method: 'POST',
-        body: formData,
-      });
+      // 1. Try BFF API Route
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
 
-      const json = await res.json();
-      const uploadedUrl = json.data?.url || json.url || json.data?.fileUrl;
+        const res = await fetch('/api/cms/media', {
+          method: 'POST',
+          body: formData,
+        });
+
+        const json = await res.json().catch(() => ({}));
+        uploadedUrl = json.data?.url || json.url || json.data?.fileUrl || null;
+      } catch (apiErr) {
+        console.warn('BFF media upload warning:', apiErr);
+      }
+
+      // 2. Fallback to direct client-side Supabase Storage upload if API times out or fails
+      if (!uploadedUrl) {
+        try {
+          uploadedUrl = await uploadToSupabase({
+            file,
+            bucket: 'mp-cms',
+            folder: 'courses/lessons',
+          });
+        } catch (subaErr) {
+          console.warn('Supabase direct upload error:', subaErr);
+        }
+      }
 
       if (uploadedUrl) {
         handleUpdateLesson(index, 'videoUrl', uploadedUrl);
-        toast.success('🎉 Video uploaded successfully!', { id: toastId });
+        toast.success(`🎉 ${file.name} uploaded successfully!`, { id: toastId });
       } else {
-        toast.error('Video upload completed with fallback.', { id: toastId });
+        toast.error(`❌ Could not upload ${file.name}. Please check connection.`, { id: toastId });
       }
     } catch (err) {
       console.warn('Video upload error:', err);
