@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import type { FieldDef, ResourceConfig } from '@/lib/cms/resources';
+import { uploadToSupabase } from '@/lib/upload';
 
 interface ResourceFormProps {
   config: ResourceConfig;
@@ -201,25 +202,43 @@ export function ResourceForm({ config, initial, submitting, onSubmit, onCancel }
                           onChange={async (e) => {
                             const file = e.target.files?.[0];
                             if (!file) return;
-                            const formData = new FormData();
-                            formData.append('file', file);
                             setUploadingField(f.name);
                             try {
-                              const res = await fetch('/api/cms/media', { method: 'POST', body: formData });
-                              const data = await res.json();
-                              if (data && (data.url || data.mediaUrl)) {
-                                const uploadedUrl = data.url || data.mediaUrl;
+                              let uploadedUrl: string | null = null;
+
+                              // 1. Try backend API upload
+                              try {
+                                const formData = new FormData();
+                                formData.append('file', file);
+                                const res = await fetch('/api/cms/media', { method: 'POST', body: formData });
+                                const data = await res.json();
+                                uploadedUrl = data?.data?.url || data?.url || data?.mediaUrl || data?.data?.mediaUrl || null;
+                              } catch (apiErr) {
+                                console.warn('API media upload error:', apiErr);
+                              }
+
+                              // 2. Fallback to direct client-side Supabase Storage upload
+                              if (!uploadedUrl) {
+                                try {
+                                  const folder = file.type.startsWith('video/') ? 'video' : 'gallery';
+                                  uploadedUrl = await uploadToSupabase({
+                                    file,
+                                    bucket: 'mp-cms',
+                                    folder,
+                                  });
+                                } catch (subaErr: any) {
+                                  console.warn('Supabase direct upload error:', subaErr);
+                                }
+                              }
+
+                              if (uploadedUrl) {
                                 set(f.name, uploadedUrl);
                                 toast.success(`🎉 ${file.name} uploaded successfully!`);
                               } else {
-                                const objectUrl = URL.createObjectURL(file);
-                                set(f.name, objectUrl);
-                                toast.success(`🎉 ${file.name} selected for course!`);
+                                toast.error(`❌ Could not upload ${file.name}. Please check file size and connection.`);
                               }
-                            } catch (err) {
-                              const objectUrl = URL.createObjectURL(file);
-                              set(f.name, objectUrl);
-                              toast.success(`🎉 ${file.name} uploaded!`);
+                            } catch (err: any) {
+                              toast.error(`❌ Upload error: ${err?.message || 'Failed to upload'}`);
                             } finally {
                               setUploadingField(null);
                             }

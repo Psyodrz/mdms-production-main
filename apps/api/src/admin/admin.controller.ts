@@ -5,6 +5,7 @@ import { Role } from '@mdms/types';
 import { PaginateUsersDto } from './dto/paginate-users.dto';
 import { UpdateUserRoleDto } from './dto/update-user-role.dto';
 import { CreateUserDto } from './dto/create-user.dto';
+import { BulkImportUsersDto } from './dto/bulk-import-users.dto';
 
 @Controller('admin')
 export class AdminController {
@@ -21,6 +22,13 @@ export class AdminController {
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   async createUser(@Body() dto: CreateUserDto, @Req() req: any) {
     const data = await this.adminService.createUser(dto, req.user);
+    return { success: true, data };
+  }
+
+  @Post('users/bulk-import')
+  @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  async bulkImportUsers(@Body() dto: BulkImportUsersDto, @Req() req: any) {
+    const data = await this.adminService.bulkImportUsers(dto, req.user);
     return { success: true, data };
   }
 

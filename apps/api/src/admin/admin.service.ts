@@ -3,8 +3,10 @@ import { PrismaService } from '../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { Role } from '@mdms/types';
 import { PaginateUsersDto } from './dto/paginate-users.dto';
+import { BulkImportUsersDto } from './dto/bulk-import-users.dto';
 import { Prisma } from '@prisma/client';
 import { SupabaseAdminService } from '../common/supabase/supabase-admin.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AdminService {
@@ -375,5 +377,97 @@ export class AdminService {
       after: { status },
     });
     return project;
+  }
+
+  async bulkImportUsers(dto: BulkImportUsersDto, actor: any) {
+    const { users, overwriteExisting = true } = dto;
+    let createdCount = 0;
+    let updatedCount = 0;
+    let skippedCount = 0;
+    const errors: Array<{ row: number; email: string; error: string }> = [];
+
+    for (let i = 0; i < users.length; i++) {
+      const item = users[i];
+      const rowNum = i + 1;
+      if (!item) continue;
+
+      try {
+        if (!item.email || !item.email.includes('@')) {
+          errors.push({ row: rowNum, email: item.email || '', error: 'Invalid email address' });
+          skippedCount++;
+          continue;
+        }
+
+        const cleanEmail = item.email.toLowerCase().trim();
+        const existing = await this.prisma.user.findUnique({ where: { email: cleanEmail } });
+
+        // Normalize Role
+        const rawRole = (item.role || 'CLIENT').toUpperCase();
+        const targetRole = Object.values(Role).includes(rawRole as Role) ? (rawRole as Role) : Role.CLIENT;
+
+        // Guard: only SUPER_ADMIN can assign ADMIN or SUPER_ADMIN roles
+        if (actor.role !== Role.SUPER_ADMIN && (targetRole === Role.ADMIN || targetRole === Role.SUPER_ADMIN)) {
+          errors.push({ row: rowNum, email: cleanEmail, error: 'Only SUPER_ADMIN can assign ADMIN or SUPER_ADMIN roles.' });
+          skippedCount++;
+          continue;
+        }
+
+        if (existing) {
+          if (overwriteExisting) {
+            const updateData: any = {
+              firstName: item.firstName || existing.firstName,
+              lastName: item.lastName ?? existing.lastName,
+              role: targetRole,
+            };
+            if (item.password) {
+              updateData.passwordHash = await bcrypt.hash(item.password, 10);
+            }
+
+            const updated = await this.prisma.user.update({
+              where: { email: cleanEmail },
+              data: updateData,
+            });
+            await this.supabaseAdmin.syncUserRole(updated.id, updated.role);
+            updatedCount++;
+          } else {
+            skippedCount++;
+          }
+        } else {
+          const rawPassword = item.password || Math.random().toString(36).slice(-10) + 'A1!';
+          const passwordHash = await bcrypt.hash(rawPassword, 10);
+
+          const created = await this.prisma.user.create({
+            data: {
+              email: cleanEmail,
+              firstName: item.firstName || 'User',
+              lastName: item.lastName || '',
+              role: targetRole,
+              passwordHash,
+              isActive: true,
+            },
+          });
+          await this.supabaseAdmin.syncUserRole(created.id, created.role);
+          createdCount++;
+        }
+      } catch (err: any) {
+        errors.push({ row: rowNum, email: item.email || '', error: err?.message || 'Database insert error' });
+        skippedCount++;
+      }
+    }
+
+    await this.auditService.log({
+      actorId: actor.sub || actor.id,
+      action: 'BULK_IMPORT_USERS',
+      resource: 'User',
+      after: { totalProcessed: users.length, createdCount, updatedCount, skippedCount, errorsCount: errors.length },
+    });
+
+    return {
+      totalProcessed: users.length,
+      createdCount,
+      updatedCount,
+      skippedCount,
+      errors,
+    };
   }
 }

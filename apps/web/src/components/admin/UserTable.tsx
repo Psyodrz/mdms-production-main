@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { RefreshCw, Search, ShieldAlert, UserMinus, UserCheck, Key, Shield } from 'lucide-react';
+import { RefreshCw, Search, ShieldAlert, UserMinus, UserCheck, Key, Shield, FileSpreadsheet } from 'lucide-react';
 import { toast } from 'sonner';
+import { UserImportModal } from './UserImportModal';
 
 interface User {
   id: string;
@@ -32,6 +33,7 @@ export function UserTable({ currentUserRole }: UserTableProps) {
   const [loading, setLoading] = useState(true);
 
   // Modal / Confirmations
+  const [importModalOpen, setImportModalOpen] = useState(false);
   const [confirmAction, setConfirmAction] = useState<{
     type: 'role' | 'deactivate' | 'reactivate' | 'reset-mfa';
     userId: string;
@@ -144,26 +146,26 @@ export function UserTable({ currentUserRole }: UserTableProps) {
   return (
     <div className="space-y-6">
       {/* Header and Controls */}
-      <div className="flex flex-col sm:flex-row gap-4 justify-between items-center bg-surface p-4 border border-border rounded-xl shadow-sm">
-        <div className="relative w-full sm:max-w-md">
-          <Search className="absolute left-3 top-3.5 w-4 h-4 text-muted-foreground" />
+      <div className="flex flex-col md:flex-row gap-3 justify-between items-stretch md:items-center bg-surface/80 backdrop-blur-md p-4 border border-border rounded-2xl shadow-sm">
+        <div className="relative flex-1 max-w-full md:max-w-xs lg:max-w-sm">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
           <input
             type="text"
             placeholder="Search name or email..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-border rounded-lg bg-background text-sm text-foreground focus:outline-none focus:border-primary transition-colors"
+            className="w-full pl-10 pr-4 py-2 rounded-xl border border-border bg-background/60 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all"
           />
         </div>
 
-        <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+        <div className="flex items-center gap-2.5 flex-wrap md:flex-nowrap justify-end shrink-0">
           <select
             value={limit}
             onChange={(e) => {
               setLimit(Number(e.target.value));
               setPage(1);
             }}
-            className="px-3 py-2 border border-border rounded-lg bg-background text-sm text-foreground focus:outline-none focus:border-primary transition-colors font-medium"
+            className="px-3 py-2 border border-border rounded-xl bg-background/60 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all cursor-pointer"
             title="Rows per page"
           >
             <option value={500}>All Users (500)</option>
@@ -179,7 +181,7 @@ export function UserTable({ currentUserRole }: UserTableProps) {
               setRoleFilter(e.target.value);
               setPage(1);
             }}
-            className="px-3 py-2 border border-border rounded-lg bg-background text-sm text-foreground focus:outline-none focus:border-primary transition-colors"
+            className="px-3 py-2 border border-border rounded-xl bg-background/60 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all cursor-pointer"
           >
             <option value="">All Roles</option>
             {rolesList.map((r) => (
@@ -190,9 +192,18 @@ export function UserTable({ currentUserRole }: UserTableProps) {
           </select>
 
           <button
+            onClick={() => setImportModalOpen(true)}
+            className="flex items-center gap-1.5 px-3.5 py-2 border border-primary/40 rounded-xl bg-primary/10 hover:bg-primary/20 active:scale-95 text-primary font-bold text-xs transition-all shrink-0 shadow-sm"
+            title="Import Users from Excel/CSV"
+          >
+            <FileSpreadsheet className="w-4 h-4 shrink-0" />
+            <span>Import Excel</span>
+          </button>
+
+          <button
             onClick={() => fetchUsers()}
             disabled={loading}
-            className="p-2 border border-border rounded-lg bg-background hover:bg-surface text-foreground transition-colors disabled:opacity-50"
+            className="p-2 border border-border rounded-xl bg-background/60 hover:bg-muted text-foreground transition-all disabled:opacity-50 shrink-0"
             title="Refresh Table"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -408,6 +419,12 @@ export function UserTable({ currentUserRole }: UserTableProps) {
           </div>
         </div>
       )}
+      {/* Excel/CSV Import Modal */}
+      <UserImportModal
+        open={importModalOpen}
+        onOpenChange={setImportModalOpen}
+        onSuccess={fetchUsers}
+      />
     </div>
   );
 }

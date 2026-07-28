@@ -42,7 +42,7 @@ export class FileController {
 
   @Post('upload')
   @Roles(Role.ADMIN, Role.SUPER_ADMIN, Role.EDITOR)
-  @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 10 * 1024 * 1024 } }))
+  @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 250 * 1024 * 1024 } }))
   async uploadMedia(@UploadedFile() file: Express.Multer.File, @Req() req: any) {
     return this.fileService.uploadMediaAsset(file, req.user.id);
   }
