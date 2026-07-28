@@ -126,6 +126,53 @@ function CreatorLabContent() {
   }
 
   useEffect(() => {
+    async function fetchCourseData() {
+      try {
+        const res = await fetch(`/api/cms/courses/${unlockedCourseParam}`);
+        const json = await res.json();
+        const data = json.data || json;
+        if (data && data.title) {
+          const formattedLessons: ModuleLesson[] = Array.isArray(data.lessons) && data.lessons.length > 0
+            ? data.lessons.map((l: any, idx: number) => ({
+                id: l.id || `l-${idx}`,
+                title: l.title,
+                duration: l.duration || '15:00',
+                videoUrl: l.videoUrl || 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+              }))
+            : (UNLOCKED_COURSES_DATA[unlockedCourseParam]?.lessons || UNLOCKED_COURSES_DATA['course-youtuber'].lessons);
+
+          const formattedResources = Array.isArray(data.resources) && data.resources.length > 0
+            ? data.resources.map((r: any) => 
+                typeof r === 'string' 
+                  ? { title: r, size: '5 MB', downloadUrl: '#' }
+                  : { title: r.title || 'Resource Asset', size: r.size || '10 MB', downloadUrl: r.downloadUrl || '#' }
+              )
+            : (UNLOCKED_COURSES_DATA[unlockedCourseParam]?.resources || UNLOCKED_COURSES_DATA['course-youtuber'].resources);
+
+          const dynamicCourse: StudentCourse = {
+            id: data.id || data.slug || unlockedCourseParam,
+            title: data.title,
+            categoryLabel: data.categoryLabel || 'Masterclass',
+            instructor: data.instructorName || 'Master Instructor',
+            progress: 35,
+            image: data.image || '/images/services-lighting.jpg',
+            lessons: formattedLessons,
+            resources: formattedResources,
+          };
+
+          setActiveCourse(dynamicCourse);
+          if (formattedLessons.length > 0) {
+            setActiveLesson(formattedLessons[0]);
+          }
+        }
+      } catch (e) {
+        console.warn('Dynamic course fetch fallback to static data:', e);
+      }
+    }
+    fetchCourseData();
+  }, [unlockedCourseParam]);
+
+  useEffect(() => {
     async function run256bitVerification() {
       if (typeof window !== 'undefined') {
         const secToken = sessionStorage.getItem('mp_sec_token') || '';

@@ -1449,5 +1449,48 @@ export class CmsService {
     await this.audit({ actorId: actorId || 'SYSTEM', action: 'SOFT_DELETE_COURSE', resource: 'Course', resourceId: id });
     return result;
   }
+
+  async updateCourseLessons(courseId: string, lessons: any[], resources?: any[], actorId?: string) {
+    await this.prisma.lesson.deleteMany({ where: { courseId } });
+
+    if (Array.isArray(lessons) && lessons.length > 0) {
+      await this.prisma.lesson.createMany({
+        data: lessons.map((l: any, idx: number) => ({
+          courseId,
+          title: l.title || `Lesson ${idx + 1}`,
+          duration: l.duration || '10:00',
+          videoUrl: l.videoUrl || '',
+          isFreePreview: Boolean(l.isFreePreview),
+          sortOrder: idx,
+        })),
+      });
+    }
+
+    const payload: any = {
+      lessonsCount: Array.isArray(lessons) ? lessons.length : 0,
+    };
+    if (Array.isArray(resources)) {
+      payload.resources = resources;
+    }
+
+    const updatedCourse = await this.prisma.course.update({
+      where: { id: courseId },
+      data: payload,
+      include: { lessons: { orderBy: { sortOrder: 'asc' } } },
+    });
+
+    await this.audit({ actorId: actorId || 'SYSTEM', action: 'UPDATE_COURSE_LESSONS', resource: 'Course', resourceId: courseId });
+    return updatedCourse;
+  }
+
+  async getCourseBySlugOrId(identifier: string) {
+    return this.prisma.course.findFirst({
+      where: {
+        OR: [{ id: identifier }, { slug: identifier }],
+        deletedAt: null,
+      },
+      include: { lessons: { orderBy: { sortOrder: 'asc' } } },
+    });
+  }
 }
 

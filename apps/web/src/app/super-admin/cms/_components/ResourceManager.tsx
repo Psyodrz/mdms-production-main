@@ -40,6 +40,8 @@ import {
 import type { ColumnDef, ResourceConfig } from '@/lib/cms/resources';
 import { cms } from '@/lib/cms/client';
 import { ResourceForm } from './ResourceForm';
+import { CourseLessonManagerModal } from '@/components/admin/CourseLessonManagerModal';
+import { Film } from 'lucide-react';
 
 type Item = Record<string, unknown>;
 
@@ -52,6 +54,8 @@ export function ResourceManager({ config }: { config: ResourceConfig }) {
   const [editing, setEditing] = useState<Item | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [deleting, setDeleting] = useState<Item | null>(null);
+  const [lessonCourse, setLessonCourse] = useState<any | null>(null);
+  const [lessonModalOpen, setLessonModalOpen] = useState(false);
 
   const bodyKey = useMemo(
     () => (config.fields.some((f) => f.name === 'slug') ? 'slug' : 'id'),
@@ -152,6 +156,10 @@ export function ResourceManager({ config }: { config: ResourceConfig }) {
     setEditing(item);
     setFormOpen(true);
   }
+  function openLessons(item: Item) {
+    setLessonCourse(item);
+    setLessonModalOpen(true);
+  }
 
   return (
     <div className="space-y-6">
@@ -230,6 +238,7 @@ export function ResourceManager({ config }: { config: ResourceConfig }) {
                         canEdit={config.canEdit}
                         canDelete={config.canDelete}
                         previewUrl={config.key === 'blog' ? `/blog/${item.slug}${item.previewToken ? `?preview=${item.previewToken}` : ''}` : undefined}
+                        onManageLessons={config.key === 'courses' ? () => openLessons(item) : undefined}
                         onEdit={() => openEdit(item)}
                         onDelete={() => setDeleting(item)}
                       />
@@ -260,6 +269,7 @@ export function ResourceManager({ config }: { config: ResourceConfig }) {
                       canEdit={config.canEdit}
                       canDelete={config.canDelete}
                       previewUrl={config.key === 'blog' ? `/blog/${item.slug}${item.previewToken ? `?preview=${item.previewToken}` : ''}` : undefined}
+                      onManageLessons={config.key === 'courses' ? () => openLessons(item) : undefined}
                       onEdit={() => openEdit(item)}
                       onDelete={() => setDeleting(item)}
                     />
@@ -319,6 +329,15 @@ export function ResourceManager({ config }: { config: ResourceConfig }) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {config.key === 'courses' && (
+        <CourseLessonManagerModal
+          isOpen={lessonModalOpen}
+          onClose={() => setLessonModalOpen(false)}
+          course={lessonCourse}
+          onSaved={load}
+        />
+      )}
     </div>
   );
 }
@@ -327,17 +346,30 @@ function RowActions({
   canEdit,
   canDelete,
   previewUrl,
+  onManageLessons,
   onEdit,
   onDelete,
 }: {
   canEdit: boolean;
   canDelete: boolean;
   previewUrl?: string;
+  onManageLessons?: () => void;
   onEdit: () => void;
   onDelete: () => void;
 }) {
   return (
     <div className="inline-flex items-center gap-1">
+      {onManageLessons && (
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onManageLessons}
+          title="Manage Video Lectures"
+          className="text-brand hover:bg-brand/10"
+        >
+          <Film className="size-4" />
+        </Button>
+      )}
       {previewUrl && (
         <Button variant="ghost" size="icon" asChild title="Preview Draft">
           <a href={previewUrl} target="_blank" rel="noopener noreferrer">

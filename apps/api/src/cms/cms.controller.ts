@@ -549,6 +549,13 @@ export class CmsController {
     return this.cmsService.getCoursesAdmin(true, dto);
   }
 
+  @Public()
+  @Get('courses/:identifier')
+  async getPublicCourseItem(@Param('identifier') identifier: string) {
+    const course = await this.cmsService.getCourseBySlugOrId(identifier);
+    return { success: true, data: course };
+  }
+
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @Get('admin/courses')
   async getAdminCourses(@Query() dto: PaginationDto) {
@@ -559,6 +566,17 @@ export class CmsController {
   @Post('admin/courses')
   async upsertCourse(@Req() req: any, @Body() body: any) {
     return this.cmsService.upsertCourse(body, req.user?.id);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Post('admin/courses/:id/lessons')
+  async updateCourseLessons(
+    @Req() req: any,
+    @Param('id') id: string,
+    @Body() body: { lessons: any[]; resources?: any[] },
+  ) {
+    const data = await this.cmsService.updateCourseLessons(id, body.lessons, body.resources, req.user?.id);
+    return { success: true, data };
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)
