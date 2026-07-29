@@ -291,12 +291,12 @@ export function ResourceManager({ config }: { config: ResourceConfig }) {
 
       {/* Create / Edit dialog */}
       <Dialog open={formOpen} onOpenChange={(o) => { setFormOpen(o); if (!o) setEditing(null); }}>
-        <DialogContent data-lenis-prevent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>
+        <DialogContent data-lenis-prevent className="max-w-lg w-[92vw] p-5 sm:p-6 rounded-2xl shadow-2xl overflow-hidden">
+          <DialogHeader className="mb-2">
+            <DialogTitle className="text-lg font-serif">
               {editing ? `Edit ${config.label}` : `New ${config.label}`}
             </DialogTitle>
-            <DialogDescription>{config.description}</DialogDescription>
+            <DialogDescription className="text-xs">{config.description}</DialogDescription>
           </DialogHeader>
           <ResourceForm
             config={config}

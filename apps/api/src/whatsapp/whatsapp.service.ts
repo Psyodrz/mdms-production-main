@@ -41,7 +41,7 @@ export class WhatsappService implements OnModuleInit {
     this.inboxwaApiKey = this.configService.get<string>('INBOXWA_API_KEY', '');
     this.inboxwaInstanceId = this.configService.get<string>('INBOXWA_INSTANCE_ID', '');
     this.inboxwaBaseUrl = this.configService.get<string>('INBOXWA_BASE_URL', 'https://inboxwa.online/api/v1');
-    this.inboxwaPhoneNumber = this.configService.get<string>('INBOXWA_PHONE_NUMBER', '919876543210');
+    this.inboxwaPhoneNumber = this.configService.get<string>('INBOXWA_PHONE_NUMBER', '918310531309');
     this.autoReplyEnabled = true;
 
     // Meta config
@@ -65,13 +65,25 @@ export class WhatsappService implements OnModuleInit {
         if (parsed.inboxwaApiKey) this.inboxwaApiKey = parsed.inboxwaApiKey;
         if (parsed.inboxwaInstanceId) this.inboxwaInstanceId = parsed.inboxwaInstanceId;
         if (parsed.inboxwaBaseUrl) this.inboxwaBaseUrl = parsed.inboxwaBaseUrl;
-        if (parsed.inboxwaPhoneNumber) this.inboxwaPhoneNumber = parsed.inboxwaPhoneNumber;
+        if (parsed.inboxwaPhoneNumber) {
+          this.inboxwaPhoneNumber = (parsed.inboxwaPhoneNumber === '919876543210' || !parsed.inboxwaPhoneNumber) ? '918310531309' : parsed.inboxwaPhoneNumber;
+        }
         if (parsed.autoReplyEnabled !== undefined) this.autoReplyEnabled = parsed.autoReplyEnabled;
         if (parsed.phoneNumberId) {
           this.phoneNumberId = parsed.phoneNumberId;
           this.metaApiUrl = `https://graph.facebook.com/v19.0/${this.phoneNumberId}/messages`;
         }
         if (parsed.accessToken) this.accessToken = parsed.accessToken;
+
+        // Auto-migrate legacy mock number in database to official 918310531309
+        if (parsed.inboxwaPhoneNumber === '919876543210') {
+          parsed.inboxwaPhoneNumber = '918310531309';
+          await this.prisma.systemConfig.update({
+            where: { key: 'WHATSAPP_CONFIG' },
+            data: { value: JSON.stringify(parsed) },
+          });
+          this.logger.log('Updated legacy WhatsApp phone number in database to 918310531309.');
+        }
 
         this.logger.log('Loaded WhatsApp configuration from database successfully.');
       }

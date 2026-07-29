@@ -9,7 +9,7 @@ interface WhatsAppWidgetProps {
 }
 
 export const WhatsAppWidget: React.FC<WhatsAppWidgetProps> = ({
-  phoneNumber: initialPhoneNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '919876543210',
+  phoneNumber: initialPhoneNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '918310531309',
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [customMessage, setCustomMessage] = useState('');
@@ -70,7 +70,8 @@ export const WhatsAppWidget: React.FC<WhatsAppWidgetProps> = ({
   ];
 
   const handleOpenWhatsApp = (text: string) => {
-    const cleanNumber = phoneNumber.replace(/[^0-9]/g, '');
+    const activeNumber = (phoneNumber === '919876543210' || !phoneNumber) ? '918310531309' : phoneNumber;
+    const cleanNumber = activeNumber.replace(/[^0-9]/g, '');
     const encodedText = encodeURIComponent(text);
     const whatsappUrl = `https://wa.me/${cleanNumber}?text=${encodedText}`;
     window.open(whatsappUrl, '_blank', 'noopener,noreferrer');

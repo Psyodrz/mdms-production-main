@@ -697,7 +697,7 @@ export const RESOURCES: Record<string, ResourceConfig> = {
       { name: 'notes', label: 'Client Requirements & Call Notes', type: 'textarea', full: true },
     ],
     sample: [
-      { id: 'sl-1', clientName: 'Ananya Sharma', phone: '+91 98765 43210', source: 'WHATSAPP', stage: 'NEW', estimatedValue: 15000000 },
+      { id: 'sl-1', clientName: 'Ananya Sharma', phone: '+91 83105 31309', source: 'WHATSAPP', stage: 'NEW', estimatedValue: 15000000 },
       { id: 'sl-2', clientName: 'Rahul & Priya Wedding', phone: '+91 91234 56789', source: 'CALL', stage: 'PROPOSAL_SENT', estimatedValue: 35000000 },
     ],
     backend: { list: '/cms/admin/sales-leads', base: '/cms/admin/sales-leads', updateMode: 'upsert', recycleModelType: 'salesLead' },

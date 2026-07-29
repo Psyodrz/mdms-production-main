@@ -257,7 +257,7 @@ export const WhatsAppConfigCard: React.FC = () => {
                   type="text"
                   value={form.inboxwaPhoneNumber}
                   onChange={(e) => setForm({ ...form, inboxwaPhoneNumber: e.target.value })}
-                  placeholder="e.g. 919876543210"
+                  placeholder="e.g. 918310531309"
                   className="w-full bg-background border border-(--color-border) focus:border-emerald-500 rounded-xl px-3.5 py-2.5 text-xs text-foreground placeholder:text-muted-foreground outline-none transition-colors"
                 />
               </div>
@@ -268,43 +268,48 @@ export const WhatsAppConfigCard: React.FC = () => {
         {/* Auto Reply Toggle */}
         <div className="flex items-center justify-between p-4 bg-background/50 border border-(--color-border) rounded-xl">
           <div className="flex items-center space-x-3">
-            <Bot className="w-5 h-5 text-emerald-500" />
+            <MessageSquare className="w-5 h-5 text-emerald-400" />
             <div>
               <p className="text-xs font-semibold text-foreground">Enable Automated WhatsApp Customer Chatbot</p>
               <p className="text-[11px] text-muted-foreground">Automatically reply to incoming customer WhatsApp queries on website</p>
             </div>
           </div>
-          <Switch
-            checked={form.autoReplyEnabled}
-            onCheckedChange={(checked) => setForm({ ...form, autoReplyEnabled: checked })}
-            className="data-[state=checked]:bg-emerald-500"
-          />
+          <button
+            type="button"
+            onClick={() => setForm({ ...form, autoReplyEnabled: !form.autoReplyEnabled })}
+            className={`w-11 h-6 rounded-full transition-colors relative flex items-center p-0.5 ${
+              form.autoReplyEnabled ? 'bg-emerald-500 justify-end' : 'bg-muted justify-start'
+            }`}
+          >
+            <div className="w-5 h-5 rounded-full bg-white shadow-sm" />
+          </button>
         </div>
 
-        {/* Save Button */}
-        <div className="flex justify-end pt-2">
+        {/* Action buttons */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
           <button
             type="submit"
             disabled={saving}
-            className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs px-6 py-3 rounded-xl transition-all flex items-center space-x-2 shadow-lg disabled:opacity-50 uppercase tracking-wider"
+            className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-6 py-2.5 rounded-xl flex items-center justify-center space-x-2 transition-all shadow-md shadow-emerald-950/20 disabled:opacity-50 font-medium"
           >
-            <Save className="w-4 h-4" />
+            <Sparkles className="w-4 h-4" />
             <span>{saving ? 'Activating Credentials...' : 'Save & Activate WhatsApp Integration'}</span>
           </button>
         </div>
       </form>
 
-      {/* Connection Test Section */}
-      <div className="mt-8 pt-6 border-t border-(--color-border)">
-        <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-          Test WhatsApp Connection
+      {/* Test Connection Box */}
+      <div className="mt-6 pt-6 border-t border-(--color-border)">
+        <h4 className="text-xs font-semibold text-foreground mb-3 flex items-center space-x-2">
+          <Send className="w-3.5 h-3.5 text-emerald-400" />
+          <span>Test WhatsApp Connection</span>
         </h4>
         <div className="flex flex-col sm:flex-row items-center gap-3">
           <input
             type="text"
             value={testPhone}
             onChange={(e) => setTestPhone(e.target.value)}
-            placeholder="Enter test phone number with country code (e.g. 919876543210)..."
+            placeholder="Enter test phone number with country code (e.g. 918310531309)..."
             className="w-full sm:flex-1 bg-background border border-(--color-border) focus:border-emerald-500 rounded-xl px-3.5 py-2.5 text-xs text-foreground placeholder:text-muted-foreground outline-none transition-colors"
           />
           <button

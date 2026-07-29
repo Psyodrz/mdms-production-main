@@ -68,7 +68,7 @@ function SiteConfigContent() {
     tagline: 'Crafting Cinematic Excellence & Digital Legacies.',
     copyrightText: `© ${new Date().getFullYear()} MP Production. All rights reserved.`,
     contactEmail: 'contact@mpproductions.com',
-    contactPhone: '+1 (555) 123-4567',
+    contactPhone: '+91 83105 31309',
     contactAddress: 'Los Angeles / New York / Paris / Tokyo',
     socialLinks: [
       { platform: 'instagram', url: 'https://instagram.com/mpproductions' },

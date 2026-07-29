@@ -265,7 +265,7 @@ export default function TermsOfService() {
                   <strong>Corporate Studio HQ:</strong> Studio 4B, Film City Complex, Goregaon East, Mumbai, Maharashtra 400065, India
                 </p>
                 <p className="text-muted-foreground text-sm">
-                  <strong>Support Desk:</strong> +91 98200 11223 (Mon – Fri, 10:00 AM – 7:00 PM IST)
+                  <strong>Support Desk:</strong> +91 83105 31309 (Mon – Fri, 10:00 AM – 7:00 PM IST)
                 </p>
               </div>
             </section>

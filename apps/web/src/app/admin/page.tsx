@@ -12,6 +12,8 @@ import { fetchAPI } from '@/lib/api-client';
 import { cms } from '@/lib/cms/client';
 import { useRealtimeRefresh } from '@/lib/realtime/useRealtimeRefresh';
 import SalesManagementPage from '@/app/super-admin/cms/sales/page';
+import { BookingAnalyticsCharts } from '@/components/admin/BookingAnalyticsCharts';
+import { AdminAuditLogsCard } from '@/components/admin/AdminAuditLogsCard';
 import { 
   Film, 
   FileText, 
@@ -35,7 +37,8 @@ import {
   RefreshCw,
   Loader2,
   Target,
-  FolderKanban
+  FolderKanban,
+  ShieldCheck
 } from 'lucide-react';
 
 interface Booking {
@@ -75,7 +78,7 @@ interface TalentReview {
 
 export default function AdminDashboard() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<'overview' | 'sales' | 'cms' | 'bookings' | 'users' | 'settings'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'sales' | 'cms' | 'bookings' | 'users' | 'audit' | 'settings'>('overview');
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -101,7 +104,7 @@ export default function AdminDashboard() {
   const [modalStatus, setModalStatus] = useState<'Published' | 'Draft' | 'Archived'>('Published');
   const [modalType, setModalType] = useState<'portfolio' | 'blog' | 'testimonial'>('portfolio');
 
-  const fetchDashboardData = async (isRefresh = false) => {
+  const fetchDashboardData = async (isRefresh = false, showToast = false) => {
     if (isRefresh) setRefreshing(true);
     else setLoading(true);
 
@@ -203,9 +206,9 @@ export default function AdminDashboard() {
         setCmsItems(loadedCms);
       }
 
-      if (isRefresh) toast.success('Dashboard data refreshed successfully');
+      if (showToast) toast.success('Dashboard data refreshed successfully');
     } catch (err) {
-      if (isRefresh) toast.error('Error refreshing dashboard data');
+      if (showToast) toast.error('Error refreshing dashboard data');
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -213,18 +216,18 @@ export default function AdminDashboard() {
   };
 
   useEffect(() => {
-    fetchDashboardData();
+    fetchDashboardData(false, false);
 
-    // Auto-refresh every 4 seconds for realtime dashboard & CRM lead updates
+    // Auto-refresh every 4 seconds for realtime dashboard & CRM lead updates (silent sync)
     const interval = setInterval(() => {
-      fetchDashboardData(true);
+      fetchDashboardData(true, false);
     }, 4000);
 
     return () => clearInterval(interval);
   }, []);
 
-  // Realtime: refresh when sales leads / contact submissions / bookings change.
-  useRealtimeRefresh(['Booking', 'Testimonial', 'PortfolioItem', 'SalesLead', 'ContactSubmission'], () => fetchDashboardData(true));
+  // Realtime: refresh when sales leads / contact submissions / bookings change (silent sync)
+  useRealtimeRefresh(['Booking', 'Testimonial', 'PortfolioItem', 'SalesLead', 'ContactSubmission'], () => fetchDashboardData(true, false));
 
   const handleStatusChange = async (id: string, newStatus: Booking['status']) => {
     // Optimistic UI update
@@ -416,18 +419,20 @@ export default function AdminDashboard() {
           </div>
 
           {/* Interactive Control Tabs */}
-          <div className="flex border-b border-border mb-12 overflow-x-auto gap-8">
+          <div className="flex border-b border-border mb-12 overflow-x-auto gap-6">
             {[
               { id: 'overview', label: 'Overview & KPIs', icon: <BarChart3 className="w-4 h-4" /> },
               { id: 'sales', label: 'Sales & Realtime CRM', icon: <Target className="w-4 h-4 text-emerald-500" /> },
               { id: 'cms', label: 'CMS Master Editor', icon: <FileText className="w-4 h-4" /> },
-              { id: 'bookings', label: 'Bookings & Inquiries', icon: <Calendar className="w-4 h-4" /> },
+              { id: 'bookings', label: 'Bookings & Auditions', icon: <Calendar className="w-4 h-4" /> },
+              { id: 'users', label: 'User Directory', icon: <Users className="w-4 h-4 text-blue-500" /> },
+              { id: 'audit', label: 'Audit Trail & Logs', icon: <ShieldCheck className="w-4 h-4 text-purple-500" /> },
               { id: 'settings', label: 'Platform Controls', icon: <Sliders className="w-4 h-4" /> },
             ].map(tab => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`py-4 px-4 text-sm font-semibold tracking-wider uppercase whitespace-nowrap transition-all border-b-2 flex items-center gap-2 cursor-pointer ${
+                className={`py-4 px-3 text-xs sm:text-sm font-semibold tracking-wider uppercase whitespace-nowrap transition-all border-b-2 flex items-center gap-2 cursor-pointer ${
                   activeTab === tab.id
                     ? 'border-primary text-primary font-bold'
                     : 'border-transparent text-muted-foreground hover:text-foreground'
@@ -560,6 +565,9 @@ export default function AdminDashboard() {
                 </Card>
 
               </div>
+
+              {/* Realtime Booking Flows & Analytics Engine */}
+              <BookingAnalyticsCharts bookings={bookings} />
             </div>
           )}
 
@@ -804,35 +812,42 @@ export default function AdminDashboard() {
             </div>
           )}
 
+          {/* TAB 6: AUDIT TRAIL & SECURITY LOGS */}
+          {activeTab === 'audit' && (
+            <div className="space-y-8 animate-fadeIn">
+              <AdminAuditLogsCard />
+            </div>
+          )}
+
           {/* INLINE MODAL FOR CMS EDITING / ADDING */}
           {isModalOpen && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-              <div className="bg-surface border border-border rounded-sm p-6 w-full max-w-lg shadow-2xl animate-scaleUp">
-                <div className="flex justify-between items-center mb-6 pb-4 border-b border-border">
-                  <h3 className="text-xl font-serif text-foreground">
+              <div className="bg-surface border border-border rounded-2xl p-5 w-full max-w-md shadow-2xl animate-scaleUp">
+                <div className="flex justify-between items-center mb-4 pb-3 border-b border-border">
+                  <h3 className="text-lg font-serif font-bold text-foreground">
                     {editingItem ? `Edit ${editingItem.type.toUpperCase()}` : `Add New ${modalType.toUpperCase()}`}
                   </h3>
-                  <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-gray-600 font-bold text-lg">✕</button>
+                  <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-gray-600 font-bold text-base cursor-pointer">✕</button>
                 </div>
 
-                <form onSubmit={saveCmsItem} className="space-y-4">
+                <form onSubmit={saveCmsItem} className="space-y-3">
                   <div>
-                    <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">
-                      Title / Project Name
+                    <label className="block text-xs font-semibold text-foreground/90 mb-1">
+                      Title / Project Name *
                     </label>
                     <input
                       type="text"
                       value={modalTitle}
                       onChange={(e) => setModalTitle(e.target.value)}
                       placeholder="e.g. Summer Fashion Week Campaign"
-                      className="w-full bg-background border border-border px-4 py-2.5 rounded-sm text-sm focus:outline-none focus:border-[#12213A]"
+                      className="w-full bg-background border border-border px-3 py-2 rounded-xl text-xs focus:outline-none focus:border-primary"
                       required
                     />
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">
+                      <label className="block text-xs font-semibold text-foreground/90 mb-1">
                         Category
                       </label>
                       <input
@@ -840,12 +855,12 @@ export default function AdminDashboard() {
                         value={modalCategory}
                         onChange={(e) => setModalCategory(e.target.value)}
                         placeholder="e.g. Commercial"
-                        className="w-full bg-background border border-border px-4 py-2.5 rounded-sm text-sm focus:outline-none focus:border-[#12213A]"
+                        className="w-full bg-background border border-border px-3 py-2 rounded-xl text-xs focus:outline-none focus:border-primary"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">
+                      <label className="block text-xs font-semibold text-foreground/90 mb-1">
                         Client / Author
                       </label>
                       <input
@@ -853,19 +868,19 @@ export default function AdminDashboard() {
                         value={modalClient}
                         onChange={(e) => setModalClient(e.target.value)}
                         placeholder="e.g. Nike / Vikram Mehta"
-                        className="w-full bg-background border border-border px-4 py-2.5 rounded-sm text-sm focus:outline-none focus:border-[#12213A]"
+                        className="w-full bg-background border border-border px-3 py-2 rounded-xl text-xs focus:outline-none focus:border-primary"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">
+                    <label className="block text-xs font-semibold text-foreground/90 mb-1">
                       Publication Status
                     </label>
                     <select
                       value={modalStatus}
                       onChange={(e) => setModalStatus(e.target.value as any)}
-                      className="w-full bg-background border border-border px-4 py-2.5 rounded-sm text-sm focus:outline-none focus:border-[#12213A]"
+                      className="w-full bg-background border border-border px-3 py-2 rounded-xl text-xs focus:outline-none focus:border-primary"
                     >
                       <option value="Published">Published (Live)</option>
                       <option value="Draft">Draft (Internal)</option>
@@ -873,14 +888,14 @@ export default function AdminDashboard() {
                     </select>
                   </div>
 
-                  <div className="pt-4 border-t border-border flex justify-end gap-3">
-                    <Button type="button" variant="outline" size="sm" onClick={() => setIsModalOpen(false)} disabled={isSubmitting}>
+                  <div className="pt-3 border-t border-border flex justify-end gap-2">
+                    <Button type="button" variant="outline" size="sm" onClick={() => setIsModalOpen(false)} disabled={isSubmitting} className="text-xs rounded-xl">
                       Cancel
                     </Button>
-                    <Button type="submit" variant="primary" size="sm" className="!bg-[#12213A] !text-white flex items-center gap-1.5" disabled={isSubmitting}>
+                    <Button type="submit" variant="primary" size="sm" className="!bg-red-600 hover:!bg-red-700 !text-white flex items-center gap-1.5 text-xs rounded-xl font-bold" disabled={isSubmitting}>
                       {isSubmitting ? (
                         <>
-                          <Loader2 className="w-4 h-4 animate-spin" /> Saving...
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" /> Saving...
                         </>
                       ) : (
                         editingItem ? 'Update Item' : 'Create Item'

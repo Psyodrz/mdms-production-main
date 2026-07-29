@@ -2,9 +2,9 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ "main", "production" ]
+    branches: [ "main", "master", "production" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "master" ]
 
 env:
   REGISTRY: ghcr.io
@@ -65,7 +65,7 @@ jobs:
   build-and-push:
     name: Build & Push Docker Images
     needs: test
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/production'
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/production'
     runs-on: ubuntu-latest
     permissions:
       contents: read

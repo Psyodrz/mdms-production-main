@@ -198,7 +198,7 @@ function CheckoutContent() {
       setStudentInfo({
         name: cachedName || 'Creator Student',
         email: cachedEmail || 'student@creator.com',
-        phone: cachedPhone || '+91 98765 43210',
+        phone: cachedPhone || '+91 83105 31309',
       });
     }
   }, []);

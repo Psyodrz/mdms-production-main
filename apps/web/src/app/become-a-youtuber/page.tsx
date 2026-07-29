@@ -1018,7 +1018,7 @@ export default function BecomeAYouTuberPage({ defaultCategory = 'ALL' }: { defau
 
                 {/* Direct WhatsApp Advisor Button */}
                 <a
-                  href={`https://wa.me/919876543210?text=${encodeURIComponent(
+                  href={`https://wa.me/918310531309?text=${encodeURIComponent(
                     `Hi MP Production Team! I submitted an enrollment request for "${leadSuccessData.courseTitle}" (${leadSuccessData.price}).\nRequest ID: ${leadSuccessData.leadId}\nName: ${leadSuccessData.name}\nPhone: ${leadSuccessData.phone}\nEmail: ${leadSuccessData.email}\nChannel: ${leadSuccessData.channelUrl}\n\nPlease send my invoice and instant payment link.`
                   )}`}
                   target="_blank"

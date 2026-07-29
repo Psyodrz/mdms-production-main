@@ -9,6 +9,7 @@ import { PortalNavbar } from '@/components/ui/PortalNavbar';
 import { Container } from '@/components/ui/Container';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import { BookingAnalyticsCharts } from '@/components/admin/BookingAnalyticsCharts';
 import { cms } from '@/lib/cms/client';
 import { toast } from 'sonner';
 import { 
@@ -611,6 +612,9 @@ export default function SuperAdminDashboard() {
                 </Card>
 
               </div>
+
+              {/* Realtime Booking Flows & Multi-Chart Analytics */}
+              <BookingAnalyticsCharts bookings={bookings} isLiveDb={isLiveDb} />
             </div>
           )}
 

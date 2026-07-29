@@ -124,6 +124,12 @@ export default function Contact() {
                   </p>
                 </div>
                 <div>
+                  <h3 className="text-foreground font-semibold uppercase tracking-wider text-sm mb-2">Direct Phone & WhatsApp</h3>
+                  <a href="tel:+918310531309" className="text-primary hover:underline font-medium block">
+                    +91 83105 31309
+                  </a>
+                </div>
+                <div>
                   <h3 className="text-foreground font-semibold uppercase tracking-wider text-sm mb-2">General Inquiries</h3>
                   <a href="mailto:hello@mpproductions.com" className="text-primary hover:underline">
                     hello@mpproductions.com
@@ -182,7 +188,7 @@ export default function Contact() {
                         value={formData.phone}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                         className="input-premium" 
-                        placeholder="+1 (555) 000-0000"
+                        placeholder="+91 83105 31309"
                       />
                     </div>
                   </div>
