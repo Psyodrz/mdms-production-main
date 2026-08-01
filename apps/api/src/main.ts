@@ -56,6 +56,9 @@ async function bootstrap() {
     'http://127.0.0.1:3000',
     'http://127.0.0.1:3001',
     'https://mpproductions.vercel.app',
+    // Production custom domain (apex + www)
+    'https://rapolarts.com',
+    'https://www.rapolarts.com',
     process.env.FRONTEND_URL,
   ].filter(Boolean);
 
@@ -65,7 +68,8 @@ async function bootstrap() {
       if (
         allowedOrigins.includes(origin) ||
         /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin) ||
-        /\.vercel\.app$/.test(origin)
+        /\.vercel\.app$/.test(origin) ||
+        /^https:\/\/([a-z0-9-]+\.)*rapolarts\.com$/.test(origin)
       ) {
         return callback(null, true);
       }
