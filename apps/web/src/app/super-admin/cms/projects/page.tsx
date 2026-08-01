@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { toast } from 'sonner';
-import { fetchAPI } from '@/lib/api-client';
 import {
   Search,
   Filter,
@@ -77,7 +76,9 @@ export default function ProjectsCmsPage() {
       const params = new URLSearchParams({ page: String(page), limit: '10' });
       if (search) params.set('search', search);
       if (statusFilter) params.set('status', statusFilter);
-      const res = await fetchAPI(`/admin/projects?${params.toString()}`);
+      // Use the session-authenticated BFF (service account) so this works on the
+      // NextAuth admin path where no Supabase browser token exists.
+      const res = await fetch(`/api/admin/projects?${params.toString()}`).then((r) => r.json());
       if (res?.success) {
         setProjects(res.data || []);
         setTotal(res.total || 0);
@@ -95,7 +96,7 @@ export default function ProjectsCmsPage() {
   const openDetail = async (projectId: string) => {
     setDetailLoading(true);
     try {
-      const res = await fetchAPI(`/admin/projects/${projectId}`);
+      const res = await fetch(`/api/admin/projects/${projectId}`).then((r) => r.json());
       if (res?.success && res.data) {
         setSelectedProject(res.data);
       }
@@ -109,10 +110,11 @@ export default function ProjectsCmsPage() {
   const handleStatusUpdate = async (projectId: string, newStatus: string) => {
     setUpdatingStatus(projectId);
     try {
-      const res = await fetchAPI(`/admin/projects/${projectId}/status`, {
+      const res = await fetch(`/api/admin/projects/${projectId}/status`, {
         method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),
-      });
+      }).then((r) => r.json());
       if (res?.success) {
         toast.success(`Project status updated to ${formatStatus(newStatus)}`);
         loadProjects();

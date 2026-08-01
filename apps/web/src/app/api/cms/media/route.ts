@@ -2,6 +2,27 @@ import { NextRequest, NextResponse } from 'next/server';
 import { backendFetch } from '@/lib/cms/server/backend';
 import { requireAdmin } from '@/lib/cms/server/guard';
 
+export async function GET() {
+  if (!(await requireAdmin())) {
+    return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const result = await backendFetch('/cms/admin/media');
+  if (result.ok && result.data) {
+    const payload = result.data as any;
+    const list = Array.isArray(payload)
+      ? payload
+      : Array.isArray(payload?.data)
+        ? payload.data
+        : [];
+    return NextResponse.json({ ok: true, status: 200, data: list });
+  }
+  return NextResponse.json(
+    { ok: false, error: result.error || 'Failed to load media assets' },
+    { status: result.status && result.status >= 400 ? result.status : 502 },
+  );
+}
+
 export async function POST(req: NextRequest) {
   if (!(await requireAdmin())) {
     return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });

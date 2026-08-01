@@ -21,5 +21,9 @@ export async function POST(req: NextRequest, ctx: Ctx) {
     return NextResponse.json(result, { status: 200 });
   }
 
-  return NextResponse.json({ ok: true, status: 200, data: { id, ...body } });
+  // Never fake success: surface the real backend error and status.
+  return NextResponse.json(
+    { ok: false, error: result.error || 'Failed to save course lessons' },
+    { status: result.status && result.status >= 400 ? result.status : 502 },
+  );
 }

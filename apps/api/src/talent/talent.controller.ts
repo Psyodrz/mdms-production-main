@@ -3,6 +3,8 @@ import { TalentService } from './talent.service';
 import { Public, Roles } from '../common/decorators/roles.decorator';
 import { Role, TalentProfileStatus } from '@mdms/types';
 import { CreateHireRequestDto } from './dto/create-hire-request.dto';
+import { RespondHireRequestDto } from './dto/respond-hire-request.dto';
+import { HireRequestStatus } from '@prisma/client';
 
 @Controller('talent')
 export class TalentController {
@@ -107,6 +109,26 @@ export class TalentController {
     return {
       success: true,
       message: 'Hire request submitted successfully',
+      data: request,
+    };
+  }
+
+  @Roles(Role.TALENT, Role.ADMIN, Role.SUPER_ADMIN)
+  @Patch('hire-requests/:id')
+  async respondToHireRequest(
+    @Req() req: any,
+    @Param('id') id: string,
+    @Body() dto: RespondHireRequestDto,
+  ) {
+    const userId = req.user?.id || req.user?.sub;
+    const request = await this.talentService.respondToHireRequest(
+      userId,
+      id,
+      dto.status as HireRequestStatus,
+    );
+    return {
+      success: true,
+      message: `Request marked as ${dto.status}`,
       data: request,
     };
   }

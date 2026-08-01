@@ -30,8 +30,11 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
     return NextResponse.json(result, { status: 200 });
   }
 
-  // Graceful fallback response for edit action
-  return NextResponse.json({ ok: true, status: 200, data: { id, ...body } });
+  // Never fake success: surface the real backend error and status.
+  return NextResponse.json(
+    { ok: false, error: result.error || 'Failed to update item' },
+    { status: result.status && result.status >= 400 ? result.status : 502 },
+  );
 }
 
 export async function DELETE(_req: NextRequest, ctx: Ctx) {
@@ -53,6 +56,9 @@ export async function DELETE(_req: NextRequest, ctx: Ctx) {
     return NextResponse.json(result, { status: 200 });
   }
 
-  // Graceful fallback response for delete action
-  return NextResponse.json({ ok: true, status: 200, data: { id } });
+  // Never fake success: surface the real backend error and status.
+  return NextResponse.json(
+    { ok: false, error: result.error || 'Failed to delete item' },
+    { status: result.status && result.status >= 400 ? result.status : 502 },
+  );
 }

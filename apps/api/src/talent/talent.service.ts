@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Prisma, SocialPlatform, HireRequestStatus } from '@prisma/client';
+import { Prisma, SocialPlatform, HireRequestStatus, MediaType } from '@prisma/client';
 import { TalentProfileStatus } from '@mdms/types';
 import { WhatsappService } from '../whatsapp/whatsapp.service';
 import { CreateHireRequestDto } from './dto/create-hire-request.dto';
@@ -127,17 +127,34 @@ export class TalentService {
     });
   }
 
-  async submitProfile(userId: string, data: any) {
+  async submitProfile(userId: string, data: any, options: { markForReview?: boolean } = {}) {
     await this.ensureUserExists(userId);
     const { 
       primaryTalentId, secondaryTalentIds, attributes,
       bio, stageName, experienceLevel,
       profilePhotoPreview, coverBannerPreview, introductionVideoPreview,
-      resumeName, compCardName, galleryImages,
+      resumeName, compCardName, resumeUrl, compCardUrl, galleryImages,
       achievements, education, brandsWorkedWith,
+      languages, skills,
+      pricingType, pricingAmount,
+      isAvailableForTravel, isAvailableForRemote, isAvailableImmediate,
       instagram, youtube, linkedin, portfolio, facebook, imdb, website, behance, pinterest, spotify, tiktok,
       ...rest 
     } = data;
+
+    // Onboarding submission (markForReview !== false) sends the profile for
+    // admin review. A plain edit of an existing profile preserves the current
+    // status so an already-approved talent is not hidden from the public site
+    // on every save.
+    const markForReview = options.markForReview !== false;
+    let updateStatus = TalentProfileStatus.PENDING_REVIEW;
+    if (!markForReview) {
+      const existing = await this.prisma.talentProfile.findUnique({
+        where: { userId },
+        select: { status: true },
+      });
+      updateStatus = (existing?.status as TalentProfileStatus) ?? TalentProfileStatus.PENDING_REVIEW;
+    }
 
     // 1. Upsert profile with all the structured data
     const profile = await this.prisma.talentProfile.upsert({
@@ -146,13 +163,13 @@ export class TalentService {
         bio,
         stageName,
         experienceLevel,
-        status: TalentProfileStatus.PENDING_REVIEW,
+        status: updateStatus,
         onboardingStep: 7,
         onboardingCompleted: true,
         coverBannerUrl: coverBannerPreview,
         introductionVideoUrl: introductionVideoPreview,
-        resumeUrl: resumeName ? `documents/${resumeName}` : null,
-        compCardUrl: compCardName ? `documents/${compCardName}` : null,
+        resumeUrl: resumeUrl || (resumeName ? `documents/${resumeName}` : null),
+        compCardUrl: compCardUrl || (compCardName ? `documents/${compCardName}` : null),
         achievements: achievements ? (achievements as any) : Prisma.DbNull,
         education: education ? (education as any) : Prisma.DbNull,
         brandsWorkedWith,
@@ -169,8 +186,8 @@ export class TalentService {
         onboardingCompleted: true,
         coverBannerUrl: coverBannerPreview,
         introductionVideoUrl: introductionVideoPreview,
-        resumeUrl: resumeName ? `documents/${resumeName}` : null,
-        compCardUrl: compCardName ? `documents/${compCardName}` : null,
+        resumeUrl: resumeUrl || (resumeName ? `documents/${resumeName}` : null),
+        compCardUrl: compCardUrl || (compCardName ? `documents/${compCardName}` : null),
         achievements: achievements ? (achievements as any) : Prisma.DbNull,
         education: education ? (education as any) : Prisma.DbNull,
         brandsWorkedWith,
@@ -207,6 +224,34 @@ export class TalentService {
       await this.prisma.userTalent.createMany({ data: categoryInserts });
     }
 
+    // Persist the uploaded profile photo (permanent URL) onto the user record so
+    // it survives a reload and shows across the app.
+    if (profilePhotoPreview && typeof profilePhotoPreview === 'string' && !profilePhotoPreview.startsWith('blob:')) {
+      await this.prisma.user.update({
+        where: { id: userId },
+        data: { avatarUrl: profilePhotoPreview },
+      });
+    }
+
+    // Persist the portfolio gallery images. Replace the existing set so removals
+    // in the editor are honoured. Only accept permanent URLs (never blob:).
+    if (Array.isArray(galleryImages)) {
+      const media = galleryImages
+        .filter((g: any) => g?.url && typeof g.url === 'string' && !g.url.startsWith('blob:'))
+        .map((g: any, index: number) => ({
+          talentProfileId: profile.id,
+          type: MediaType.PORTFOLIO_IMAGE,
+          url: g.url as string,
+          order: index,
+        }));
+      await this.prisma.portfolioMedia.deleteMany({
+        where: { talentProfileId: profile.id, type: MediaType.PORTFOLIO_IMAGE },
+      });
+      if (media.length > 0) {
+        await this.prisma.portfolioMedia.createMany({ data: media });
+      }
+    }
+
     // 3. Set Social Links
     await this.prisma.socialLink.deleteMany({
       where: { talentProfileId: profile.id }
@@ -226,6 +271,76 @@ export class TalentService {
     
     if (socialLinks.length > 0) {
       await this.prisma.socialLink.createMany({ data: socialLinks });
+    }
+
+    // 4. Languages — resolve/create by name, then link (replace existing set).
+    if (Array.isArray(languages)) {
+      await this.prisma.userLanguage.deleteMany({ where: { talentProfileId: profile.id } });
+      for (const raw of languages) {
+        const name = typeof raw === 'string' ? raw.trim() : '';
+        if (!name) continue;
+        const language = await this.prisma.language.upsert({
+          where: { name },
+          update: {},
+          create: { name },
+        });
+        await this.prisma.userLanguage
+          .create({ data: { talentProfileId: profile.id, languageId: language.id } })
+          .catch(() => null); // ignore duplicate links
+      }
+    }
+
+    // 5. Skills — resolve/create by name, then link (replace existing set).
+    if (Array.isArray(skills)) {
+      await this.prisma.userSkill.deleteMany({ where: { talentProfileId: profile.id } });
+      for (const raw of skills) {
+        const name = typeof raw === 'string' ? raw.trim() : '';
+        if (!name) continue;
+        const skill = await this.prisma.skill.upsert({
+          where: { name },
+          update: {},
+          create: { name },
+        });
+        await this.prisma.userSkill
+          .create({ data: { talentProfileId: profile.id, skillId: skill.id } })
+          .catch(() => null);
+      }
+    }
+
+    // 6. Pricing (stored in paise; rupees × 100).
+    if (pricingType || pricingAmount) {
+      const parsed = pricingAmount ? Math.round(parseFloat(String(pricingAmount)) * 100) : null;
+      const amount = parsed !== null && !Number.isNaN(parsed) ? parsed : null;
+      await this.prisma.talentPricing.upsert({
+        where: { talentProfileId: profile.id },
+        update: {
+          perDay: pricingType === 'per-day' ? amount : null,
+          perHour: pricingType === 'per-hour' ? amount : null,
+        },
+        create: {
+          talentProfileId: profile.id,
+          perDay: pricingType === 'per-day' ? amount : null,
+          perHour: pricingType === 'per-hour' ? amount : null,
+        },
+      });
+    }
+
+    // 7. Availability flags (mapping mirrors the edit form's read mapping).
+    if (
+      isAvailableForTravel !== undefined ||
+      isAvailableForRemote !== undefined ||
+      isAvailableImmediate !== undefined
+    ) {
+      const availabilityData = {
+        travelReady: !!isAvailableForTravel,
+        availablePartTime: !!isAvailableForRemote,
+        availableFullTime: !!isAvailableImmediate,
+      };
+      await this.prisma.talentAvailability.upsert({
+        where: { talentProfileId: profile.id },
+        update: availabilityData,
+        create: { talentProfileId: profile.id, ...availabilityData },
+      });
     }
 
     return profile;
@@ -297,7 +412,8 @@ export class TalentService {
   }
 
   async updateMe(userId: string, data: any) {
-    return this.submitProfile(userId, data);
+    // A profile edit must not silently send an approved talent back to review.
+    return this.submitProfile(userId, data, { markForReview: false });
   }
 
   async getFeatured() {
@@ -401,5 +517,33 @@ export class TalentService {
     }
 
     return request;
+  }
+
+  /**
+   * A talent accepts / declines / marks-in-discussion one of their own inbound
+   * hire requests. Ownership is enforced by matching the request's talentId to
+   * the caller's talent profile.
+   */
+  async respondToHireRequest(userId: string, requestId: string, status: HireRequestStatus) {
+    const profile = await this.prisma.talentProfile.findUnique({
+      where: { userId },
+      select: { id: true },
+    });
+    if (!profile) {
+      throw new NotFoundException('Talent profile not found');
+    }
+
+    const request = await this.prisma.hireRequest.findUnique({
+      where: { id: requestId },
+      select: { id: true, talentId: true },
+    });
+    if (!request || request.talentId !== profile.id) {
+      throw new NotFoundException('Hire request not found');
+    }
+
+    return this.prisma.hireRequest.update({
+      where: { id: requestId },
+      data: { status },
+    });
   }
 }

@@ -5,6 +5,7 @@ import { Reveal } from '@/components/ui/Reveal';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { RefreshCw, Trash2, Edit3, Loader2, Plus } from 'lucide-react';
+import { fetchAPI } from '@/lib/api-client';
 
 
 
@@ -24,24 +25,14 @@ export default function EmployeeRoster() {
     else setLoading(true);
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') || localStorage.getItem('mdms_auth_token') : null;
-      const res = await fetch(`${apiUrl}/employee`, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {}
-      });
-
-      if (res.ok) {
-        const json = await res.json();
-        const list = json.data || json;
-        if (Array.isArray(list)) {
-          setEmployees(list.length > 0 ? list : []);
-        }
-        if (isRefresh) toast.success('Employee roster refreshed');
-      } else {
-        if (isRefresh) toast.error('Failed to fetch employee roster');
-      }
-    } catch (err) {
-      if (isRefresh) toast.error('Network error refreshing roster');
+      // fetchAPI resolves the Supabase access token (incl. the sb-*-auth-token
+      // fallback) so the request is authenticated even on a fresh page load.
+      const json = await fetchAPI('/employee');
+      const list = json?.data || json;
+      setEmployees(Array.isArray(list) ? list : []);
+      if (isRefresh) toast.success('Employee roster refreshed');
+    } catch (err: any) {
+      if (isRefresh) toast.error(err?.message || 'Failed to fetch employee roster');
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -61,27 +52,10 @@ export default function EmployeeRoster() {
 
     setIsSubmitting(true);
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') || localStorage.getItem('mdms_auth_token') : null;
-      
-      const res = await fetch(`${apiUrl}/employee`, {
+      await fetchAPI('/employee', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {})
-        },
-        body: JSON.stringify({
-          email,
-          designation,
-          department,
-          joiningDate
-        })
+        body: JSON.stringify({ email, designation, department, joiningDate }),
       });
-
-      if (!res.ok) {
-        const errJson = await res.json().catch(() => null);
-        throw new Error(errJson?.message || 'Failed to create employee');
-      }
       toast.success('Employee record added successfully');
       setIsModalOpen(false);
       setEmail('');
@@ -97,19 +71,12 @@ export default function EmployeeRoster() {
 
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to remove this employee record?')) return;
-    setEmployees(prev => prev.filter(e => e.id !== id));
-    toast.success('Employee record removed');
-
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') || localStorage.getItem('mdms_auth_token') : null;
-      await fetch(`${apiUrl}/employee/${id}`, {
-        method: 'DELETE',
-        headers: token ? { Authorization: `Bearer ${token}` } : {}
-      });
-      fetchEmployees();
-    } catch (err) {
-      toast.error('Failed to delete on server');
+      await fetchAPI(`/employee/${id}`, { method: 'DELETE' });
+      setEmployees(prev => prev.filter(e => e.id !== id));
+      toast.success('Employee record removed');
+    } catch (err: any) {
+      toast.error(err?.message || 'Failed to delete employee');
     }
   };
 

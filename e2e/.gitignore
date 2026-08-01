@@ -1,0 +1,7 @@
+# Playwright auth storage states (contain live session tokens)
+.auth/
+# Test artifacts
+report/
+test-results/
+# Local secrets
+.env.e2e

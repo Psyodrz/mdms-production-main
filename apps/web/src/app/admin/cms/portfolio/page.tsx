@@ -6,7 +6,7 @@ import { AddProjectButton } from '@/components/ui/AddProjectButton';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { RefreshCw, Trash2, Edit3, Loader2 } from 'lucide-react';
-import { fetchAPI } from '@/lib/api-client';
+import { cms } from '@/lib/cms/client';
 
 
 
@@ -20,12 +20,15 @@ export default function CMSPortfolio() {
     else setLoading(true);
 
     try {
-      const json = await fetchAPI('/cms/admin/portfolio');
-      const list = json.data || json;
-      if (Array.isArray(list)) {
-        setItems(list.length > 0 ? list : []);
+      // Route through the same-origin CMS BFF (NextAuth session → service account),
+      // like the rest of the CMS. Avoids the browser-token 401 on the admin API.
+      const res = await cms.list<any[]>('portfolio');
+      if (res.ok && Array.isArray(res.data)) {
+        setItems(res.data);
+        if (isRefresh) toast.success('Portfolio items refreshed');
+      } else if (!res.ok) {
+        if (isRefresh) toast.error(res.error || 'Failed to refresh items');
       }
-      if (isRefresh) toast.success('Portfolio items refreshed');
     } catch (err) {
       if (isRefresh) toast.error('Network error refreshing items');
     } finally {
@@ -39,36 +42,38 @@ export default function CMSPortfolio() {
   }, []);
 
   const handleDelete = async (id: string) => {
-    setItems(prev => prev.filter(i => i.id !== id));
-    toast.success('Item moved to recycle bin');
-
-    try {
-      await fetchAPI(`/cms/admin/portfolio/${id}`, {
-        method: 'DELETE'
-      });
-      fetchItems();
-    } catch (err) {
-      toast.error('Failed to delete item on server');
+    // Confirm on the server before removing from the UI — no fake success.
+    const res = await cms.remove('portfolio', id);
+    if (res.ok) {
+      setItems(prev => prev.filter(i => i.id !== id));
+      toast.success('Item moved to recycle bin');
+    } else {
+      toast.error(res.error || 'Failed to delete item');
     }
   };
 
   const handleToggleStatus = async (item: any) => {
-    const updatedStatus = !item.isFeatured;
-    setItems(prev => prev.map(i => i.id === item.id ? { ...i, isFeatured: updatedStatus } : i));
-    toast.success(updatedStatus ? 'Project published live' : 'Project set to draft');
+    const updatedStatus = !(item.isPublished ?? item.isFeatured);
+    // optimistic
+    setItems(prev => prev.map(i => i.id === item.id ? { ...i, isPublished: updatedStatus } : i));
 
-    try {
-      await fetchAPI('/cms/admin/portfolio', {
-        method: 'POST',
-        body: JSON.stringify({
-          slug: item.slug,
-          isFeatured: updatedStatus,
-          title: item.title,
-          category: item.category
-        })
-      });
-    } catch (err) {
-      console.error(err);
+    // Portfolio upserts re-validate the whole DTO (slug,title,category,mediaUrl
+    // required), so send the full record with the toggled publish flag.
+    const res = await cms.update('portfolio', item.id, {
+      slug: item.slug,
+      title: item.title,
+      category: item.category,
+      mediaUrl: item.mediaUrl,
+      mediaType: item.mediaType,
+      isPublished: updatedStatus,
+    });
+
+    if (res.ok) {
+      toast.success(updatedStatus ? 'Project published live' : 'Project set to draft');
+    } else {
+      // revert on failure
+      setItems(prev => prev.map(i => i.id === item.id ? { ...i, isPublished: !updatedStatus } : i));
+      toast.error(res.error || 'Failed to update status');
     }
   };
 

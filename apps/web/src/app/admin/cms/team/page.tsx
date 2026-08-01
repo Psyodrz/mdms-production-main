@@ -5,7 +5,7 @@ import { Reveal } from '@/components/ui/Reveal';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { RefreshCw, Trash2, Edit3, Loader2, Plus } from 'lucide-react';
-import { fetchAPI } from '@/lib/api-client';
+import { cms } from '@/lib/cms/client';
 
 
 
@@ -24,12 +24,13 @@ export default function CMSTeam() {
     else setLoading(true);
 
     try {
-      const json = await fetchAPI('/cms/admin/team');
-      const list = json.data || json;
-      if (Array.isArray(list)) {
-        setTeam(list.length > 0 ? list : []);
+      const res = await cms.list<any[]>('team');
+      if (res.ok && Array.isArray(res.data)) {
+        setTeam(res.data);
+        if (isRefresh) toast.success('Team members refreshed');
+      } else if (!res.ok && isRefresh) {
+        toast.error(res.error || 'Failed to refresh team');
       }
-      if (isRefresh) toast.success('Team members refreshed');
     } catch (err) {
       if (isRefresh) toast.error('Network error refreshing team');
     } finally {
@@ -51,60 +52,55 @@ export default function CMSTeam() {
 
     setIsSubmitting(true);
     try {
-      await fetchAPI('/cms/admin/team', {
-        method: 'POST',
-        body: JSON.stringify({
-          name,
-          role,
-          bio: bio || 'Key member of the MP Production team.',
-          isPublished: true,
-          order: team.length + 1
-        })
+      // `sortOrder` is the DTO field name (not `order`).
+      const res = await cms.create('team', {
+        name,
+        role,
+        bio: bio || 'Key member of the MP Production team.',
+        isPublished: true,
+        sortOrder: team.length + 1,
       });
+      if (!res.ok) throw new Error(res.error || 'Failed to add team member');
       toast.success('Team member added successfully');
       setIsModalOpen(false);
       setName('');
       setRole('');
       setBio('');
       fetchTeam(true);
-    } catch (err) {
-      toast.error('Error adding team member');
+    } catch (err: any) {
+      toast.error(err?.message || 'Error adding team member');
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleDelete = async (id: string) => {
-    setTeam(prev => prev.filter(m => m.id !== id));
-    toast.success('Team member removed');
-
-    try {
-      await fetchAPI(`/cms/admin/team/${id}`, {
-        method: 'DELETE'
-      });
-      fetchTeam();
-    } catch (err) {
-      toast.error('Failed to delete on server');
+    const res = await cms.remove('team', id);
+    if (res.ok) {
+      setTeam(prev => prev.filter(m => m.id !== id));
+      toast.success('Team member removed');
+    } else {
+      toast.error(res.error || 'Failed to delete team member');
     }
   };
 
   const handleToggleStatus = async (member: any) => {
     const updatedPublished = !member.isPublished;
     setTeam(prev => prev.map(m => m.id === member.id ? { ...m, isPublished: updatedPublished } : m));
-    toast.success(updatedPublished ? 'Member profile published live' : 'Member profile hidden');
 
-    try {
-      await fetchAPI('/cms/admin/team', {
-        method: 'POST',
-        body: JSON.stringify({
-          id: member.id,
-          name: member.name,
-          role: member.role,
-          isPublished: updatedPublished
-        })
-      });
-    } catch (err) {
-      console.error(err);
+    const res = await cms.update('team', member.id, {
+      id: member.id,
+      name: member.name,
+      role: member.role,
+      bio: member.bio,
+      isPublished: updatedPublished,
+      sortOrder: member.sortOrder,
+    });
+    if (res.ok) {
+      toast.success(updatedPublished ? 'Member profile published live' : 'Member profile hidden');
+    } else {
+      setTeam(prev => prev.map(m => m.id === member.id ? { ...m, isPublished: !updatedPublished } : m));
+      toast.error(res.error || 'Failed to update member');
     }
   };
 

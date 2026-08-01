@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/Button';
 import { fetchAPI } from '@/lib/api-client';
-import { uploadToSupabase } from '@/lib/upload';
+import { serverUpload } from '@/lib/upload';
 
 export function CommentBox({ projectId, versionId }: { projectId: string; versionId?: string }) {
   const router = useRouter();
@@ -22,8 +22,7 @@ export function CommentBox({ projectId, versionId }: { projectId: string; versio
 
     setUploading(true);
     try {
-      const url = await uploadToSupabase({
-        file,
+      const url = await serverUpload(file, {
         bucket: 'mp-private',
         folder: `client-docs/${projectId}`,
       });

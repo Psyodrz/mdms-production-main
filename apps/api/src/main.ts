@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
@@ -98,6 +98,6 @@ async function bootstrap() {
   app.useGlobalFilters(new HttpExceptionFilter());
 
   await app.listen(port, '0.0.0.0');
-  console.log(`🚀 MDMS API running on http://0.0.0.0:${port}/api/v1`);
+  Logger.log(`MDMS API running on http://0.0.0.0:${port}/api/v1`, 'Bootstrap');
 }
 bootstrap();

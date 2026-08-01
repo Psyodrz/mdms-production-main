@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef } from 'react';
-import { uploadToSupabase } from '@/lib/upload';
+import { serverUpload } from '@/lib/upload';
 import { toast } from 'sonner';
 
 export function UploadVersionUI({
@@ -31,9 +31,8 @@ export function UploadVersionUI({
     setErrorMessage('');
 
     try {
-      // Step 1: Upload file to Supabase Storage
-      const url = await uploadToSupabase({
-        file,
+      // Step 1: Upload via authenticated server route (service-role, bypasses RLS)
+      const url = await serverUpload(file, {
         bucket: 'mp-private',
         folder: `projects/${projectId}`,
       });

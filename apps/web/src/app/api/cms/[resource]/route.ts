@@ -8,7 +8,7 @@ type Ctx = { params: Promise<{ resource: string }> };
 // Server-side fallback store for resources when backend API returns 404
 const fallbackStore: Record<string, any[]> = {};
 
-export async function GET(_req: NextRequest, ctx: Ctx) {
+export async function GET(req: NextRequest, ctx: Ctx) {
   if (!(await requireAdmin())) {
     return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
   }
@@ -16,19 +16,33 @@ export async function GET(_req: NextRequest, ctx: Ctx) {
   const cfg = getResource(resource);
   if (!cfg) return NextResponse.json({ ok: false, error: 'Unknown resource' }, { status: 404 });
 
-  const result = await backendFetch(cfg.backend.list);
+  // Forward pagination params so the backend returns the requested page instead
+  // of silently capping at the default page size.
+  const { searchParams } = new URL(req.url);
+  const qs = new URLSearchParams();
+  const page = searchParams.get('page');
+  const limit = searchParams.get('limit');
+  if (page) qs.set('page', page);
+  if (limit) qs.set('limit', limit);
+  const listPath = qs.toString() ? `${cfg.backend.list}?${qs.toString()}` : cfg.backend.list;
+
+  const result = await backendFetch(listPath);
 
   if (result.ok && result.data) {
-    const payload = result.data as unknown;
-    const list = Array.isArray(payload)
-      ? payload
-      : payload && typeof payload === 'object' && Array.isArray((payload as any).data)
-        ? (payload as any).data
-        : payload;
+    const payload = result.data as any;
+    const paginated = !Array.isArray(payload) && payload && Array.isArray(payload.data);
+    const list = Array.isArray(payload) ? payload : paginated ? payload.data : [];
 
-    if (Array.isArray(list) && list.length > 0) {
-      fallbackStore[resource] = list;
-      return NextResponse.json({ ok: true, status: 200, data: list });
+    if (Array.isArray(list)) {
+      if (list.length > 0) fallbackStore[resource] = list;
+      return NextResponse.json({
+        ok: true,
+        status: 200,
+        data: list,
+        ...(paginated
+          ? { total: payload.total, page: payload.page, totalPages: payload.totalPages }
+          : {}),
+      });
     }
   }
 
@@ -61,12 +75,10 @@ export async function POST(req: NextRequest, ctx: Ctx) {
     return NextResponse.json(result, { status: 200 });
   }
 
-  // Update fallback store if backend endpoint is unavailable
-  if (!fallbackStore[resource]) {
-    fallbackStore[resource] = (cfg.sample as any[]) || [];
-  }
-  const newItem = { id: body.id || body.slug || `custom-${Date.now()}`, ...body };
-  fallbackStore[resource] = [newItem, ...fallbackStore[resource]];
-
-  return NextResponse.json({ ok: true, status: 200, data: newItem });
+  // Never fake success: surface the real backend error and status so the UI can
+  // show an accurate message instead of a phantom row that vanishes on reload.
+  return NextResponse.json(
+    { ok: false, error: result.error || 'Failed to create item' },
+    { status: result.status && result.status >= 400 ? result.status : 502 },
+  );
 }

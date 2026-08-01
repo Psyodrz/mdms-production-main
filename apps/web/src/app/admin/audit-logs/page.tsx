@@ -5,6 +5,7 @@ import { Reveal } from '@/components/ui/Reveal';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { RefreshCw, Search, ShieldCheck } from 'lucide-react';
+import { fetchAPI } from '@/lib/api-client';
 
 
 
@@ -19,23 +20,12 @@ export default function AuditLogs() {
     else setLoading(true);
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') || localStorage.getItem('mdms_auth_token') : null;
-      const res = await fetch(`${apiUrl}/audit?limit=50`, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {}
-      });
-
-      if (res.ok) {
-        const json = await res.json();
-        if (json.data && Array.isArray(json.data)) {
-          setLogs(json.data.length > 0 ? json.data : []);
-        }
-        if (isRefresh) toast.success('Audit trail refreshed');
-      } else {
-        if (isRefresh) toast.error('Failed to fetch latest audit logs');
-      }
-    } catch (err) {
-      if (isRefresh) toast.error('Network error refreshing audit logs');
+      const json = await fetchAPI('/audit?limit=50');
+      const list = json?.data;
+      setLogs(Array.isArray(list) ? list : []);
+      if (isRefresh) toast.success('Audit trail refreshed');
+    } catch (err: any) {
+      if (isRefresh) toast.error(err?.message || 'Failed to fetch audit logs');
     } finally {
       setLoading(false);
       setRefreshing(false);

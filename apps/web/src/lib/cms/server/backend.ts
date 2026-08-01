@@ -82,10 +82,11 @@ export interface BackendResult<T = unknown> {
  * Perform an authenticated request against the API. Retries once with a fresh
  * token if the first attempt is rejected as unauthorized.
  */
-export async function backendFetch<T = unknown>(
+/** Shared authenticated request core (service-account token + one 401 retry). */
+async function rawRequest(
   path: string,
   init: RequestInit = {},
-): Promise<BackendResult<T>> {
+): Promise<{ ok: boolean; status: number; json: any; error?: string }> {
   const isFormData = init.body instanceof FormData;
   const doFetch = async (token: string) => {
     const headers: Record<string, string> = {
@@ -95,11 +96,7 @@ export async function backendFetch<T = unknown>(
     if (!isFormData && !headers['Content-Type']) {
       headers['Content-Type'] = 'application/json';
     }
-    return fetch(`${API_URL}${path}`, {
-      ...init,
-      headers,
-      cache: 'no-store',
-    });
+    return fetch(`${API_URL}${path}`, { ...init, headers, cache: 'no-store' });
   };
 
   try {
@@ -113,22 +110,43 @@ export async function backendFetch<T = unknown>(
     }
 
     const json = await res.json().catch(() => null);
-    const data = (json && typeof json === 'object' && 'data' in json ? json.data : json) as T | null;
-
     if (!res.ok) {
-      const error =
-        (json && (json.message || json.error)) || `Request failed (${res.status})`;
-      return { ok: false, status: res.status, data: null, error: String(error) };
+      const error = (json && (json.message || json.error)) || `Request failed (${res.status})`;
+      return { ok: false, status: res.status, json, error: String(error) };
     }
-
-    return { ok: true, status: res.status, data };
+    return { ok: true, status: res.status, json };
   } catch (err) {
-    console.warn('Backend fetch warning:', err);
+    // Never fabricate success. A transport failure must surface as an error so
+    // callers (BFF routes / ResourceManager) can show an accurate message and
+    // avoid reporting a persisted write that never happened.
+    console.error('Backend fetch failed:', err);
     return {
-      ok: true,
-      status: 200,
-      data: [] as unknown as T,
+      ok: false,
+      status: 503,
+      json: null,
       error: err instanceof Error ? err.message : 'Backend unreachable',
     };
   }
+}
+
+export async function backendFetch<T = unknown>(
+  path: string,
+  init: RequestInit = {},
+): Promise<BackendResult<T>> {
+  const r = await rawRequest(path, init);
+  if (!r.ok) return { ok: false, status: r.status, data: null, error: r.error };
+  const json = r.json;
+  const data = (json && typeof json === 'object' && 'data' in json ? json.data : json) as T | null;
+  return { ok: true, status: r.status, data };
+}
+
+/**
+ * Like backendFetch but returns the FULL parsed envelope (preserving sibling
+ * fields such as `total` / `totalPages` that backendFetch would otherwise drop).
+ */
+export async function backendFetchRaw(
+  path: string,
+  init: RequestInit = {},
+): Promise<{ ok: boolean; status: number; json: any; error?: string }> {
+  return rawRequest(path, init);
 }

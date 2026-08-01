@@ -38,7 +38,17 @@ export default function Services() {
             features: Array.isArray(s.features)
               ? s.features
               : (typeof s.features === 'string' ? (() => { try { return JSON.parse(s.features); } catch { return []; } })() : []),
-            pricing: s.pricing || s.price || s.basePrice ? `₹${(s.basePrice / 100).toLocaleString('en-IN')}` : 'Custom Quote'
+            pricing: (() => {
+              // basePrice is stored in paise on the backend — divide only that.
+              if (typeof s.basePrice === 'number' && !Number.isNaN(s.basePrice)) {
+                return `₹${Math.round(s.basePrice / 100).toLocaleString('en-IN')}`;
+              }
+              const raw = s.price ?? s.pricing;
+              if (raw !== undefined && raw !== null && raw !== '') {
+                return typeof raw === 'number' ? `₹${raw.toLocaleString('en-IN')}` : String(raw);
+              }
+              return 'Custom Quote';
+            })()
           }));
           setServices(mapped);
         }

@@ -109,11 +109,15 @@ export default function About() {
                   alt="Studio Production Set" 
                   className="w-full h-full object-cover opacity-70 group-hover:scale-105 group-hover:opacity-80 transition-all duration-1200 ease-out" 
                 />
-                <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+                <a
+                  href="/reel"
+                  aria-label="Watch the studio showreel"
+                  className="absolute inset-0 bg-black/20 flex items-center justify-center"
+                >
                   <div className="w-24 h-24 bg-brand rounded-full flex items-center justify-center pl-1.5 shadow-[0_0_50px_rgba(235,61,38,0.3)] group-hover:scale-110 transition-transform duration-500 cursor-pointer">
                     <Play className="w-8 h-8 fill-primary-foreground text-primary-foreground" />
                   </div>
-                </div>
+                </a>
                 
                 {/* Floating Specs Bar */}
                 <div className="absolute bottom-8 left-8 right-8 flex items-center justify-between z-20">

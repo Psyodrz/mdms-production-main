@@ -127,8 +127,8 @@ export function AuthForm({ mode }: AuthFormProps) {
         else if (role === 'admin') router.push('/studio-8f2k/mgmt');
         else if (role === 'model' || role === 'talent') router.push('/talent-dashboard');
         else if (role === 'editor') router.push('/editor-portal');
-        else if (role === 'employee') router.push('/employee-portal');
-        else if (role === 'project_manager') router.push('/project-manager');
+        else if (role === 'employee') router.push('/employee/dashboard');
+        else if (role === 'project_manager') router.push('/project-manager/dashboard');
         else router.push('/client-portal');
       }
       

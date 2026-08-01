@@ -6,6 +6,20 @@ import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { RefreshCw, Loader2, Plus } from 'lucide-react';
 import { WhatsAppConfigCard } from '@/components/admin/WhatsAppConfigCard';
+import { fetchAPI } from '@/lib/api-client';
+import { cms } from '@/lib/cms/client';
+import { Loader2 as Spinner, Plus as PlusIcon, Trash2 } from 'lucide-react';
+
+const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+type BusinessHour = { day: string; open: string; close: string; closed: boolean };
+type BlockedDate = { date: string; reason: string };
+
+const DEFAULT_HOURS: BusinessHour[] = DAYS.map((day) => ({
+  day,
+  open: '09:00',
+  close: '18:00',
+  closed: day === 'Sunday',
+}));
 
 
 
@@ -18,29 +32,81 @@ export default function AdminSettings() {
   const [description, setDescription] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Business Hours & Blocked Dates (stored in SystemConfig via the CMS config API)
+  const [hoursOpen, setHoursOpen] = useState(false);
+  const [datesOpen, setDatesOpen] = useState(false);
+  const [hours, setHours] = useState<BusinessHour[]>(DEFAULT_HOURS);
+  const [blockedDates, setBlockedDates] = useState<BlockedDate[]>([]);
+  const [configLoading, setConfigLoading] = useState(false);
+  const [configSaving, setConfigSaving] = useState(false);
+
+  const openHours = async () => {
+    setHoursOpen(true);
+    setConfigLoading(true);
+    try {
+      const res = await cms.getConfig<any>('business-hours');
+      const val = res.ok ? (typeof res.data === 'string' ? JSON.parse(res.data) : res.data) : null;
+      setHours(Array.isArray(val) && val.length > 0 ? val : DEFAULT_HOURS);
+    } catch {
+      setHours(DEFAULT_HOURS);
+    } finally {
+      setConfigLoading(false);
+    }
+  };
+
+  const openDates = async () => {
+    setDatesOpen(true);
+    setConfigLoading(true);
+    try {
+      const res = await cms.getConfig<any>('blocked-dates');
+      const val = res.ok ? (typeof res.data === 'string' ? JSON.parse(res.data) : res.data) : null;
+      setBlockedDates(Array.isArray(val) ? val : []);
+    } catch {
+      setBlockedDates([]);
+    } finally {
+      setConfigLoading(false);
+    }
+  };
+
+  const saveHours = async () => {
+    setConfigSaving(true);
+    try {
+      const res = await cms.setConfig('business-hours', hours);
+      if (!res.ok) throw new Error(res.error || 'Save failed');
+      toast.success('Business hours saved');
+      setHoursOpen(false);
+    } catch (err: any) {
+      toast.error(err?.message || 'Failed to save business hours');
+    } finally {
+      setConfigSaving(false);
+    }
+  };
+
+  const saveDates = async () => {
+    setConfigSaving(true);
+    try {
+      const res = await cms.setConfig('blocked-dates', blockedDates);
+      if (!res.ok) throw new Error(res.error || 'Save failed');
+      toast.success('Blocked dates saved');
+      setDatesOpen(false);
+    } catch (err: any) {
+      toast.error(err?.message || 'Failed to save blocked dates');
+    } finally {
+      setConfigSaving(false);
+    }
+  };
+
   const fetchFlags = async (isRefresh = false) => {
     if (isRefresh) setRefreshing(true);
     else setLoading(true);
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') || localStorage.getItem('mdms_auth_token') : null;
-      const res = await fetch(`${apiUrl}/system/flags`, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {}
-      });
-
-      if (res.ok) {
-        const json = await res.json();
-        const list = json.data || json;
-        if (Array.isArray(list)) {
-          setFlags(list.length > 0 ? list : []);
-        }
-        if (isRefresh) toast.success('Feature flags refreshed');
-      } else {
-        if (isRefresh) toast.error('Failed to fetch feature flags');
-      }
-    } catch (err) {
-      if (isRefresh) toast.error('Network error refreshing flags');
+      const json = await fetchAPI('/system/flags');
+      const list = json?.data || json;
+      setFlags(Array.isArray(list) ? list : []);
+      if (isRefresh) toast.success('Feature flags refreshed');
+    } catch (err: any) {
+      if (isRefresh) toast.error(err?.message || 'Failed to fetch feature flags');
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -53,22 +119,19 @@ export default function AdminSettings() {
 
   const handleToggle = async (flag: any) => {
     const updatedEnabled = !flag.enabled;
+    // optimistic update
     setFlags(prev => prev.map(f => f.key === flag.key ? { ...f, enabled: updatedEnabled } : f));
-    toast.success(`Feature flag ${flag.key} ${updatedEnabled ? 'enabled' : 'disabled'}`);
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') || localStorage.getItem('mdms_auth_token') : null;
-      await fetch(`${apiUrl}/system/flags/${flag.key}`, {
+      await fetchAPI(`/system/flags/${flag.key}`, {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {})
-        },
-        body: JSON.stringify({ enabled: updatedEnabled })
+        body: JSON.stringify({ enabled: updatedEnabled }),
       });
-    } catch (err) {
-      console.error(err);
+      toast.success(`Feature flag ${flag.key} ${updatedEnabled ? 'enabled' : 'disabled'}`);
+    } catch (err: any) {
+      // revert on failure — never leave the UI showing an unpersisted state
+      setFlags(prev => prev.map(f => f.key === flag.key ? { ...f, enabled: !updatedEnabled } : f));
+      toast.error(err?.message || 'Failed to update feature flag');
     }
   };
 
@@ -82,35 +145,18 @@ export default function AdminSettings() {
     const formattedKey = key.trim().toUpperCase().replace(/[^A-Z0-9_]/g, '_');
     setIsSubmitting(true);
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') || localStorage.getItem('mdms_auth_token') : null;
-      
-      const res = await fetch(`${apiUrl}/system/flags`, {
+      await fetchAPI('/system/flags', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {})
-        },
-        body: JSON.stringify({
-          key: formattedKey,
-          description,
-          enabled: false
-        })
+        body: JSON.stringify({ key: formattedKey, description, enabled: false }),
       });
-
-      if (!res.ok) throw new Error('Failed to create flag');
       toast.success('Feature flag added successfully');
       setIsModalOpen(false);
       setKey('');
       setDescription('');
       fetchFlags(true);
-    } catch (err) {
-      // Fallback local addition if backend endpoint isn't ready
-      setFlags(prev => [...prev, { key: formattedKey, description, enabled: false }]);
-      toast.success('Feature flag added');
-      setIsModalOpen(false);
-      setKey('');
-      setDescription('');
+    } catch (err: any) {
+      // Never fake success — report the real error and keep the modal open.
+      toast.error(err?.message || 'Failed to create feature flag');
     } finally {
       setIsSubmitting(false);
     }
@@ -203,7 +249,7 @@ export default function AdminSettings() {
                     <h2 className="text-xl font-serif text-foreground mb-6">Business Hours</h2>
                     <p className="text-muted-foreground text-sm mb-4">Manage working days and operational hours for the booking engine.</p>
                     <button
-                      onClick={() => toast.info('Business hours schedule editor will open in Phase 8.')}
+                      onClick={openHours}
                       className="px-4 py-2 border border-[var(--color-border)] hover:border-primary transition-colors text-xs uppercase tracking-widest font-semibold rounded"
                     >
                       Edit Schedule
@@ -214,7 +260,7 @@ export default function AdminSettings() {
                     <h2 className="text-xl font-serif text-foreground mb-6">Blocked Dates</h2>
                     <p className="text-muted-foreground text-sm mb-4">Prevent bookings on specific calendar dates (holidays, maintenance).</p>
                     <button
-                      onClick={() => toast.info('Blocked dates calendar will open in Phase 8.')}
+                      onClick={openDates}
                       className="px-4 py-2 border border-[var(--color-border)] hover:border-primary transition-colors text-xs uppercase tracking-widest font-semibold rounded"
                     >
                       Manage Dates
@@ -225,6 +271,67 @@ export default function AdminSettings() {
               </div>
             </Reveal>
           </div>
+          )}
+
+          {/* Business Hours Modal */}
+          {hoursOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+              <div className="bg-[var(--color-surface)] border border-[var(--color-border)] p-8 max-w-2xl w-full rounded-sm shadow-2xl relative animate-fadeIn max-h-[90vh] overflow-y-auto">
+                <button onClick={() => setHoursOpen(false)} disabled={configSaving} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors">✕</button>
+                <h2 className="text-2xl font-serif text-foreground mb-6">Business Hours</h2>
+                {configLoading ? (
+                  <div className="flex justify-center py-12"><Spinner className="w-6 h-6 animate-spin text-primary" /></div>
+                ) : (
+                  <div className="space-y-3">
+                    {hours.map((h, i) => (
+                      <div key={h.day} className="flex items-center gap-3 border border-border rounded-lg p-3">
+                        <span className="w-28 text-sm font-semibold text-foreground">{h.day}</span>
+                        <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                          <input type="checkbox" checked={h.closed} onChange={(e) => setHours((prev) => prev.map((x, xi) => xi === i ? { ...x, closed: e.target.checked } : x))} />
+                          Closed
+                        </label>
+                        <input type="time" value={h.open} disabled={h.closed} onChange={(e) => setHours((prev) => prev.map((x, xi) => xi === i ? { ...x, open: e.target.value } : x))} className="bg-[var(--color-base)] border border-border p-2 text-sm rounded text-foreground disabled:opacity-40" />
+                        <span className="text-muted-foreground text-xs">to</span>
+                        <input type="time" value={h.close} disabled={h.closed} onChange={(e) => setHours((prev) => prev.map((x, xi) => xi === i ? { ...x, close: e.target.value } : x))} className="bg-[var(--color-base)] border border-border p-2 text-sm rounded text-foreground disabled:opacity-40" />
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <button onClick={saveHours} disabled={configSaving || configLoading} className="w-full mt-6 px-6 py-3 bg-primary text-white font-semibold tracking-widest text-sm uppercase hover:bg-primary/80 transition-colors flex items-center justify-center gap-2 disabled:opacity-50">
+                  {configSaving ? <><Spinner className="w-4 h-4 animate-spin" /> Saving...</> : 'Save Business Hours'}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Blocked Dates Modal */}
+          {datesOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+              <div className="bg-[var(--color-surface)] border border-[var(--color-border)] p-8 max-w-lg w-full rounded-sm shadow-2xl relative animate-fadeIn max-h-[90vh] overflow-y-auto">
+                <button onClick={() => setDatesOpen(false)} disabled={configSaving} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors">✕</button>
+                <h2 className="text-2xl font-serif text-foreground mb-6">Blocked Dates</h2>
+                {configLoading ? (
+                  <div className="flex justify-center py-12"><Spinner className="w-6 h-6 animate-spin text-primary" /></div>
+                ) : (
+                  <div className="space-y-3">
+                    {blockedDates.length === 0 && <p className="text-sm text-muted-foreground">No blocked dates. Add one below.</p>}
+                    {blockedDates.map((d, i) => (
+                      <div key={i} className="flex items-center gap-3">
+                        <input type="date" value={d.date} onChange={(e) => setBlockedDates((prev) => prev.map((x, xi) => xi === i ? { ...x, date: e.target.value } : x))} className="bg-[var(--color-base)] border border-border p-2 text-sm rounded text-foreground" />
+                        <input type="text" placeholder="Reason (e.g. Holiday)" value={d.reason} onChange={(e) => setBlockedDates((prev) => prev.map((x, xi) => xi === i ? { ...x, reason: e.target.value } : x))} className="flex-1 bg-[var(--color-base)] border border-border p-2 text-sm rounded text-foreground" />
+                        <button onClick={() => setBlockedDates((prev) => prev.filter((_, xi) => xi !== i))} className="text-red-500 hover:text-red-400 p-2"><Trash2 className="w-4 h-4" /></button>
+                      </div>
+                    ))}
+                    <button onClick={() => setBlockedDates((prev) => [...prev, { date: new Date().toISOString().split('T')[0], reason: '' }])} className="w-full py-2.5 border border-dashed border-border hover:border-primary text-xs uppercase tracking-widest font-semibold rounded flex items-center justify-center gap-2 text-muted-foreground hover:text-primary">
+                      <PlusIcon className="w-4 h-4" /> Add Blocked Date
+                    </button>
+                  </div>
+                )}
+                <button onClick={saveDates} disabled={configSaving || configLoading} className="w-full mt-6 px-6 py-3 bg-primary text-white font-semibold tracking-widest text-sm uppercase hover:bg-primary/80 transition-colors flex items-center justify-center gap-2 disabled:opacity-50">
+                  {configSaving ? <><Spinner className="w-4 h-4 animate-spin" /> Saving...</> : 'Save Blocked Dates'}
+                </button>
+              </div>
+            </div>
           )}
 
           {isModalOpen && (

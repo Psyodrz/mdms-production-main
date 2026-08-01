@@ -10,7 +10,7 @@ import {
 import { Button } from '@/components/ui/Button';
 import { Loader2, Trash2, Upload, X } from 'lucide-react';
 import { toast } from 'sonner';
-import { uploadToSupabase } from '@/lib/upload';
+import { serverUpload } from '@/lib/upload';
 
 interface MediaAsset {
   id: string;
@@ -69,11 +69,7 @@ export function MediaLibrary({ open, onOpenChange, onSelect }: MediaLibraryProps
 
     try {
       const folder = file.type.startsWith('video/') ? 'video' : 'gallery';
-      const url = await uploadToSupabase({
-        file,
-        bucket: 'mp-cms',
-        folder,
-      });
+      const url = await serverUpload(file, { bucket: 'mp-cms', folder });
 
       toast.success('Media uploaded successfully.');
       // Select the newly uploaded URL immediately for convenience

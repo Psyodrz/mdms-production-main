@@ -5,7 +5,7 @@ import { Reveal } from '@/components/ui/Reveal';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { RefreshCw, Trash2, Edit3, Loader2, Plus } from 'lucide-react';
-import { fetchAPI } from '@/lib/api-client';
+import { cms } from '@/lib/cms/client';
 
 
 
@@ -24,12 +24,13 @@ export default function CMSBlog() {
     else setLoading(true);
 
     try {
-      const json = await fetchAPI('/cms/admin/blog');
-      const list = json.data || json;
-      if (Array.isArray(list)) {
-        setPosts(list.length > 0 ? list : []);
+      const res = await cms.list<any[]>('blog');
+      if (res.ok && Array.isArray(res.data)) {
+        setPosts(res.data);
+        if (isRefresh) toast.success('Blog posts refreshed');
+      } else if (!res.ok && isRefresh) {
+        toast.error(res.error || 'Failed to refresh posts');
       }
-      if (isRefresh) toast.success('Blog posts refreshed');
     } catch (err) {
       if (isRefresh) toast.error('Network error refreshing posts');
     } finally {
@@ -53,64 +54,58 @@ export default function CMSBlog() {
     try {
       const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || `post-${Date.now()}`;
 
-      await fetchAPI('/cms/admin/blog', {
-        method: 'POST',
-        body: JSON.stringify({
-          title,
-          slug,
-          category,
-          excerpt: excerpt || 'Expert insight from the production team.',
-          content: `${excerpt || title}\n\nFull article content coming soon...`,
-          status: 'PUBLISHED',
-          isPublished: true,
-          publishedAt: new Date().toISOString()
-        })
+      // `isPublished` is not part of UpsertBlogDto — use `status` instead.
+      const res = await cms.create('blog', {
+        title,
+        slug,
+        category,
+        excerpt: excerpt || 'Expert insight from the production team.',
+        content: `${excerpt || title}\n\nFull article content coming soon...`,
+        status: 'PUBLISHED',
+        publishedAt: new Date().toISOString(),
       });
+      if (!res.ok) throw new Error(res.error || 'Failed to create blog post');
       toast.success('Blog post created successfully');
       setIsModalOpen(false);
       setTitle('');
       setExcerpt('');
       fetchPosts(true);
-    } catch (err) {
-      toast.error('Error creating blog post');
+    } catch (err: any) {
+      toast.error(err?.message || 'Error creating blog post');
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleDelete = async (id: string) => {
-    setPosts(prev => prev.filter(p => p.id !== id));
-    toast.success('Blog post deleted');
-
-    try {
-      await fetchAPI(`/cms/admin/blog/${id}`, {
-        method: 'DELETE'
-      });
-      fetchPosts();
-    } catch (err) {
-      toast.error('Failed to delete post on server');
+    const res = await cms.remove('blog', id);
+    if (res.ok) {
+      setPosts(prev => prev.filter(p => p.id !== id));
+      toast.success('Blog post deleted');
+    } else {
+      toast.error(res.error || 'Failed to delete post');
     }
   };
 
   const handleToggleStatus = async (post: any) => {
-    const updatedPublished = !post.isPublished;
+    const updatedPublished = !(post.status === 'PUBLISHED' || post.isPublished);
     const updatedStatus = updatedPublished ? 'PUBLISHED' : 'DRAFT';
     setPosts(prev => prev.map(p => p.id === post.id ? { ...p, status: updatedStatus, isPublished: updatedPublished } : p));
-    toast.success(updatedPublished ? 'Blog post published live' : 'Blog post set to draft');
 
-    try {
-      await fetchAPI('/cms/admin/blog', {
-        method: 'POST',
-        body: JSON.stringify({
-          slug: post.slug,
-          isPublished: updatedPublished,
-          status: updatedStatus,
-          title: post.title,
-          category: post.category
-        })
-      });
-    } catch (err) {
-      console.error(err);
+    // Blog upserts require slug, title, content — send the full record.
+    const res = await cms.update('blog', post.id, {
+      slug: post.slug,
+      title: post.title,
+      content: post.content ?? post.excerpt ?? post.title,
+      category: post.category,
+      status: updatedStatus,
+      publishedAt: updatedPublished ? (post.publishedAt || new Date().toISOString()) : post.publishedAt,
+    });
+    if (res.ok) {
+      toast.success(updatedPublished ? 'Blog post published live' : 'Blog post set to draft');
+    } else {
+      setPosts(prev => prev.map(p => p.id === post.id ? { ...p, status: post.status, isPublished: post.isPublished } : p));
+      toast.error(res.error || 'Failed to update post');
     }
   };
 

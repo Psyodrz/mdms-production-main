@@ -5,7 +5,7 @@ import { Reveal } from '@/components/ui/Reveal';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { RefreshCw, Trash2, Edit3, Loader2, Plus, Star } from 'lucide-react';
-import { fetchAPI } from '@/lib/api-client';
+import { cms } from '@/lib/cms/client';
 
 
 
@@ -27,12 +27,13 @@ export default function CMSTestimonials() {
     else setLoading(true);
 
     try {
-      const json = await fetchAPI('/cms/admin/testimonials');
-      const list = json.data || json;
-      if (Array.isArray(list)) {
-        setTestimonials(list.length > 0 ? list : []);
+      const res = await cms.list<any[]>('testimonials');
+      if (res.ok && Array.isArray(res.data)) {
+        setTestimonials(res.data);
+        if (isRefresh) toast.success('Testimonials refreshed');
+      } else if (!res.ok && isRefresh) {
+        toast.error(res.error || 'Failed to refresh testimonials');
       }
-      if (isRefresh) toast.success('Testimonials refreshed');
     } catch (err) {
       if (isRefresh) toast.error('Network error refreshing testimonials');
     } finally {
@@ -54,18 +55,17 @@ export default function CMSTestimonials() {
 
     setIsSubmitting(true);
     try {
-      await fetchAPI('/cms/admin/testimonials', {
-        method: 'POST',
-        body: JSON.stringify({
-          clientName,
-          clientTitle: clientTitle || 'Client',
-          clientCompany: clientCompany || 'Enterprise',
-          content,
-          rating: Number(rating),
-          isApproved: true,
-          isFeatured: true
-        })
+      // `isFeatured` is not part of CreateTestimonialDto — omit it.
+      const res = await cms.create('testimonials', {
+        clientName,
+        clientTitle: clientTitle || 'Client',
+        clientCompany: clientCompany || 'Enterprise',
+        content,
+        rating: Number(rating),
+        isApproved: true,
+        isPublished: true,
       });
+      if (!res.ok) throw new Error(res.error || 'Failed to add testimonial');
       toast.success('Testimonial added successfully');
       setIsModalOpen(false);
       setClientName('');
@@ -74,45 +74,35 @@ export default function CMSTestimonials() {
       setContent('');
       setRating(5);
       fetchTestimonials(true);
-    } catch (err) {
-      toast.error('Error adding testimonial');
+    } catch (err: any) {
+      toast.error(err?.message || 'Error adding testimonial');
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleDelete = async (id: string) => {
-    setTestimonials(prev => prev.filter(t => t.id !== id));
-    toast.success('Testimonial deleted');
-
-    try {
-      await fetchAPI(`/cms/admin/testimonials/${id}`, {
-        method: 'DELETE'
-      });
-      fetchTestimonials();
-    } catch (err) {
-      toast.error('Failed to delete on server');
+    const res = await cms.remove('testimonials', id);
+    if (res.ok) {
+      setTestimonials(prev => prev.filter(t => t.id !== id));
+      toast.success('Testimonial deleted');
+    } else {
+      toast.error(res.error || 'Failed to delete testimonial');
     }
   };
 
   const handleToggleApproved = async (item: any) => {
     const updatedApproved = !item.isApproved;
     setTestimonials(prev => prev.map(t => t.id === item.id ? { ...t, isApproved: updatedApproved } : t));
-    toast.success(updatedApproved ? 'Testimonial approved & live' : 'Testimonial hidden');
 
-    try {
-      await fetchAPI('/cms/admin/testimonials', {
-        method: 'POST',
-        body: JSON.stringify({
-          id: item.id,
-          clientName: item.clientName,
-          content: item.content,
-          isApproved: updatedApproved,
-          rating: item.rating
-        })
-      });
-    } catch (err) {
-      console.error(err);
+    // Testimonials use PATCH (UpdateTestimonialDto, all-optional) — a partial
+    // payload is valid here.
+    const res = await cms.update('testimonials', item.id, { isApproved: updatedApproved });
+    if (res.ok) {
+      toast.success(updatedApproved ? 'Testimonial approved & live' : 'Testimonial hidden');
+    } else {
+      setTestimonials(prev => prev.map(t => t.id === item.id ? { ...t, isApproved: !updatedApproved } : t));
+      toast.error(res.error || 'Failed to update testimonial');
     }
   };
 

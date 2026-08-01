@@ -6,11 +6,15 @@ import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
 import { QuickUploadClient } from './QuickUploadClient';
 
+// Per-editor data via auth() cookies — must render dynamically, never prerender.
+export const dynamic = 'force-dynamic';
+
 async function getAssignedProjects() {
   try {
+    // serverFetchAPI returns the parsed { success, data } envelope and throws on
+    // non-2xx — read `.data` directly rather than a nonexistent `.ok`.
     const res = await serverFetchAPI(`/editor/projects`, { next: { revalidate: 0 } });
-    if (!res.ok) return [];
-    return (res.data && res.data.length > 0) ? res.data : [];
+    return Array.isArray(res?.data) ? res.data : [];
   } catch (error) {
     console.error('Error fetching assigned projects:', error);
     return [];

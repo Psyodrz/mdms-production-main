@@ -11,6 +11,14 @@ export interface CmsResult<T = unknown> {
   data: T | null;
   error?: string;
   status?: number;
+  total?: number;
+  page?: number;
+  totalPages?: number;
+}
+
+export interface ListParams {
+  page?: number;
+  limit?: number;
 }
 
 async function request<T = unknown>(url: string, init?: RequestInit): Promise<CmsResult<T>> {
@@ -26,6 +34,9 @@ async function request<T = unknown>(url: string, init?: RequestInit): Promise<Cm
         data: (json.data ?? null) as T | null,
         error: json.error,
         status: res.status,
+        total: json.total,
+        page: json.page,
+        totalPages: json.totalPages,
       };
     }
     return { ok: res.ok, data: json as T, status: res.status };
@@ -35,7 +46,13 @@ async function request<T = unknown>(url: string, init?: RequestInit): Promise<Cm
 }
 
 export const cms = {
-  list: <T = unknown[]>(resource: string) => request<T>(`/api/cms/${resource}`),
+  list: <T = unknown[]>(resource: string, params?: ListParams) => {
+    const qs = new URLSearchParams();
+    if (params?.page) qs.set('page', String(params.page));
+    if (params?.limit) qs.set('limit', String(params.limit));
+    const suffix = qs.toString() ? `?${qs.toString()}` : '';
+    return request<T>(`/api/cms/${resource}${suffix}`);
+  },
 
   create: <T = unknown>(resource: string, body: Record<string, unknown>) =>
     request<T>(`/api/cms/${resource}`, { method: 'POST', body: JSON.stringify(body) }),

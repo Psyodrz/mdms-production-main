@@ -22,10 +22,13 @@ import {
   Video,
   Layers,
   Star,
+  Clock,
+  RefreshCw,
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { verifyStudentSessionToken, verifyCourseAccess256 } from '@/lib/security';
+import { fetchAPI } from '@/lib/api-client';
 
 interface ModuleLesson {
   id: string;

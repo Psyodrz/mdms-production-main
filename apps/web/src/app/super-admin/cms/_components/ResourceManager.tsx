@@ -50,6 +50,10 @@ export function ResourceManager({ config }: { config: ResourceConfig }) {
   const [loading, setLoading] = useState(true);
   const [demo, setDemo] = useState(false);
   const [query, setQuery] = useState('');
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
+  const PAGE_SIZE = 20;
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Item | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -69,20 +73,35 @@ export function ResourceManager({ config }: { config: ResourceConfig }) {
 
   const load = useCallback(async () => {
     setLoading(true);
-    const res = await cms.list<Item[]>(config.key);
+    const res = await cms.list<Item[]>(config.key, { page, limit: PAGE_SIZE });
     if (res.ok && Array.isArray(res.data) && res.data.length > 0) {
       setItems(res.data);
       setDemo(false);
+      setTotal(res.total ?? res.data.length);
+      setTotalPages(res.totalPages ?? 1);
+    } else if (res.ok && Array.isArray(res.data)) {
+      setItems([]);
+      setDemo(false);
+      setTotal(res.total ?? 0);
+      setTotalPages(res.totalPages ?? 1);
     } else if (config.sample && config.sample.length > 0) {
       setItems(config.sample as Item[]);
       setDemo(true);
+      setTotal(config.sample.length);
+      setTotalPages(1);
     } else {
       setItems([]);
       setDemo(false);
+      setTotal(0);
+      setTotalPages(1);
     }
     setLoading(false);
-  }, [config]);
+  }, [config, page]);
 
+  // Reset to the first page whenever the resource changes.
+  useEffect(() => {
+    setPage(1);
+  }, [config.key]);
 
   useEffect(() => {
     load();
@@ -132,10 +151,19 @@ export function ResourceManager({ config }: { config: ResourceConfig }) {
     // optimistic
     setItems((prev) => prev.map((it) => (idOf(it) === idOf(item) ? { ...it, [field]: next } : it)));
 
+    // Upsert endpoints re-validate the whole DTO (whitelist + forbidNonWhitelisted),
+    // so a partial { slug, publishField } payload fails required-field validation.
+    // Rebuild the payload from the configured fields (same set the edit form sends)
+    // so all required fields are present and no backend-only fields leak through.
+    const upsertPayload: Item = {};
+    for (const f of config.fields) {
+      const v = item[f.name];
+      if (v !== undefined) upsertPayload[f.name] = v;
+    }
+    upsertPayload[field] = next;
+
     const payload: Item =
-      config.backend.updateMode === 'upsert'
-        ? { [bodyKey]: item[bodyKey], [field]: next }
-        : { [field]: next };
+      config.backend.updateMode === 'upsert' ? upsertPayload : { [field]: next };
 
     const res = await cms.update(config.key, idOf(item), payload);
     if (res.ok) {
@@ -287,6 +315,34 @@ export function ResourceManager({ config }: { config: ResourceConfig }) {
             })}
           </div>
         </>
+      )}
+
+      {/* Pagination */}
+      {!loading && !demo && totalPages > 1 && (
+        <div className="flex items-center justify-between pt-2">
+          <p className="text-xs text-muted-foreground">
+            Page {page} of {totalPages}
+            {total ? ` · ${total} total` : ''}
+          </p>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={page <= 1}
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+            >
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={page >= totalPages}
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            >
+              Next
+            </Button>
+          </div>
+        </div>
       )}
 
       {/* Create / Edit dialog */}

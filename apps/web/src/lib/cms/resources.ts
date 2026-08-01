@@ -120,52 +120,6 @@ export const RESOURCES: Record<string, ResourceConfig> = {
     canCreate: true, canEdit: true, canDelete: true,
   },
 
-  courses: {
-    key: 'courses',
-    label: 'Creator Course',
-    labelPlural: 'Creator Courses & Videos',
-    description: 'Masterclasses, video modules, pricing, and 4K streaming URLs for Creator Academy.',
-    icon: 'GraduationCap',
-    idField: 'id',
-    publishField: 'isPublished',
-    columns: [
-      { name: 'title', label: 'Course Title', primary: true },
-      { name: 'categoryLabel', label: 'Category', type: 'badge' },
-      { name: 'price', label: 'Price', type: 'badge' },
-      { name: 'instructorName', label: 'Instructor', type: 'text' },
-      { name: 'isPublished', label: 'Published', type: 'boolean' },
-    ],
-    fields: [
-      { name: 'title', label: 'Course Title', type: 'text', required: true, full: true },
-      { name: 'slug', label: 'Slug', type: 'text', required: true },
-      { name: 'categoryLabel', label: 'Category Label', type: 'text', required: true },
-      { name: 'instructorName', label: 'Instructor Name', type: 'text', required: true },
-      { name: 'price', label: 'Display Price (e.g. ₹4,999)', type: 'text', required: true },
-      { name: 'numericPrice', label: 'Numeric Price in INR', type: 'number', required: true },
-      { name: 'originalPrice', label: 'Original Price (e.g. ₹12,999)', type: 'text', required: true },
-      { name: 'duration', label: 'Duration (e.g. 4.5 Hours)', type: 'text', required: true },
-      { name: 'image', label: 'Thumbnail / Cover Image URL', type: 'image', required: true, full: true },
-      { name: 'description', label: 'Full Course Description & Syllabus', type: 'textarea', full: true },
-      bool('isPublished', 'Published on Public Site'),
-    ],
-    sample: [
-      {
-        id: 'course-youtuber',
-        slug: 'course-youtuber',
-        title: 'How to Become a YouTuber: 100K Algorithm & 4K Setup',
-        categoryLabel: 'YouTube Masterclass',
-        price: '₹4,999',
-        numericPrice: 4999,
-        originalPrice: '₹12,999',
-        duration: '4.5 Hours',
-        instructorName: 'Rohan Verma',
-        isPublished: true,
-      },
-    ],
-    backend: { list: '/cms/admin/courses', base: '/cms/admin/courses', updateMode: 'upsert', recycleModelType: 'course' },
-    canCreate: true, canEdit: true, canDelete: true,
-  },
-
   blog: {
     key: 'blog',
     label: 'Blog Post',
@@ -622,7 +576,10 @@ export const RESOURCES: Record<string, ResourceConfig> = {
       { id: 'm-1', originalName: 'hero_production.jpg', mimeType: 'image/jpeg', size: 1048576, createdAt: '2026-07-01' },
     ],
     backend: { list: '/cms/admin/media', base: '/cms/admin/media', updateMode: 'upsert', recycleModelType: 'mediaAsset' },
-    canCreate: true, canEdit: true, canDelete: true,
+    // Media assets are binary uploads handled by the MediaLibrary uploader, not
+    // JSON records — a JSON create/edit form cannot produce a real file, so those
+    // actions are disabled here. Listing and deletion remain available.
+    canCreate: false, canEdit: false, canDelete: true,
   },
 
   featureFlags: {
@@ -784,7 +741,9 @@ export const CONFIG_KEYS: { key: string; label: string; description: string }[] 
   { key: 'intro', label: 'Intro', description: 'Homepage intro text and location data.' },
   { key: 'stats', label: 'Stats', description: 'Headline statistics band.' },
   { key: 'pricing', label: 'Pricing', description: 'Pricing tiers and packages.' },
-  { key: 'navbar', label: 'Navbar', description: 'Primary navigation links.' },
+  // Public navbar reads the `navigation` config key — keep this in sync with the
+  // site-config visual editor so both write the key the site actually consumes.
+  { key: 'navigation', label: 'Navbar', description: 'Primary navigation links.' },
   { key: 'footer', label: 'Footer', description: 'Footer columns, links and legal text.' },
   { key: 'seo', label: 'SEO', description: 'Default meta title, description and social image.' },
 ];

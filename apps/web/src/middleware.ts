@@ -31,7 +31,7 @@ const ROLE_ROUTES: Record<string, Role[]> = {
   '/client-portal':   [Role.CLIENT, Role.ADMIN, Role.SUPER_ADMIN],
   '/talent-dashboard':[Role.TALENT, Role.ADMIN, Role.SUPER_ADMIN],
   '/editor-portal':   [Role.EDITOR, Role.ADMIN, Role.SUPER_ADMIN],
-  '/employee-portal': [Role.EMPLOYEE, Role.ADMIN, Role.SUPER_ADMIN],
+  '/employee':        [Role.EMPLOYEE, Role.ADMIN, Role.SUPER_ADMIN],
   '/project-manager': [Role.PROJECT_MANAGER, Role.ADMIN, Role.SUPER_ADMIN],
 };
 
@@ -120,8 +120,8 @@ function getDashboardUrl(role: Role): string {
     case Role.CLIENT:         return '/client-portal';
     case Role.TALENT:         return '/talent-dashboard';
     case Role.EDITOR:         return '/editor-portal';
-    case Role.EMPLOYEE:       return '/employee-portal';
-    case Role.PROJECT_MANAGER:return '/project-manager';
+    case Role.EMPLOYEE:       return '/employee/dashboard';
+    case Role.PROJECT_MANAGER:return '/project-manager/dashboard';
     default:                  return '/';
   }
 }
@@ -140,8 +140,8 @@ export const config = {
     '/talent-dashboard/:path*',
     '/editor-portal',
     '/editor-portal/:path*',
-    '/employee-portal',
-    '/employee-portal/:path*',
+    '/employee',
+    '/employee/:path*',
     '/project-manager',
     '/project-manager/:path*',
     '/model/dashboard/:path*',

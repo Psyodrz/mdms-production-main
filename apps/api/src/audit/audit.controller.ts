@@ -4,7 +4,7 @@ import { Roles } from '../common/decorators/roles.decorator';
 import { Role } from '@mdms/types';
 
 @Controller('audit')
-@Roles(Role.SUPER_ADMIN)
+@Roles(Role.ADMIN, Role.SUPER_ADMIN)
 export class AuditController {
   constructor(private readonly auditService: AuditService) {}
 

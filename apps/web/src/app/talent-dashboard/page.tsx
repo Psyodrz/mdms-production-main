@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/Card';
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
 import { serverFetchAPI } from '@/lib/server-api-client';
+import { HireRequestActions } from './HireRequestActions';
 
 type ProfileResult =
   | { status: 'ok'; data: any }
@@ -222,10 +223,7 @@ export default async function TalentDashboard() {
                             </span>
                           </div>
                           <p className="text-sm text-muted-foreground mb-4">{hr.projectType}</p>
-                          <div className="flex gap-4">
-                            <Button href="/talent-dashboard/requests" size="sm" variant="primary">Accept Request</Button>
-                            <Button href="/talent-dashboard/requests" size="sm" variant="outline" className="text-red-600 hover:bg-red-600 hover:text-white border-red-600">Decline</Button>
-                          </div>
+                          <HireRequestActions requestId={hr.id} status={hr.status} />
                         </li>
                       ))}
                     </ul>

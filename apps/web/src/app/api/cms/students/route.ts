@@ -123,13 +123,19 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (error) {
-      console.warn('[StudentAPI] POST insert notice:', error.message);
-      return NextResponse.json({ message: 'Enrollment record logged' });
+      console.error('[StudentAPI] POST insert failed:', error.message);
+      return NextResponse.json(
+        { error: error.message || 'Failed to record enrollment' },
+        { status: 502 },
+      );
     }
 
     return NextResponse.json({ data, message: 'Enrollment submitted' });
   } catch (e) {
     console.error('[StudentAPI] POST error:', e);
-    return NextResponse.json({ message: 'Enrollment record logged' });
+    return NextResponse.json(
+      { error: e instanceof Error ? e.message : 'Failed to record enrollment' },
+      { status: 500 },
+    );
   }
 }

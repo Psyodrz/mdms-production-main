@@ -13,6 +13,7 @@ import { StepAboutMe } from './StepAboutMe';
 import { StepSocialMedia } from './StepSocialMedia';
 import { StepProfilePreview } from './StepProfilePreview';
 import { fetchAPI } from '@/lib/api-client';
+import { uploadTalentMedia } from '@/lib/upload';
 
 
 const WIZARD_STEPS = [
@@ -121,6 +122,18 @@ export function TalentRegistrationWizard() {
         if (scrollContainerRef.current) {
           scrollContainerRef.current.scrollTo({ top: scrollContainerRef.current.scrollHeight, behavior: 'smooth' });
         }
+      } else if (currentStep === 2 && !data.primaryTalentId) {
+        // The Primary Talent selector lives at the top of this step and often
+        // scrolls out of view once Languages/Skills are filled in. Point the
+        // user at the actual blocking field and scroll it back into view.
+        if (categories.length === 0) {
+          toast.error('Talent categories failed to load. Please refresh the page and try again.');
+        } else {
+          toast.error('Please select your Primary Talent at the top of this step to continue.');
+          if (scrollContainerRef.current) {
+            scrollContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+          }
+        }
       } else {
         toast.error('Please fix the highlighted errors before continuing.');
       }
@@ -159,18 +172,68 @@ export function TalentRegistrationWizard() {
     }
   };
 
+  // Upload any pending File objects to permanent storage and replace the
+  // ephemeral blob: preview URLs with real public URLs. Files cannot be JSON
+  // serialized (they become {}), so this must run before submit.
+  const resolveMediaUrls = async (d: typeof data) => {
+    const next: any = { ...d };
+    if (d.profilePhoto) {
+      next.profilePhotoPreview = await uploadTalentMedia(d.profilePhoto, 'avatars');
+    }
+    if (d.coverBanner) {
+      next.coverBannerPreview = await uploadTalentMedia(d.coverBanner, 'covers');
+    }
+    if (d.introductionVideo) {
+      next.introductionVideoPreview = await uploadTalentMedia(d.introductionVideo, 'videos');
+    }
+    if (d.resume) {
+      next.resumeUrl = await uploadTalentMedia(d.resume, 'documents');
+    }
+    if (d.compCard) {
+      next.compCardUrl = await uploadTalentMedia(d.compCard, 'documents');
+    }
+    if (Array.isArray(d.galleryImages) && d.galleryImages.length > 0) {
+      next.galleryImages = await Promise.all(
+        d.galleryImages.map(async (img) => {
+          if (img.file) {
+            const url = await uploadTalentMedia(img.file, 'gallery');
+            return { id: img.id, url };
+          }
+          return { id: img.id, url: img.url };
+        }),
+      );
+    }
+    // Strip non-serializable File handles so they don't ride along as empty {}.
+    next.profilePhoto = null;
+    next.coverBanner = null;
+    next.introductionVideo = null;
+    next.resume = null;
+    next.compCard = null;
+    return next;
+  };
+
   const submitProfile = async () => {
     setIsSubmitting(true);
     try {
-      const res = await fetchAPI('/talent/submit', {
+      // Persist media first; abort the submit if any upload fails so we never
+      // save a profile that references a blob: URL or a missing asset.
+      let payload: any;
+      try {
+        payload = await resolveMediaUrls(data);
+      } catch (uploadErr: any) {
+        toast.error(uploadErr?.message || 'Media upload failed. Please retry.');
+        return;
+      }
+
+      await fetchAPI('/talent/submit', {
         method: 'POST',
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       });
-      
+
       toast.success('Profile submitted successfully! Pending admin review.');
       router.push('/');
-    } catch (error) {
-      toast.error('Failed to submit profile.');
+    } catch (error: any) {
+      toast.error(error?.message || 'Failed to submit profile.');
     } finally {
       setIsSubmitting(false);
     }

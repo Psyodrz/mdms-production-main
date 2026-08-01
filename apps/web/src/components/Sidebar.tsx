@@ -74,6 +74,32 @@ export function Sidebar({ role }: SidebarProps) {
           { category: 'Bookings', label: 'Casting Requests', href: '/talent/dashboard?tab=requests', icon: <Send className="w-4 h-4 text-blue-400" /> },
           { category: 'Bookings', label: 'Escrow & Earnings', href: '/talent/dashboard?tab=earnings', icon: <DollarSign className="w-4 h-4 text-emerald-400" /> },
         ];
+      case 'employee':
+        return [
+          { category: 'Workspace', label: 'Overview', href: '/employee/dashboard?tab=overview', icon: <LayoutDashboard className="w-4 h-4 text-brand" /> },
+          { category: 'Workspace', label: 'My Tasks', href: '/employee/dashboard?tab=tasks', icon: <Award className="w-4 h-4" /> },
+          { category: 'Workspace', label: 'My Projects', href: '/employee/dashboard?tab=projects', icon: <FolderKanban className="w-4 h-4" /> },
+          { category: 'Workspace', label: 'Calendar / Schedule', href: '/employee/dashboard?tab=schedule', icon: <Calendar className="w-4 h-4" /> },
+          { category: 'Communication', label: 'Notifications', href: '/employee/dashboard?tab=notifications', icon: <Send className="w-4 h-4" /> },
+          { category: 'Communication', label: 'Documents', href: '/employee/dashboard?tab=documents', icon: <FileText className="w-4 h-4" /> },
+          { category: 'Account', label: 'Profile', href: '/employee/dashboard?tab=profile', icon: <UserCheck className="w-4 h-4" /> },
+          { category: 'Account', label: 'Settings', href: '/employee/dashboard?tab=settings', icon: <Settings className="w-4 h-4" /> },
+        ];
+      case 'project_manager':
+        return [
+          { category: 'Production', label: 'Overview', href: '/project-manager/dashboard?tab=overview', icon: <LayoutDashboard className="w-4 h-4 text-brand" /> },
+          { category: 'Production', label: 'Projects', href: '/project-manager/dashboard?tab=projects', icon: <FolderKanban className="w-4 h-4" /> },
+          { category: 'Production', label: 'Task Board', href: '/project-manager/dashboard?tab=tasks', icon: <Award className="w-4 h-4" /> },
+          { category: 'Production', label: 'Deliverables', href: '/project-manager/dashboard?tab=deliverables', icon: <Video className="w-4 h-4" /> },
+          { category: 'People', label: 'Team Assignments', href: '/project-manager/dashboard?tab=team', icon: <Users className="w-4 h-4" /> },
+          { category: 'People', label: 'Talent Assignments', href: '/project-manager/dashboard?tab=talent', icon: <UserCheck className="w-4 h-4" /> },
+          { category: 'People', label: 'Client Requests', href: '/project-manager/dashboard?tab=requests', icon: <Briefcase className="w-4 h-4" /> },
+          { category: 'Planning', label: 'Calendar', href: '/project-manager/dashboard?tab=calendar', icon: <Calendar className="w-4 h-4" /> },
+          { category: 'Planning', label: 'Reports', href: '/project-manager/dashboard?tab=reports', icon: <DollarSign className="w-4 h-4" /> },
+          { category: 'Communication', label: 'Notifications', href: '/project-manager/dashboard?tab=notifications', icon: <Send className="w-4 h-4" /> },
+          { category: 'Account', label: 'Profile', href: '/project-manager/dashboard?tab=profile', icon: <UserCheck className="w-4 h-4" /> },
+          { category: 'Account', label: 'Settings', href: '/project-manager/dashboard?tab=settings', icon: <Settings className="w-4 h-4" /> },
+        ];
       default:
         return [
           { label: 'Studio Dashboard', href: '/login', icon: <LayoutDashboard className="w-4 h-4 text-brand" /> },

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { fetchAPI } from '@/lib/api-client';
+import { uploadTalentMedia } from '@/lib/upload';
 import { StepProfessionalIdentity } from '@/components/talent-registration/StepProfessionalIdentity';
 import { StepProfessionalDetails } from '@/components/talent-registration/StepProfessionalDetails';
 import { StepPortfolioBuilder } from '@/components/talent-registration/StepPortfolioBuilder';
@@ -31,9 +32,13 @@ export default function FullEditProfileClient({ initialData }: { initialData: an
     attributes: primaryTalent?.attributes || {},
     
     // Step 4
-    profilePhoto: null as File | null, profilePhotoPreview: initialData?.user?.profileImage || '',
+    profilePhoto: null as File | null, profilePhotoPreview: initialData?.user?.avatarUrl || initialData?.user?.profileImage || '',
     coverBanner: null as File | null, coverBannerPreview: initialData?.coverBannerUrl || '',
-    galleryImages: [] as { id: string; url: string; file?: File }[],
+    // Prefill existing gallery so an edit-and-save does not wipe it.
+    galleryImages: (Array.isArray(initialData?.portfolioMedia) ? initialData.portfolioMedia : [])
+      .filter((m: any) => m?.type === 'PORTFOLIO_IMAGE' && m?.url)
+      .sort((a: any, b: any) => (a.order ?? 0) - (b.order ?? 0))
+      .map((m: any) => ({ id: m.id, url: m.url })) as { id: string; url: string; file?: File }[],
     introductionVideo: null as File | null, introductionVideoPreview: initialData?.introductionVideoUrl || '',
     resume: null as File | null, resumeName: initialData?.resumeUrl ? initialData.resumeUrl.replace('documents/', '') : '',
     compCard: null as File | null, compCardName: initialData?.compCardUrl ? initialData.compCardUrl.replace('documents/', '') : '',
@@ -82,20 +87,67 @@ export default function FullEditProfileClient({ initialData }: { initialData: an
   const primaryCategory = categories.find(c => c.id === data.primaryTalentId);
   const dynamicFields = primaryCategory?.fields || [];
 
+  // Upload pending File objects to permanent storage before save. File objects
+  // cannot be JSON serialized (they become {}), and blob: previews are useless
+  // server-side — so resolve real public URLs first.
+  const resolveMediaUrls = async (d: typeof data): Promise<any> => {
+    const next: any = { ...d };
+    if (d.profilePhoto) {
+      next.profilePhotoPreview = await uploadTalentMedia(d.profilePhoto, 'avatars');
+    }
+    if (d.coverBanner) {
+      next.coverBannerPreview = await uploadTalentMedia(d.coverBanner, 'covers');
+    }
+    if (d.introductionVideo) {
+      next.introductionVideoPreview = await uploadTalentMedia(d.introductionVideo, 'videos');
+    }
+    if (d.resume) {
+      next.resumeUrl = await uploadTalentMedia(d.resume, 'documents');
+    }
+    if (d.compCard) {
+      next.compCardUrl = await uploadTalentMedia(d.compCard, 'documents');
+    }
+    if (Array.isArray(d.galleryImages) && d.galleryImages.length > 0) {
+      next.galleryImages = await Promise.all(
+        d.galleryImages.map(async (img) => {
+          if (img.file) {
+            const url = await uploadTalentMedia(img.file, 'gallery');
+            return { id: img.id, url };
+          }
+          return { id: img.id, url: img.url };
+        }),
+      );
+    }
+    next.profilePhoto = null;
+    next.coverBanner = null;
+    next.introductionVideo = null;
+    next.resume = null;
+    next.compCard = null;
+    return next;
+  };
+
   const handleSave = async () => {
     setIsSubmitting(true);
     try {
+      let payload: any;
+      try {
+        payload = await resolveMediaUrls(data);
+      } catch (uploadErr: any) {
+        toast.error(uploadErr?.message || 'Media upload failed. Please retry.');
+        return;
+      }
+
       // For updates, the backend expects PATCH to /talent/me
       await fetchAPI('/talent/me', {
         method: 'PATCH',
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       });
-      
+
       toast.success('Profile updated successfully!');
       router.push('/talent-dashboard');
       router.refresh();
-    } catch (error) {
-      toast.error('Failed to update profile.');
+    } catch (error: any) {
+      toast.error(error?.message || 'Failed to update profile.');
     } finally {
       setIsSubmitting(false);
     }

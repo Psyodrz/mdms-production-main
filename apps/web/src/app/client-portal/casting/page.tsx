@@ -6,6 +6,9 @@ import Image from 'next/image';
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
 
+// Per-user casting data via auth() cookies — must render dynamically.
+export const dynamic = 'force-dynamic';
+
 interface CastingApplication {
   id: string;
   status: string;
@@ -31,15 +34,15 @@ interface CastingCall {
 async function getCastingCalls(accessToken: string): Promise<CastingCall[]> {
   try {
     
+    // serverFetchAPI returns the parsed { success, data } envelope and throws on
+    // non-2xx — read `.data` directly rather than a nonexistent `.ok`.
     const res = await serverFetchAPI(`/bookings/casting-calls`, {
       headers: {
         'Authorization': `Bearer ${accessToken}`,
       },
       next: { revalidate: 0 }, // casting data must be fresh
     });
-    if (!res.ok) return [];
-    const json = res;
-    return json.data || [];
+    return Array.isArray(res?.data) ? res.data : [];
   } catch (error) {
     console.error('Error fetching casting calls:', error);
     return [];

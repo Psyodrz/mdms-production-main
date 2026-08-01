@@ -5,17 +5,19 @@ import { Container } from '@/components/ui/Container';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 
-
+// Per-editor data via auth() cookies — must render dynamically, never prerender.
+export const dynamic = 'force-dynamic';
 
 async function getAssignedProjects() {
   try {
     
-    // Requires Editor token in production
+    // Requires Editor token in production.
+    // serverFetchAPI returns the parsed { success, data } envelope and throws on
+    // non-2xx — there is no `.ok` on the result, so read `.data` directly.
     const res = await serverFetchAPI(`/editor/projects`, { next: { revalidate: 0 } });
-    if (!res.ok) return [];
-    const json = res;
-    return (json.data && json.data.length > 0) ? json.data : [];
+    return Array.isArray(res?.data) ? res.data : [];
   } catch (error) {
+    console.error('Error fetching assigned projects:', error);
     return [];
   }
 }
@@ -41,11 +43,8 @@ export default async function EditorPortal() {
                 </h1>
               </div>
               <div className="flex gap-4">
-                <Button href="/editor-portal/tasks" variant="ghost" size="sm" className="uppercase text-sm tracking-widest">
-                  My Tasks
-                </Button>
-                <Button href="/editor-portal/queue" variant="ghost" size="sm" className="uppercase text-sm tracking-widest">
-                  Render Queue
+                <Button href="/editor-portal/upload" variant="ghost" size="sm" className="uppercase text-sm tracking-widest">
+                  Quick Upload
                 </Button>
               </div>
             </div>
@@ -68,7 +67,11 @@ export default async function EditorPortal() {
                       <div className="flex justify-between items-start mb-4">
                         <div>
                           <h3 className="text-xl font-medium text-foreground">{project.name}</h3>
-                          <p className="text-muted-foreground text-sm mt-1">Client: {project.client?.user?.companyName || 'N/A'}</p>
+                          <p className="text-muted-foreground text-sm mt-1">Client: {(() => {
+                            const u = project.booking?.client?.user;
+                            const name = u ? `${u.firstName || ''} ${u.lastName || ''}`.trim() : '';
+                            return u?.companyName || name || 'N/A';
+                          })()}</p>
                         </div>
                         <span className="px-3 py-1 bg-primary text-white text-xs uppercase tracking-widest font-semibold rounded-sm">
                           {project.status.replace('_', ' ')}
