@@ -6,6 +6,8 @@ import { Reveal } from '@/components/ui/Reveal';
 import { Container } from '@/components/ui/Container';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { fetchAPI } from '@/lib/api-client';
@@ -156,85 +158,108 @@ export default function Contact() {
           {/* Right: Form */}
           <div className="w-full md:w-7/12">
             <Reveal direction="up" delay={0.2}>
-              <Card className="shadow-md">
+              <Card className="shadow-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-6 sm:p-8 rounded-2xl">
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-muted-foreground mb-2" htmlFor="firstName">First Name *</label>
-                      <input 
+                      <label className="block text-xs uppercase tracking-wider font-semibold text-zinc-700 dark:text-zinc-300 mb-2" htmlFor="firstName">
+                        First Name <span className="text-red-500">*</span>
+                      </label>
+                      <Input 
                         type="text" 
                         id="firstName" 
                         required
                         value={formData.firstName}
                         onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                        className="input-premium" 
+                        placeholder="e.g. Rahul"
+                        className="border-2 border-zinc-300 dark:border-zinc-700 bg-zinc-50/80 dark:bg-zinc-900/90 text-foreground focus:bg-white dark:focus:bg-zinc-900 shadow-xs" 
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-muted-foreground mb-2" htmlFor="lastName">Last Name</label>
-                      <input 
+                      <label className="block text-xs uppercase tracking-wider font-semibold text-zinc-700 dark:text-zinc-300 mb-2" htmlFor="lastName">
+                        Last Name
+                      </label>
+                      <Input 
                         type="text" 
                         id="lastName" 
                         value={formData.lastName}
                         onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                        className="input-premium" 
+                        placeholder="e.g. Sharma"
+                        className="border-2 border-zinc-300 dark:border-zinc-700 bg-zinc-50/80 dark:bg-zinc-900/90 text-foreground focus:bg-white dark:focus:bg-zinc-900 shadow-xs" 
                       />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-muted-foreground mb-2" htmlFor="email">Email Address *</label>
-                      <input 
+                      <label className="block text-xs uppercase tracking-wider font-semibold text-zinc-700 dark:text-zinc-300 mb-2" htmlFor="email">
+                        Email Address <span className="text-red-500">*</span>
+                      </label>
+                      <Input 
                         type="email" 
                         id="email" 
                         required
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        className="input-premium" 
+                        placeholder="name@example.com"
+                        className="border-2 border-zinc-300 dark:border-zinc-700 bg-zinc-50/80 dark:bg-zinc-900/90 text-foreground focus:bg-white dark:focus:bg-zinc-900 shadow-xs" 
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-muted-foreground mb-2" htmlFor="phone">Phone Number</label>
-                      <input 
+                      <label className="block text-xs uppercase tracking-wider font-semibold text-zinc-700 dark:text-zinc-300 mb-2" htmlFor="phone">
+                        Phone Number
+                      </label>
+                      <Input 
                         type="tel" 
                         id="phone" 
                         value={formData.phone}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        className="input-premium" 
-                        placeholder="+91 83105 31309"
+                        placeholder="+91 98765 43210 (optional)"
+                        className="border-2 border-zinc-300 dark:border-zinc-700 bg-zinc-50/80 dark:bg-zinc-900/90 text-foreground focus:bg-white dark:focus:bg-zinc-900 shadow-xs" 
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-muted-foreground mb-2" htmlFor="inquiryType">Inquiry Type</label>
-                    <select 
-                      id="inquiryType" 
-                      value={formData.inquiryType}
-                      onChange={(e) => setFormData({ ...formData, inquiryType: e.target.value })}
-                      className="input-premium"
-                    >
-                      <option value="Production Services">Production Services</option>
-                      <option value="Talent Representation">Talent Representation</option>
-                      <option value="Press / Media">Press / Media</option>
-                      <option value="Other">Other</option>
-                    </select>
+                    <label className="block text-xs uppercase tracking-wider font-semibold text-zinc-700 dark:text-zinc-300 mb-2" htmlFor="inquiryType">
+                      Inquiry Type
+                    </label>
+                    <div className="relative">
+                      <select 
+                        id="inquiryType" 
+                        value={formData.inquiryType}
+                        onChange={(e) => setFormData({ ...formData, inquiryType: e.target.value })}
+                        className="flex h-12 w-full appearance-none rounded-xl border-2 border-zinc-300 dark:border-zinc-700 bg-zinc-50/80 dark:bg-zinc-900/90 px-4 py-2.5 text-base text-foreground focus:border-red-500 focus:bg-white dark:focus:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-red-500/20 shadow-xs transition-all cursor-pointer font-medium"
+                      >
+                        <option value="Production Services">Production Services</option>
+                        <option value="Talent Representation">Talent Representation</option>
+                        <option value="Press / Media">Press / Media</option>
+                        <option value="Other">Other</option>
+                      </select>
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-zinc-500">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </div>
+                    </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-muted-foreground mb-2" htmlFor="message">Message *</label>
-                    <textarea 
+                    <label className="block text-xs uppercase tracking-wider font-semibold text-zinc-700 dark:text-zinc-300 mb-2" htmlFor="message">
+                      Message <span className="text-red-500">*</span>
+                    </label>
+                    <Textarea 
                       id="message" 
                       rows={5} 
                       required
                       value={formData.message}
                       onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                      className="input-premium resize-none"
-                    ></textarea>
+                      placeholder="Tell us about your project, timeline, and requirements..."
+                      className="border-2 border-zinc-300 dark:border-zinc-700 bg-zinc-50/80 dark:bg-zinc-900/90 text-foreground focus:bg-white dark:focus:bg-zinc-900 shadow-xs min-h-[130px] resize-none"
+                    ></Textarea>
                   </div>
 
-                  <Button type="submit" disabled={submitting} size="lg" className="w-full justify-center">
+                  <Button type="submit" disabled={submitting} size="lg" className="w-full justify-center text-base font-semibold py-4 rounded-xl shadow-md">
                     {submitting ? "Sending Message..." : "Send Message"}
                   </Button>
                 </form>
