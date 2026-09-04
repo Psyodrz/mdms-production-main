@@ -3,8 +3,9 @@ const fs = require('fs');
 const path = require('path');
 const dotenv = require('dotenv');
 
-// Load environment variables
-const envPath = path.join(__dirname, 'apps', 'api', '.env.local');
+// Project root & output directory
+const projectRoot = path.join(__dirname, '..', '..');
+const envPath = path.join(projectRoot, 'apps', 'api', '.env.local');
 if (fs.existsSync(envPath)) {
   const envConfig = dotenv.parse(fs.readFileSync(envPath));
   for (const k in envConfig) {
@@ -30,7 +31,7 @@ function arrayToCsv(headers, rows) {
 async function exportData() {
   console.log('🚀 Starting Data Export for Excel...');
 
-  const exportDir = path.join(__dirname, 'exports_excel');
+  const exportDir = path.join(__dirname, 'output');
   if (!fs.existsSync(exportDir)) {
     fs.mkdirSync(exportDir, { recursive: true });
   }

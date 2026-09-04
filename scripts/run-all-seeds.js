@@ -3,8 +3,11 @@ const fs = require('fs');
 const path = require('path');
 const dotenv = require('dotenv');
 
+// Project root directory
+const projectRoot = path.join(__dirname, '..');
+
 // Load environment variables from apps/api/.env.local
-const envPath = path.join(__dirname, 'apps', 'api', '.env.local');
+const envPath = path.join(projectRoot, 'apps', 'api', '.env.local');
 if (fs.existsSync(envPath)) {
   console.log(`Loading env from ${envPath}...`);
   const envConfig = dotenv.parse(fs.readFileSync(envPath));
@@ -32,7 +35,7 @@ console.log('Starting seed sequence targeting remote database...');
 console.log('Database URL:', process.env.DATABASE_URL ? 'Loaded (masked)' : 'Missing');
 
 for (const seed of seeds) {
-  const filePath = path.join(__dirname, seed.file);
+  const filePath = path.join(projectRoot, seed.file);
   if (!fs.existsSync(filePath)) {
     console.warn(`⚠️  Seed file not found: ${seed.file}`);
     continue;

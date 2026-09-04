@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { Reveal } from '@/components/ui/Reveal';
 import { Container } from '@/components/ui/Container';
-import { Camera, Film, Users, Sparkles, ArrowUpRight, Award, CircleDot } from 'lucide-react';
+import { Camera, Film, Users, Sparkles, ArrowUpRight, Award, CircleDot, Mail, Phone, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { serverFetchAPI } from '@/lib/server-api-client';
@@ -151,6 +151,53 @@ export default async function TeamPage() {
               ))}
             </div>
           )}
+
+          {/* Executive Contact & Representation Banner */}
+          <section className="mt-24">
+            <Reveal direction="up">
+              <div className="rounded-3xl border border-border bg-card/80 backdrop-blur-xl p-8 sm:p-12 shadow-2xl relative overflow-hidden text-center max-w-4xl mx-auto">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-brand/10 rounded-full blur-3xl pointer-events-none" />
+                <h3 className="text-3xl font-serif text-foreground mb-4">Connect With Our Creative Leadership</h3>
+                <p className="text-muted-foreground font-light max-w-xl mx-auto mb-8 leading-relaxed">
+                  Looking to consult with our lead producers, book talent, or explore career opportunities? Direct your communication to our dedicated desks.
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-left">
+                  <a
+                    href="mailto:yogsathi@gmail.com"
+                    className="p-5 rounded-2xl bg-surface border border-border hover:border-brand/40 transition-colors flex flex-col gap-2 group"
+                  >
+                    <div className="flex items-center gap-2 text-brand">
+                      <Mail className="w-4 h-4" />
+                      <span className="text-xs font-mono font-bold uppercase tracking-wider">General & Bookings</span>
+                    </div>
+                    <span className="text-foreground text-sm font-mono group-hover:text-brand transition-colors break-all">yogsathi@gmail.com</span>
+                  </a>
+
+                  <a
+                    href="mailto:hr@jcrm.in"
+                    className="p-5 rounded-2xl bg-surface border border-border hover:border-brand/40 transition-colors flex flex-col gap-2 group"
+                  >
+                    <div className="flex items-center gap-2 text-brand">
+                      <Users className="w-4 h-4" />
+                      <span className="text-xs font-mono font-bold uppercase tracking-wider">HR & Recruitment</span>
+                    </div>
+                    <span className="text-foreground text-sm font-mono group-hover:text-brand transition-colors break-all">hr@jcrm.in</span>
+                  </a>
+
+                  <a
+                    href="tel:+918310531309"
+                    className="p-5 rounded-2xl bg-surface border border-border hover:border-brand/40 transition-colors flex flex-col gap-2 group"
+                  >
+                    <div className="flex items-center gap-2 text-brand">
+                      <Phone className="w-4 h-4" />
+                      <span className="text-xs font-mono font-bold uppercase tracking-wider">Phone & WhatsApp</span>
+                    </div>
+                    <span className="text-foreground text-sm font-mono group-hover:text-brand transition-colors break-all">+91 83105 31309</span>
+                  </a>
+                </div>
+              </div>
+            </Reveal>
+          </section>
         </Container>
       </main>
     </>

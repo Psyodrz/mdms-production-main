@@ -195,7 +195,7 @@ export default function EmployeeRoster() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       className="w-full bg-[var(--color-base)] border border-[var(--color-border)] p-3 text-sm focus:border-[var(--color-primary)] outline-none text-foreground" 
-                      placeholder="e.g. s.roy@mpproduction.com"
+                      placeholder="e.g. hr@jcrm.in"
                       required 
                     />
                     <p className="text-[11px] text-muted-foreground mt-1">The user must exist or will be linked by email address.</p>

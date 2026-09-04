@@ -67,7 +67,7 @@ function SiteConfigContent() {
     companyName: 'MP Production',
     tagline: 'Crafting Cinematic Excellence & Digital Legacies.',
     copyrightText: `© ${new Date().getFullYear()} MP Production. All rights reserved.`,
-    contactEmail: 'contact@mpproductions.com',
+    contactEmail: 'yogsathi@gmail.com',
     contactPhone: '+91 83105 31309',
     contactAddress: 'Los Angeles / New York / Paris / Tokyo',
     socialLinks: [
@@ -756,7 +756,7 @@ function SiteConfigContent() {
                       id="footer-email"
                       value={footer.contactEmail}
                       onChange={(e) => setFooter(prev => ({ ...prev, contactEmail: e.target.value }))}
-                      placeholder="contact@mpproductions.com"
+                      placeholder="yogsathi@gmail.com"
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
@@ -765,7 +765,7 @@ function SiteConfigContent() {
                       id="footer-phone"
                       value={footer.contactPhone}
                       onChange={(e) => setFooter(prev => ({ ...prev, contactPhone: e.target.value }))}
-                      placeholder="+1 (555) 123-4567"
+                      placeholder="+91 83105 31309"
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">

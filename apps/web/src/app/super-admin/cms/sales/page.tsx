@@ -845,7 +845,7 @@ export default function SalesManagementPage() {
                 <label className="block font-semibold mb-1 text-muted-foreground">Phone Number</label>
                 <Input
                   required
-                  placeholder="+91 98765 43210"
+                  placeholder="+91 83105 31309"
                   value={leadForm.phone}
                   onChange={e => setLeadForm({ ...leadForm, phone: e.target.value })}
                 />
@@ -975,7 +975,7 @@ export default function SalesManagementPage() {
                 <label className="block font-semibold mb-1 text-muted-foreground">Referrer Email</label>
                 <Input
                   type="email"
-                  placeholder="e.g. vikram@example.com"
+                  placeholder="e.g. yogsathi@gmail.com"
                   value={referralForm.referrerEmail}
                   onChange={e => setReferralForm({ ...referralForm, referrerEmail: e.target.value })}
                 />

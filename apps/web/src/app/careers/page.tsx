@@ -5,7 +5,7 @@ import { Container } from '@/components/ui/Container';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import Link from 'next/link';
-import { Palette, Camera, Home, BookOpen, HeartPulse, Sun } from 'lucide-react';
+import { Palette, Camera, Home, BookOpen, HeartPulse, Sun, Mail, MessageSquare } from 'lucide-react';
 
 const openPositions = [
   {
@@ -152,6 +152,37 @@ export default function Careers() {
                 </Reveal>
               ))}
             </div>
+          </section>
+
+          {/* Direct HR Application CTA Banner */}
+          <section className="mt-20">
+            <Reveal direction="up">
+              <div className="rounded-3xl border border-border bg-card/80 backdrop-blur-xl p-8 sm:p-12 shadow-2xl relative overflow-hidden text-center max-w-4xl mx-auto">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-brand/10 rounded-full blur-3xl pointer-events-none" />
+                <h3 className="text-3xl font-serif text-foreground mb-4">Don't See Your Role Listed?</h3>
+                <p className="text-muted-foreground font-light max-w-xl mx-auto mb-8 leading-relaxed">
+                  We are always seeking world-class talent, creative directors, editors, colorists, and coordinators. Send your portfolio, showreel, or resume directly to our HR team.
+                </p>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                  <a
+                    href="mailto:hr@jcrm.in"
+                    className="w-full sm:w-auto px-6 py-3.5 rounded-full bg-primary text-primary-foreground font-medium hover:opacity-90 transition-all flex items-center justify-center gap-2 text-sm shadow-md"
+                  >
+                    <Mail className="w-4 h-4" />
+                    <span>Email HR: hr@jcrm.in</span>
+                  </a>
+                  <a
+                    href="https://wa.me/918310531309?text=Hi%20HR%20Team!%20I%20am%20interested%20in%20career%20opportunities%20at%20MP%20Production."
+                    target="_blank"
+                    rel="noreferrer"
+                    className="w-full sm:w-auto px-6 py-3.5 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium transition-all flex items-center justify-center gap-2 text-sm shadow-md"
+                  >
+                    <MessageSquare className="w-4 h-4" />
+                    <span>WhatsApp HR: +91 83105 31309</span>
+                  </a>
+                </div>
+              </div>
+            </Reveal>
           </section>
 
         </Container>

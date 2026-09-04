@@ -19,7 +19,7 @@ export default function SecurityCompliance() {
             <h2 className="text-foreground font-serif text-2xl">Auditing</h2>
             <p>Administrative actions are recorded in an audit log for accountability and traceability.</p>
             <h2 className="text-foreground font-serif text-2xl">Reporting an Issue</h2>
-            <p>Found a vulnerability? Please report it responsibly to <a href="mailto:security@mpproduction.com" className="text-primary">security@mpproduction.com</a>.</p>
+            <p>Found a vulnerability or security concern? Please report it responsibly to our security cell at <a href="mailto:yogsathi@gmail.com" className="text-primary font-mono">yogsathi@gmail.com</a> or reach out via Phone/WhatsApp at <a href="tel:+918310531309" className="text-primary font-mono">+91 83105 31309</a>.</p>
           </div>
         </Container>
       </main>

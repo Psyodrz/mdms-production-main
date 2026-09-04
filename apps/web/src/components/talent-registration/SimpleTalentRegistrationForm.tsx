@@ -449,7 +449,7 @@ export function SimpleTalentRegistrationForm() {
                       <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                       <input
                         type="tel"
-                        placeholder="9876543210"
+                        placeholder="8310531309"
                         value={formData.mobile}
                         onChange={(e) => setFormData({ ...formData, mobile: e.target.value.replace(/[^0-9]/g, '') })}
                         className="input-premium bg-surface border border-border focus:border-brand rounded-xl text-foreground font-medium placeholder:text-muted-foreground/60 focus:bg-background w-full py-3.5 pl-11 pr-4 transition-colors"
@@ -467,7 +467,7 @@ export function SimpleTalentRegistrationForm() {
                     <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <input
                       type="email"
-                      placeholder="talent@mpproductions.com"
+                      placeholder="hr@jcrm.in"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       className="input-premium bg-surface border border-border focus:border-brand rounded-xl text-foreground font-medium placeholder:text-muted-foreground/60 focus:bg-background w-full py-3.5 pl-11 pr-4 transition-colors"

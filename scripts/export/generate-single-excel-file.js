@@ -4,8 +4,9 @@ const fs = require('fs');
 const path = require('path');
 const dotenv = require('dotenv');
 
-// Load env
-const envPath = path.join(__dirname, 'apps', 'api', '.env.local');
+// Project root
+const projectRoot = path.join(__dirname, '..', '..');
+const envPath = path.join(projectRoot, 'apps', 'api', '.env.local');
 if (fs.existsSync(envPath)) {
   const envConfig = dotenv.parse(fs.readFileSync(envPath));
   for (const k in envConfig) {
@@ -286,8 +287,12 @@ async function generateMasterExcel() {
   }));
   setupSheet('Contact Inquiries', contactHeaders, contactRows);
 
-  // Save to single XLSX file
-  const outputFile = path.join(__dirname, 'MP_Production_Master_Database.xlsx');
+  // Save to single XLSX file in output directory
+  const outputDir = path.join(__dirname, 'output');
+  if (!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir, { recursive: true });
+  }
+  const outputFile = path.join(outputDir, 'MP_Production_Master_Database.xlsx');
   await workbook.xlsx.writeFile(outputFile);
 
   console.log(`\n🎉 MASTER EXCEL WORKBOOK GENERATED SUCCESSFULLY!`);

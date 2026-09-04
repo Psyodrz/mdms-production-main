@@ -29,8 +29,8 @@ async function main() {
       companyName: 'MP Production',
       tagline: 'Crafting Cinematic Excellence & Digital Legacies.',
       copyright: `© ${new Date().getFullYear()} MP Production. All rights reserved.`,
-      contactEmail: 'hello@mpproduction.com',
-      contactPhone: '+91 86373 73116',
+      contactEmail: 'yogsathi@gmail.com',
+      contactPhone: '+91 8310531309',
       contactAddress: 'Mumbai, India',
       socialLinks: { instagram: 'https://instagram.com/mpproduction', linkedin: 'https://linkedin.com/company/mpproduction', youtube: 'https://youtube.com/mpproduction' },
       sections: [

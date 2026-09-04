@@ -261,13 +261,13 @@ export default function PrivacyPolicy() {
               <div className="bg-card border border-border p-6 sm:p-8 rounded-2xl space-y-3 text-foreground mt-4">
                 <h3 className="font-bold text-lg text-brand">MP Production Privacy & Data Protection Office</h3>
                 <p className="text-muted-foreground text-sm">
-                  <strong>Data Protection Officer (DPO):</strong> <a href="mailto:privacy@mpproduction.com" className="text-foreground underline">privacy@mpproduction.com</a> / <a href="mailto:hello@mpproduction.com" className="text-foreground underline">hello@mpproduction.com</a>
+                  <strong>Data Protection Officer (DPO):</strong> <a href="mailto:yogsathi@gmail.com" className="text-foreground underline font-mono">yogsathi@gmail.com</a> / <a href="mailto:hr@jcrm.in" className="text-foreground underline font-mono">hr@jcrm.in</a>
                 </p>
                 <p className="text-muted-foreground text-sm">
                   <strong>Corporate Studio HQ:</strong> Studio 4B, Film City Complex, Goregaon East, Mumbai, Maharashtra 400065, India
                 </p>
                 <p className="text-muted-foreground text-sm">
-                  <strong>Grievance Response Time:</strong> Within 48 business hours
+                  <strong>Grievance & Privacy Helpline:</strong> <a href="tel:+918310531309" className="text-foreground underline font-mono">+91 83105 31309</a> (Response within 48 business hours)
                 </p>
               </div>
             </section>

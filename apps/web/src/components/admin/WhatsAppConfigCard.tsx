@@ -31,7 +31,7 @@ export const WhatsAppConfigCard: React.FC = () => {
     inboxwaApiKey: '',
     inboxwaInstanceId: '',
     inboxwaBaseUrl: 'https://inboxwa.online/api/v1',
-    inboxwaPhoneNumber: '',
+    inboxwaPhoneNumber: '918310531309',
     autoReplyEnabled: true,
   });
 

@@ -224,8 +224,18 @@ export function HoverFooter() {
   const contactInfo = [
     {
       icon: <Mail size={18} className="text-primary" />,
-      text: footerConfig?.contactEmail || "hello@mpproduction.com",
-      href: `mailto:${footerConfig?.contactEmail || "hello@mpproduction.com"}`,
+      emails: [
+        {
+          label: "Inquiries:",
+          text: footerConfig?.contactEmail || "yogsathi@gmail.com",
+          href: `mailto:${footerConfig?.contactEmail || "yogsathi@gmail.com"}`,
+        },
+        {
+          label: "HR:",
+          text: "hr@jcrm.in",
+          href: "mailto:hr@jcrm.in",
+        },
+      ],
     },
     {
       icon: <Phone size={18} className="text-primary" />,
@@ -297,8 +307,23 @@ export function HoverFooter() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 py-8 mb-10 bg-(--cinematic-bg-elevated)/60 backdrop-blur-2xl rounded-3xl p-8 border border-(--cinematic-border) shadow-xl">
           {contactInfo.map((item, i) => (
             <div key={i} className="flex items-center space-x-4">
-              <div className="p-3 rounded-2xl bg-brand/15 border border-brand/30 text-brand">{item.icon}</div>
-              {item.href ? (
+              <div className="p-3 rounded-2xl bg-brand/15 border border-brand/30 text-brand shrink-0">{item.icon}</div>
+              {item.emails ? (
+                <div className="flex flex-col gap-0.5 font-mono text-xs sm:text-sm tracking-wide">
+                  {item.emails.map((em, emIdx) => (
+                    <a
+                      key={emIdx}
+                      href={em.href}
+                      data-cursor="hover"
+                      data-cursor-label="CONTACT"
+                      className="text-(--cinematic-text-muted) hover:text-brand transition-colors break-all"
+                    >
+                      <span className="text-brand/80 font-medium mr-1">{em.label}</span>
+                      {em.text}
+                    </a>
+                  ))}
+                </div>
+              ) : item.href ? (
                 <a
                   href={item.href}
                   data-cursor="hover"

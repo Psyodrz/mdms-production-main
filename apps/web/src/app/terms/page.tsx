@@ -259,13 +259,13 @@ export default function TermsOfService() {
               <div className="bg-card border border-border p-6 sm:p-8 rounded-2xl space-y-3 text-foreground mt-4">
                 <h3 className="font-bold text-lg text-brand">MP Production Corporate Legal Cell</h3>
                 <p className="text-muted-foreground text-sm">
-                  <strong>Legal Email:</strong> <a href="mailto:legal@mpproduction.com" className="text-foreground underline">legal@mpproduction.com</a> / <a href="mailto:hello@mpproduction.com" className="text-foreground underline">hello@mpproduction.com</a>
+                  <strong>Legal & Corporate Email:</strong> <a href="mailto:yogsathi@gmail.com" className="text-foreground underline font-mono">yogsathi@gmail.com</a> / <a href="mailto:hr@jcrm.in" className="text-foreground underline font-mono">hr@jcrm.in</a>
                 </p>
                 <p className="text-muted-foreground text-sm">
                   <strong>Corporate Studio HQ:</strong> Studio 4B, Film City Complex, Goregaon East, Mumbai, Maharashtra 400065, India
                 </p>
                 <p className="text-muted-foreground text-sm">
-                  <strong>Support Desk:</strong> +91 83105 31309 (Mon – Fri, 10:00 AM – 7:00 PM IST)
+                  <strong>Support Desk:</strong> <a href="tel:+918310531309" className="text-foreground underline font-mono">+91 83105 31309</a> (Mon – Fri, 10:00 AM – 7:00 PM IST)
                 </p>
               </div>
             </section>

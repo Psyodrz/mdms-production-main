@@ -1084,7 +1084,7 @@ export default function BecomeAYouTuberPage({ defaultCategory = 'ALL' }: { defau
                     <Input
                       type="email"
                       required
-                      placeholder="rahul@creator.com"
+                      placeholder="yogsathi@gmail.com"
                       value={accessForm.email}
                       onChange={e => setAccessForm({ ...accessForm, email: e.target.value })}
                       className="rounded-xl border-border bg-card"
@@ -1095,7 +1095,7 @@ export default function BecomeAYouTuberPage({ defaultCategory = 'ALL' }: { defau
                     <label className="block font-semibold mb-1 text-muted-foreground">WhatsApp Number (For Instant Payment Link) *</label>
                     <Input
                       required
-                      placeholder="+91 98765 43210"
+                      placeholder="+91 83105 31309"
                       value={accessForm.phone}
                       onChange={e => setAccessForm({ ...accessForm, phone: e.target.value })}
                       className="rounded-xl border-border bg-card"

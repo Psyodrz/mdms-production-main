@@ -125,14 +125,28 @@ export default function Contact() {
                 </div>
                 <div>
                   <h3 className="text-foreground font-semibold uppercase tracking-wider text-sm mb-2">Direct Phone & WhatsApp</h3>
-                  <a href="tel:+918310531309" className="text-primary hover:underline font-medium block">
+                  <a href="tel:+918310531309" className="text-primary hover:underline font-medium block text-base">
                     +91 83105 31309
+                  </a>
+                  <a
+                    href="https://wa.me/918310531309"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-xs text-emerald-500 hover:text-emerald-400 underline font-medium inline-block mt-1"
+                  >
+                    Chat on WhatsApp (Instant Support) →
                   </a>
                 </div>
                 <div>
-                  <h3 className="text-foreground font-semibold uppercase tracking-wider text-sm mb-2">General Inquiries</h3>
-                  <a href="mailto:hello@mpproductions.com" className="text-primary hover:underline">
-                    hello@mpproductions.com
+                  <h3 className="text-foreground font-semibold uppercase tracking-wider text-sm mb-2">General Inquiries & Bookings</h3>
+                  <a href="mailto:yogsathi@gmail.com" className="text-primary hover:underline font-mono text-sm block">
+                    yogsathi@gmail.com
+                  </a>
+                </div>
+                <div>
+                  <h3 className="text-foreground font-semibold uppercase tracking-wider text-sm mb-2">HR, Talent & Careers</h3>
+                  <a href="mailto:hr@jcrm.in" className="text-primary hover:underline font-mono text-sm block">
+                    hr@jcrm.in
                   </a>
                 </div>
               </div>

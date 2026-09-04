@@ -376,7 +376,7 @@ export class WhatsappService implements OnModuleInit {
   async handleIncomingMessage(fromPhone: string, text: string, messageId: string) {
     this.logger.log(`Incoming WhatsApp message from ${fromPhone}: ${text}`);
 
-    const autoReplyText = `Hi! Thanks for reaching out to MP Production on WhatsApp. 🎬\n\nWe have received your query: "${text.substring(0, 50)}..."\n\nOur team is working on your request and will connect with you shortly. You can also view active projects at https://mpproduction.com/client-portal`;
+    const autoReplyText = `Hi! Thanks for reaching out to MP Production on WhatsApp. 🎬\n\nWe have received your query: "${text.substring(0, 50)}..."\n\nOur team is working on your request and will connect with you shortly. You can also reach us directly at yogsathi@gmail.com (general) or hr@jcrm.in (careers/talent), or view active projects at https://mpproduction.com/client-portal`;
 
     await this.sendMessage(fromPhone, autoReplyText);
   }
